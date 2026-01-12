@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell:*)",
+      "Bash(find:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(head:*)",
+      "WebSearch",
+      "Bash(dir:*)",
+      "Bash(php -r:*)",
+      "Bash(php artisan tinker:*)",
+      "Bash(php artisan config:clear:*)",
+      "Bash(git checkout:*)",
+      "Bash(php artisan:*)",
+      "Bash(php copy_translations.php:*)",
+      "Bash(npm run build)",
+      "Bash(php update_german_translations.php:*)",
+      "Bash(php check_terms.php:*)",
+      "Bash(php update_all_german_translations.php:*)",
+      "Bash(php:*)",
+      "Bash(ls:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,98 @@
+{
+    "name": "mega-sign-rental/erp-2024",
+    "type": "project",
+    "description": "Mega Sign Rental ERP 2024 - Laravel 9 Application with Vue 3 Frontend",
+    "keywords": [
+        "laravel",
+        "vue",
+        "erp",
+        "rental",
+        "inventory",
+        "mega-sign-rental"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "ext-intl": "*",
+        "barryvdh/laravel-dompdf": "^2.0",
+        "cbagdawala/laravel-id-generator": "1.*",
+        "genealabs/laravel-model-caching": "^12.0",
+        "guzzlehttp/guzzle": "^7.2",
+        "itsgoingd/clockwork": "^5.2",
+        "laracraft-tech/laravel-date-scopes": "^2.4",
+        "laravel/cashier": "^15.0",
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/tinker": "^2.9",
+        "maatwebsite/excel": "^3.1",
+        "maennchen/zipstream-php": "^3.1",
+        "mailersend/laravel-driver": "^v2.6.1",
+        "mpdf/mpdf": "^8.2",
+        "opcodesio/log-viewer": "^v3.14.0",
+        "php-open-source-saver/jwt-auth": "^2.0",
+        "picqer/php-barcode-generator": "^2.4",
+        "predis/predis": "^2.2",
+        "riskihajar/terbilang": "^2.0",
+        "spatie/laravel-medialibrary": "^11.0"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "laravel/boost": "^1.8",
+        "laravel/pint": "^1.13",
+        "laravel/sail": "^1.26",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.1",
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-laravel": "^3.2",
+        "phpunit/phpunit": "^11.0",
+        "spatie/laravel-ignition": "^2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        },
+        "files": [
+            "app/Helpers/Auth.php",
+            "app/Helpers/System.php",
+            "app/Helpers/Response.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

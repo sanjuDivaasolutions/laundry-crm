@@ -1,0 +1,32 @@
+.multiselect-tag {
+  background: #000 !important;
+}
+
+.multiselect-tag i:before {
+  color: #fff !important;
+}
+
+.multiselect-search input {
+  @extend .form-control;
+  @extend .form-control-solid;
+}
+
+.menu-item .menu-title {
+  font-weight: 600 !important;
+}
+
+.modal-fullscreen {
+  padding: 30px !important;
+}
+
+[data-theme="light"] {
+  .modal-header {
+    background-color: var(--kt-primary) !important;
+    color: #fff !important;
+    border-bottom: 1px solid #ddd !important;
+  }
+
+  .modal-header h2 {
+    color: #fff !important;
+  }
+}

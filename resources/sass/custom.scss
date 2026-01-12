@@ -1,0 +1,190 @@
+/*!
+ *
+ *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
+ *  *
+ *  *  This software is the confidential and proprietary information of Divaa Solutions
+ *  *  ("Confidential Information"). You shall not disclose such Confidential Information and
+ *  *  shall use it only in accordance with the terms of the license agreement you entered into
+ *  *  with Divaa Solutions.
+ *  *
+ *  *  Unauthorized copying of this file, via any medium is strictly prohibited.
+ *  *  Proprietary and confidential.
+ *  *
+ *  *  Last modified: 12/12/24, 11:30 am
+ *  *  Written by Chintan Bagdawala, 2024.
+ *
+ */
+
+@import "date-picker/main";
+
+// define font-weight variable
+$form-control-font-weight: 400;
+$table-border-color: #ddd;
+
+.multiselect.is-tags {
+
+  .multiselect-tags {
+    margin-top: 0 !important;
+  }
+
+  .multiselect-tag {
+    margin-bottom: 0 !important;
+  }
+
+  .multiselect-search input {
+    border: none !important;
+    margin: 0 0 0 3px !important;
+  }
+}
+
+.multiselect-option {
+  white-space: normal;
+  align-items: flex-start;
+  min-height: auto;
+  line-height: 1.4;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+[data-theme="light"] {
+  .form-control.form-control-solid, .multiselect-search input, .multiselect.is-tags .multiselect-input {
+    background-color: #fff;
+    color: #666;
+    border: 1px solid #ccc;
+    font-weight: $form-control-font-weight;
+    border-radius: 0.475rem;
+
+    &::placeholder {
+      font-weight: $form-control-font-weight;
+      color: #666;
+    }
+  }
+
+  .border {
+    border-color: #ccc !important;
+  }
+
+  .multiselect-tag {
+    background-color: #555 !important;
+    color: #eee;
+
+    i:before {
+      color: #eee !important;
+    }
+  }
+
+  .multiselect-placeholder {
+    color: #666;
+    font-weight: $form-control-font-weight;
+  }
+}
+
+[data-theme="dark"] {
+  .form-control.form-control-solid, .multiselect-search input, .multiselect.is-tags .multiselect-input {
+    background-color: var(--kt-input-solid-bg);
+    border: 1px solid #aaa;
+    color: #aaa;
+    font-weight: $form-control-font-weight;
+    border-radius: 0.475rem;
+
+    &::placeholder {
+      color: #aaa;
+    }
+  }
+
+  .border {
+    border-color: #aaa !important;
+  }
+
+  .multiselect-tag {
+    background-color: #ccc !important;
+    color: #222;
+
+    i:before {
+      color: #222 !important;
+    }
+  }
+
+  .multiselect-placeholder {
+    color: #666;
+    font-weight: $form-control-font-weight;
+  }
+}
+
+[data-theme="light"] {
+
+  .card {
+    border: 1px solid #ddd !important;
+    box-shadow: 0 0 10px 0 rgba(183, 192, 206, 0.2) !important;
+  }
+
+  .card .card-footer {
+    border-top: 1px solid #ddd !important;
+  }
+
+  /* generate bootstrap 5 table-bordered styles */
+  .table-bordered {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+    color: inherit;
+    border: 1px solid $table-border-color;
+    border-radius: 0.475rem;
+
+    thead {
+      background-color: inherit;
+      color: inherit;
+    }
+
+    th, td {
+      border: 1px solid $table-border-color;
+      padding: 0.5rem !important;
+      vertical-align: top;
+      border-radius: 0.475rem;
+    }
+
+    .table-sm th, .table-sm td {
+      padding: 0.3rem !important;
+    }
+
+    th {
+      font-weight: 500;
+    }
+
+    tbody tr td {
+      border-top: 1px solid $table-border-color;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 1px solid $table-border-color;
+    }
+
+    tbody tr td:first-child {
+      border-left: 1px solid $table-border-color;
+    }
+
+    tbody tr td:last-child {
+      border-right: 1px solid $table-border-color;
+    }
+
+    tfoot tr td, tfoot tr th {
+      border-top: 1px solid $table-border-color;
+      background-color: inherit;
+    }
+  }
+
+  .table-row-bordered, .table-row-bordered th, .table-row-bordered td {
+    border-color: $table-border-color !important;
+  }
+}
+
+.form-control, .multiselect-search input {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+[data-theme="dark"] {
+  --kt-primary: #688FC2;
+  --kt-text-primary: #688FC2;
+}

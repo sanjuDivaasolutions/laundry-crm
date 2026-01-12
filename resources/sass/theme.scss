@@ -1,0 +1,64 @@
+/*!
+ *
+ *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
+ *  *
+ *  *  This software is the confidential and proprietary information of Divaa Solutions
+ *  *  ("Confidential Information"). You shall not disclose such Confidential Information and
+ *  *  shall use it only in accordance with the terms of the license agreement you entered into
+ *  *  with Divaa Solutions.
+ *  *
+ *  *  Unauthorized copying of this file, via any medium is strictly prohibited.
+ *  *  Proprietary and confidential.
+ *  *
+ *  *  Last modified: 17/12/24, 11:41 am
+ *  *  Written by Chintan Bagdawala, 2024.
+ *
+ */
+
+// Bootstrap color system
+$white: #ffffff;
+
+// Theme colors
+// Primary
+$primary: #393185;
+$primary-active: #222222;
+$primary-light: #cad6e7;
+$primary-light-dark: #0c0e0f;
+$primary-inverse: $white;
+
+//Secondary
+$secondary: #888;
+$secondary-active: #222222;
+$secondary-light: #e2e3e5;
+$secondary-light-dark: #0c0e0f;
+$secondary-inverse: $white;
+
+// Success
+$success: #119d5a;
+$success-active: #47be7d;
+$success-light: #e8fff3;
+$success-light-dark: #1c3238;
+$success-inverse: $white;
+
+// Info
+$info: #6e4ff5;
+$info-active: #5014d0;
+$info-light: #f8f5ff;
+$info-light-dark: #2f264f;
+$info-inverse: $white;
+
+// Danger
+$danger: #E31E24;
+$danger-active: #d9214e;
+$danger-light: #fff5f8;
+$danger-light-dark: #3a2434;
+$danger-inverse: $white;
+
+// Warning
+$warning: #e1c913;
+$warning-active: #f1bc00;
+$warning-light: #fff8dd;
+$warning-light-dark: #392f28;
+$warning-inverse: $white;
+
+//$app-sidebar-dark-bg-color:                         #222222;

@@ -1,0 +1,325 @@
+<template>
+    <div class="columns">
+        <div class="column is-flex">
+            <VField v-if="searchFieldFilters.length">
+                <VControl>
+                    <input
+                        class="input"
+                        type="text"
+                        v-for="(s, idx) in searchFieldFilters"
+                        :id="s.name"
+                        :name="s.name"
+                        v-model="s.value"
+                        :placeholder="
+                            s.placeholder
+                                ? s.placeholder
+                                : 'Search & press enter...'
+                        "
+                        :key="'control-' + idx"
+                        @keyup.enter="handleSubmit"
+                    />
+                </VControl>
+            </VField>
+            <VButton
+                v-if="comFilters.length < 1"
+                icon="feather:search"
+                color="primary"
+                class="is-trigger ml-2"
+                @click="handleSubmit"
+            />
+            <VDropdown
+                class="is-pushed-mobile ml-2"
+                spaced
+                right
+                v-if="comFilters.length"
+            >
+                <template #button="{ open, toggle }">
+                    <VButton
+                        icon="feather:filter"
+                        color="primary"
+                        class="is-trigger"
+                        @click="toggle"
+                    />
+                </template>
+                <template #content="{ close }">
+                    <form
+                        name="form-search"
+                        @submit.prevent="handleSubmit(close)"
+                    >
+                        <div class="columns is-multiline p-5">
+                            <component
+                                v-for="(s, idx) in comFilters"
+                                :is="'filter-' + s.type.toLowerCase()"
+                                :c="s"
+                                :key="'control-' + idx"
+                                class="column is-12"
+                                :options="getOptions(s)"
+                                @entered="handleSubmit(close)"
+                            ></component>
+                            <div class="column is-6 text-center">
+                                <VButton
+                                    class="w-100"
+                                    icon="feather:search"
+                                    color="primary"
+                                    raised
+                                    :status="status"
+                                    :isLoading="loading"
+                                    :disabled="loading"
+                                >
+                                    Search
+                                </VButton>
+                            </div>
+                            <div class="column is-6 text-center">
+                                <VButton
+                                    class="w-100"
+                                    icon="feather:x"
+                                    @click="handleClear(close)"
+                                    :disabled="loading"
+                                    :class="{ disabled: loading }"
+                                    light
+                                    dark-outlined
+                                >
+                                    Clear
+                                </VButton>
+                            </div>
+                        </div>
+                    </form>
+                </template>
+            </VDropdown>
+            <VDropdown
+                class="is-pushed-mobile ml-2"
+                spaced
+                right
+                v-if="comActionButtons.length"
+            >
+                <template #button="{ open, toggle }">
+                    <VButton
+                        icon="feather:settings"
+                        color="danger"
+                        class="is-trigger"
+                        @click="toggle"
+                    ></VButton>
+                </template>
+                <template #content>
+                    <component
+                        v-for="(s, idx) in comActionButtons"
+                        :key="s.type + idx"
+                        :is="s.type"
+                        class="dropdown-item"
+                        @click.prevent="$globalEmit(s.event, s.eventPayload)"
+                        >{{ s.label }}</component
+                    >
+                </template>
+            </VDropdown>
+        </div>
+    </div>
+</template>
+
+<script>
+import FilterText from "@/components/magic-datatable/filter-plugin/controls/FilterText.vue";
+//import FilterCheck from "@/components/magic-datatable/filter-plugin/controls/FilterCheck";
+//import FilterSelect from "@/components/magic-datatable/filter-plugin/controls/FilterSelect";
+/*import FilterDateRange from "./controls/FilterDateRange";
+ */
+
+export default {
+    name: "GlobalFilter",
+    components: {
+        FilterText,
+        FilterCheck,
+        FilterSelect,
+        /*FilterDateRange,*/
+    },
+    props: {
+        filters: {
+            type: Array,
+            required: true,
+        },
+        query: {
+            type: Object,
+            required: true,
+        },
+        loading: {
+            type: Boolean,
+            required: true,
+        },
+        status: {
+            type: String,
+            default: "",
+        },
+        searchFieldOutside: {
+            type: Boolean,
+            default: true,
+        },
+        actionButtons: {
+            type: Array,
+            default: () => [],
+        },
+        columnChooserLabel: {
+            type: String,
+            default: "Column Chooser",
+        },
+        hasColumnChooser: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    data() {
+        return {
+            defaultQuery: {},
+            defaultFilters: [],
+            filterData: [],
+        };
+    },
+    computed: {
+        comFilters() {
+            if (this.searchFieldOutside) {
+                return this.defaultFilters.filter((f) => f.name !== "s");
+            }
+            return this.defaultFilters;
+        },
+        searchFieldFilters() {
+            if (this.searchFieldOutside) {
+                return this.defaultFilters.filter((f) => f.name === "s");
+            }
+            return [];
+        },
+        optionFields() {
+            return ["select"];
+        },
+        comActionButtons() {
+            const buttons = [];
+            if (this.hasColumnChooser && 1 === 2) {
+                buttons.push({
+                    type: this.getControlComponent("button"),
+                    label: this.columnChooserLabel,
+                    event: "initColumnChooser",
+                    eventPayload: true,
+                });
+            }
+            this.actionButtons.forEach((button) => {
+                buttons.push(button);
+            });
+            return buttons;
+        },
+    },
+    methods: {
+        getControlComponent(type) {
+            switch (type) {
+                case "button":
+                    return "a";
+                case "link":
+                    return "a";
+                default:
+                    return null;
+            }
+        },
+        setupValues(obj) {
+            this.defaultFilters.forEach((s) => {
+                if (this[obj].hasOwnProperty(s.name)) {
+                    s.value = this[obj][s.name];
+                }
+            });
+        },
+        getOptions(c) {
+            const output =
+                typeof c.option_source_output !== "undefined"
+                    ? c.option_source_output
+                    : c.option_source;
+            const filterData = this.filterData[output];
+            if (typeof filterData === "undefined") {
+                return this.optionFields.indexOf(c.type) !== -1
+                    ? c.options
+                    : [];
+            }
+            return filterData;
+        },
+        handleSubmit(c) {
+            const params = _.cloneDeep(this.query);
+            this.defaultFilters.forEach((s) => {
+                if (typeof s.value === "object" && s.value !== null) {
+                    if (s.type === "select") {
+                        params[s.name] = s.value.join(",");
+                    } else if (s.type === "date-range") {
+                        if (
+                            moment(s.value.startDate).isValid() &&
+                            moment(s.value.endDate).isValid()
+                        ) {
+                            params[s.name] =
+                                moment(s.value.startDate).format("MM/DD/YYYY") +
+                                " to " +
+                                moment(s.value.endDate).format("MM/DD/YYYY");
+                        }
+                    }
+                } else {
+                    if (s.type === "check" && s.cast === "integer") {
+                        params[s.name] = s.value ? 1 : 0;
+                    } else {
+                        params[s.name] = s.value;
+                    }
+                }
+            });
+            this.$emit("submit", params);
+            if (typeof c === "function") {
+                c();
+            }
+        },
+        handleClear(c) {
+            this.$emit("submit", this.defaultQuery);
+            this.$globalEmit("clear-global-filter");
+            this.defaultFilters = _.cloneDeep(this.filters);
+            this.setupValues("defaultQuery");
+            c();
+        },
+        fetchFilterData() {
+            return new Promise((resolve, reject) => {
+                const optionFilters = this.filters.filter((s) => {
+                    return (
+                        this.optionFields.indexOf(s.type) !== -1 &&
+                        !s.options.length
+                    );
+                });
+                if (optionFilters.length) {
+                    const filterDataSources = this.$pluck(
+                        optionFilters,
+                        "option_source"
+                    );
+                    if (filterDataSources.length) {
+                        axios
+                            .get("filter-meta/", {
+                                params: {
+                                    filters: filterDataSources.join(","),
+                                },
+                            })
+                            .then((response) => {
+                                this.filterData = response.data;
+                                resolve(response);
+                            })
+                            .catch((error) => {
+                                reject(error);
+                            });
+                    }
+                }
+            });
+        },
+    },
+    beforeDestroy() {
+        this.defaultQuery = {};
+        this.defaultFilters = [];
+    },
+    mounted() {
+        this.defaultQuery = _.cloneDeep(this.query);
+        this.defaultFilters = _.cloneDeep(this.filters);
+        this.setupValues("query");
+    },
+    created() {
+        this.fetchFilterData();
+    },
+};
+</script>
+
+<style scoped>
+.w-100 {
+    width: 100% !important;
+}
+</style>
