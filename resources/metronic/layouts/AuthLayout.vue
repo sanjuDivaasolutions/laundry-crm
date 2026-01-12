@@ -21,7 +21,7 @@
             class="d-flex flex-column flex-lg-row-fluid w-lg-50 p-10 order-2 order-lg-1"
         >
             <div class="d-flex flex-center flex-column flex-lg-row-fluid">
-                <div class="<?php echo $params['wrapperClass']?> p-10">
+                <div class="d-flex flex-center flex-column flex-lg-row-fluid p-10">
                     <router-view></router-view>
                 </div>
             </div>

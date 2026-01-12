@@ -15,7 +15,81 @@ import { systemRoutes } from "@common@/data/routes";
 import i18n from "@/core/plugins/i18n";
 // @ts-ignore
 import { useAbilityStore } from "@/stores/ability";
-const routes: Array<RouteRecordRaw> = systemRoutes;
+const routes: Array<RouteRecordRaw> = [
+    {
+        path: "/",
+        redirect: "/dashboard",
+        component: () => import("@/layouts/main-layout/MainLayout.vue"),
+        meta: {
+            middleware: "auth",
+        },
+        children: systemRoutes[0].children,
+    },
+    {
+        path: "/",
+        component: () => import("@/layouts/AuthLayout.vue"),
+        children: [
+            {
+                path: "/sign-in",
+                name: "sign-in",
+                component: () =>
+                    import("@/views/auth/SignIn.vue"),
+                meta: {
+                    pageTitle: "general.fields.signIn",
+                },
+            },
+            {
+                path: "/sign-up",
+                name: "sign-up",
+                component: () =>
+                    import("@/views/auth/SignUp.vue"),
+                meta: {
+                    pageTitle: "Sign Up",
+                },
+            },
+            {
+                path: "/password-reset",
+                name: "password-reset",
+                component: () =>
+                    import("@/views/auth/PasswordReset.vue"),
+                meta: {
+                    pageTitle: "Password Reset",
+                },
+            },
+            {
+                path: "/reset-password",
+                name: "reset-password",
+                component: () =>
+                    import("@/views/auth/ResetPassword.vue"),
+                meta: {
+                    pageTitle: "Reset Password",
+                },
+            },
+            {
+                path: "/404",
+                name: "404",
+                component: () =>
+                    import("@/views/auth/Error404.vue"),
+                meta: {
+                    pageTitle: "Error 404",
+                },
+            },
+            {
+                path: "/500",
+                name: "500",
+                component: () =>
+                    import("@/views/auth/Error500.vue"),
+                meta: {
+                    pageTitle: "Error 500",
+                },
+            },
+        ],
+    },
+    {
+        path: "/:pathMatch(.*)*",
+        redirect: "/404",
+    },
+];
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -38,33 +112,30 @@ router.beforeEach((to, from, next) => {
     // reset config to initial state
     configStore.resetLayoutConfig();
 
+    // verify auth token before each page change
+    authStore.verifyAuth();
+
     // before page access check if page requires authentication
     if (to.meta.middleware == "auth") {
-        // verify auth token before each page change for protected routes only
-        const verification = authStore.verifyAuth();
-        verification.catch(() => {
-            next({ name: "sign-in" });
-        });
-
         if (authStore.isAuthenticated) {
-            if (authStore.user.redirect && to.name != authStore.user.redirect) {
-                console.log("redirect to", authStore.user.redirect);
-                const name = authStore.user.redirect;
-                next({ name: name });
-            } else {
-                // current page view title
+            // current page view title
+            if (to.meta.pageTitle) {
                 setDocumentTitle(i18n.global.t(to.meta.pageTitle));
-                next();
             }
+            next();
         } else {
             // current page view title
-            setDocumentTitle(i18n.global.t(to.meta.pageTitle));
+            if (to.meta.pageTitle) {
+                setDocumentTitle(i18n.global.t(to.meta.pageTitle));
+            }
             next({ name: "sign-in" });
         }
     } else {
         // For public routes (auth pages), don't verify auth
         // current page view title
-        setDocumentTitle(i18n.global.t(to.meta.pageTitle));
+        if (to.meta.pageTitle) {
+            setDocumentTitle(i18n.global.t(to.meta.pageTitle));
+        }
         next();
     }
 

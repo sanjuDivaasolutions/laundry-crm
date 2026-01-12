@@ -51,6 +51,7 @@ class SearchApiController extends Controller
 
         $result = $this->getOptionData($camelType);
         if ($result === false) {
+            \Log::error("SearchApiController Options: Invalid search type '$type' (Camel: '$camelType')");
             return errorResponse('Invalid search type');
         }
 
@@ -65,6 +66,7 @@ class SearchApiController extends Controller
             $camelType = Str::camel($type);
             $result = $this->getOptionData($camelType);
             if ($result === false) {
+                \Log::error("SearchApiController Bulk: Invalid search type '$type' (Camel: '$camelType')");
                 return errorResponse('Invalid search type');
             }
             $options[$type] = $result;
@@ -160,6 +162,49 @@ class SearchApiController extends Controller
                 return null;
 
         }
+    }
+
+    public function yesNos()
+    {
+        return [
+            ['id' => 1, 'name' => 'Yes'],
+            ['id' => 0, 'name' => 'No'],
+        ];
+    }
+
+    public function units() { return []; }
+    public function paymentTerms() { return []; }
+    public function warehouses() { return []; }
+    public function features() { return []; }
+
+    public function currencies()
+    {
+        return Currency::get(['id', 'name', 'code', 'symbol', 'rate']);
+    }
+
+    public function countries()
+    {
+        return Country::get(['id', 'name', 'phone_code']);
+    }
+
+    public function states()
+    {
+        return State::get(['id', 'name', 'country_id']);
+    }
+
+    public function cities()
+    {
+        return City::get(['id', 'name', 'state_id']);
+    }
+
+    public function companies()
+    {
+        return \App\Models\Company::get(['id', 'name']);
+    }
+
+    public function roles()
+    {
+        return Role::get(['id', 'title']);
     }
 
     private function getOptionData($type)

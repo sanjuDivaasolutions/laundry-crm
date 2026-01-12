@@ -88,6 +88,10 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
 
     Route::resource('permissions', 'PermissionsApiController');
 
+    // Dashboard (Generic)
+    Route::get('dashboard-modules', 'DashboardApiController@modules')->name('dashboard.modules');
+    Route::get('dashboard-data', 'DashboardApiController@fetchData')->name('dashboard.data');
+
     // Search Options (Generic)
     Route::get('query/{type}', 'SearchApiController@search')->name('query');
     Route::get('options/{type}', 'SearchApiController@options')->name('options');

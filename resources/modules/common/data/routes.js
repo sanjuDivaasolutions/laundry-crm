@@ -19,7 +19,7 @@ const systemRoutes = [
                 name: "dashboard",
                 component: () => import("@/views/Dashboard.vue"),
                 meta: {
-                    pageTitle: "Dashboard",
+                    pageTitle: "general.fields.dashboard",
                     breadcrumbs: [],
                 },
             },
