@@ -37,13 +37,8 @@ import DatatableLedgerLink from "@/components/magic-datatable/components/Datatab
 import DatatableActions from "@/components/magic-datatable/components/DatatableActions.vue";
 import DatatableJournalItemList from "@/components/magic-datatable/components/DatatableJournalItemList.vue";
 import DatatableHtml from "@/components/magic-datatable/components/DatatableHtml.vue";
-import ProductSaleDetailsButton from "@modules@/reports/components/ProductSaleDetailsButton.vue";
-import ProductInwardDetailsButton from "@modules@/reports/components/ProductInwardDetailsButton.vue";
-import AgentCommissionDetailsButton from "@modules@/reports/components/AgentCommissionDetailsButton.vue";
 import BarcodeScanner from "@common@/components/BarcodeScanner.vue";
-import BarcodeField from "@modules@/products/components/BarcodeField.vue";
 import BarcodeQuickAdd from "@common@/components/BarcodeQuickAdd.vue";
-import PaymentStatusLink from "@modules@/salesInvoices/components/PaymentStatusLink.vue";
 
 import { Ckeditor } from "@ckeditor/ckeditor5-vue";
 
@@ -87,12 +82,7 @@ export default function registerFormGlobalComponents(app) {
     app.component("DatatableJournalItemList", DatatableJournalItemList);
     app.component("DatatableActions", DatatableActions);
     app.component("DatatableHtml", DatatableHtml);
-    app.component("ProductSaleDetailsButton", ProductSaleDetailsButton);
-    app.component("ProductInwardDetailsButton", ProductInwardDetailsButton);
-    app.component("AgentCommissionDetailsButton", AgentCommissionDetailsButton);
-    app.component("PaymentStatusLink", PaymentStatusLink);
     app.component("BarcodeScanner", BarcodeScanner);
-    app.component("BarcodeField", BarcodeField);
     app.component("BarcodeQuickAdd", BarcodeQuickAdd);
 
     app.component("ckeditor", Ckeditor.component);

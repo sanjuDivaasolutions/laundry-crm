@@ -125,10 +125,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Role::class);
     }
 
-    public function buyer()
-    {
-        return $this->hasOne(Buyer::class);
-    }
+
 
     public function language()
     {

@@ -42,7 +42,7 @@ class Company extends Model implements HasMedia
         'address_2',
         'active',
         'user_id',
-        'warehouse_id',
+        'user_id',
     ];
 
     protected $orderable = [
@@ -62,7 +62,7 @@ class Company extends Model implements HasMedia
         'address_2',
         'active',
         'user.name',
-        'warehouse.name',
+        'user.name',
     ];
 
     protected $casts = [
@@ -72,11 +72,6 @@ class Company extends Model implements HasMedia
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
     }
 
     public function registerMediaConversions(Media $media = null): void
