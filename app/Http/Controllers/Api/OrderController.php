@@ -8,8 +8,8 @@ use App\Http\Requests\API\SalesOrderUpdateRequest;
 use App\Http\Resources\API\SalesOrderResource;
 use App\Models\SalesOrder;
 use App\Services\OrderService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -30,7 +30,7 @@ class OrderController extends Controller
                 $query->where('order_number', 'like', "%{$search}%")
                     ->orWhereHas('buyer', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%")
-                          ->orWhere('display_name', 'like', "%{$search}%");
+                            ->orWhere('display_name', 'like', "%{$search}%");
                     });
             })
             ->when($request->has('status'), function ($query) use ($request) {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -57,7 +58,7 @@ return [
     |
     */
 
-    'debug' => (bool)env('APP_DEBUG', false),
+    'debug' => (bool) env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -228,7 +229,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        'Gate'      => Illuminate\Support\Facades\Gate::class,
+        'Gate' => Illuminate\Support\Facades\Gate::class,
         'Terbilang' => Riskihajar\Terbilang\Facades\Terbilang::class,
         'Clockwork' => Clockwork\Support\Laravel\Facade::class,
     ])->toArray(),

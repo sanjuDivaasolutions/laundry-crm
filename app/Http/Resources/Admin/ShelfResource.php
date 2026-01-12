@@ -18,10 +18,10 @@ class ShelfResource extends JsonResource
 
         $data['products'] = $products->toArray();
         $data['product_summary'] = [
-            'total_products'      => $products->count(),
-            'total_quantity'      => $products->sum('on_hand'),
+            'total_products' => $products->count(),
+            'total_quantity' => $products->sum('on_hand'),
             'total_quantity_text' => $this->formatQuantity($products->sum('on_hand')),
-            'type_breakdown'      => $this->buildTypeBreakdown($products),
+            'type_breakdown' => $this->buildTypeBreakdown($products),
         ];
 
         return $data;
@@ -29,7 +29,7 @@ class ShelfResource extends JsonResource
 
     protected function prepareProducts(): Collection
     {
-        if (!$this->relationLoaded('productStockShelf')) {
+        if (! $this->relationLoaded('productStockShelf')) {
             return collect();
         }
 
@@ -37,7 +37,7 @@ class ShelfResource extends JsonResource
             ->map(function ($shelfStock) {
                 $productStock = $shelfStock->productStock;
                 $product = $productStock?->product;
-                if (!$product) {
+                if (! $product) {
                     return null;
                 }
 
@@ -50,20 +50,20 @@ class ShelfResource extends JsonResource
                 }
 
                 return [
-                    'product_id'        => $product->id,
-                    'name'              => $product->name,
-                    'code'              => $product->code,
-                    'sku'               => $product->sku,
-                    'type_value'        => data_get($type, 'value', $rawType),
-                    'type_label'        => data_get($type, 'label', ucfirst((string) $rawType)),
-                    'category'          => data_get($product, 'category.name'),
-                    'manufacturer'      => $product->manufacturer,
-                    'unit'              => data_get($product, 'unit_01.name'),
-                    'warehouse'         => data_get($productStock, 'warehouse.name'),
-                    'on_hand'           => $onHand,
-                    'on_hand_text'      => $this->formatQuantity($onHand),
-                    'in_transit'        => $inTransit,
-                    'in_transit_text'   => $this->formatQuantity($inTransit),
+                    'product_id' => $product->id,
+                    'name' => $product->name,
+                    'code' => $product->code,
+                    'sku' => $product->sku,
+                    'type_value' => data_get($type, 'value', $rawType),
+                    'type_label' => data_get($type, 'label', ucfirst((string) $rawType)),
+                    'category' => data_get($product, 'category.name'),
+                    'manufacturer' => $product->manufacturer,
+                    'unit' => data_get($product, 'unit_01.name'),
+                    'warehouse' => data_get($productStock, 'warehouse.name'),
+                    'on_hand' => $onHand,
+                    'on_hand_text' => $this->formatQuantity($onHand),
+                    'in_transit' => $inTransit,
+                    'in_transit_text' => $this->formatQuantity($inTransit),
                 ];
             })
             ->filter()
@@ -82,10 +82,10 @@ class ShelfResource extends JsonResource
                 $totalQuantity = $items->sum('on_hand');
 
                 return [
-                    'type_value'          => data_get($items->first(), 'type_value'),
-                    'type_label'          => data_get($items->first(), 'type_label'),
-                    'unique_products'     => $items->count(),
-                    'total_quantity'      => $totalQuantity,
+                    'type_value' => data_get($items->first(), 'type_value'),
+                    'type_label' => data_get($items->first(), 'type_label'),
+                    'unique_products' => $items->count(),
+                    'total_quantity' => $totalQuantity,
                     'total_quantity_text' => $this->formatQuantity($totalQuantity),
                 ];
             })

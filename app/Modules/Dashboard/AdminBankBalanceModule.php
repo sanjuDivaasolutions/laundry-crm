@@ -3,20 +3,19 @@
 namespace App\Modules\Dashboard;
 
 use App\Models\Account;
-use App\Models\Payment;
-use App\Models\PettyCashExpense;
-use App\Models\PurchaseInvoice;
-use App\Models\SalesInvoice;
-use App\Models\Transaction;
-use App\Services\DashboardService;
 
 class AdminBankBalanceModule
 {
     public string $module = 'AdminBankBalanceModule';
+
     public string $title = 'Bank Balances';
+
     public string $component = 'BasicTableComponent';
+
     public int $limit = 5;
+
     public int $columns = 4;
+
     public array $filters = [];
 
     public function __construct($params = [])
@@ -31,14 +30,14 @@ class AdminBankBalanceModule
     public function get(): array
     {
         return [
-            'title'        => $this->title,
-            'component'    => $this->component,
-            'module'       => $this->module,
-            'query'        => $this->getQuery(),
+            'title' => $this->title,
+            'component' => $this->component,
+            'module' => $this->module,
+            'query' => $this->getQuery(),
             'defaultQuery' => $this->getQuery(),
-            'filters'      => $this->getFilters(),
-            'data'         => $this->getData(),
-            'columns'      => $this->columns,
+            'filters' => $this->getFilters(),
+            'data' => $this->getData(),
+            'columns' => $this->columns,
         ];
     }
 
@@ -60,8 +59,8 @@ class AdminBankBalanceModule
         foreach ($result as $s) {
             $currencySign = $s->currency?->symbol ?? '$';
             $data[] = [
-                'name'   => $s->name,
-                'amount' => $currencySign . number_format($s->balance, 2),
+                'name' => $s->name,
+                'amount' => $currencySign.number_format($s->balance, 2),
             ];
         }
 
@@ -109,9 +108,9 @@ class AdminBankBalanceModule
                 'value' => 'name',
             ],
             [
-                'label'   => 'Amount',
-                'value'   => 'amount',
-                'class'   => 'text-end',
+                'label' => 'Amount',
+                'value' => 'amount',
+                'class' => 'text-end',
                 'thClass' => '',
                 'tdClass' => 'text-info fw-bold',
             ],

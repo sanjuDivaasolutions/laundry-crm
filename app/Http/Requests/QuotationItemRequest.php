@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -26,14 +27,14 @@ class QuotationItemRequest extends FormRequest
     {
         return [
             'quotation_id' => ['required', 'exists:quotations'],
-            'product_id'   => ['required', 'exists:products'],
-            'unit_id'      => ['required', 'exists:units'],
-            'title'        => ['required'],
-            'sku'          => ['required'],
-            'rate'         => ['required', 'numeric'],
-            'quantity'     => ['required', 'numeric'],
-            'amount'       => ['required', 'numeric'],
-            'remark'       => ['required'],
+            'product_id' => ['required', 'exists:products'],
+            'unit_id' => ['required', 'exists:units'],
+            'title' => ['required'],
+            'sku' => ['required'],
+            'rate' => ['required', 'numeric'],
+            'quantity' => ['required', 'numeric'],
+            'amount' => ['required', 'numeric'],
+            'remark' => ['required'],
         ];
     }
 

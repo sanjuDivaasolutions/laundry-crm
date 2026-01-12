@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 class FilterQueryBuilder
 {
     protected $model;
+
     protected $table;
 
     public function apply($query, $data)
@@ -104,6 +105,7 @@ class FilterQueryBuilder
     {
         if ($filter['operator'] == 'scope') {
             $this->scope($filter, $query);
+
             return;
         }
         if ($this->isNestedColumn($filter['column'])) {
@@ -111,9 +113,9 @@ class FilterQueryBuilder
             $relation = Str::beforeLast($filter['column'], '.');
             $filter['column'] = Str::afterLast($filter['column'], '.');
 
-            //[$relation, $filter['column']] = explode('.', $filter['column']);
-            //$callable                      = Str::camel($relation);
-            $filter['match']               = isset($filter['match'])?$filter['match']:'and';
+            // [$relation, $filter['column']] = explode('.', $filter['column']);
+            // $callable                      = Str::camel($relation);
+            $filter['match'] = isset($filter['match']) ? $filter['match'] : 'and';
 
             $query->whereRelation(Str::camel($relation), function ($q) use ($filter) {
                 $this->{Str::camel($filter['operator'])}(
@@ -136,12 +138,15 @@ class FilterQueryBuilder
             );
         }
     }
+
     protected function makeOrder($query, $data, $prefix = 'prefix_')
     {
         foreach ($data['order_column'] as $str) {
             if ($this->isNestedColumn($str)) {
                 $relationships = explode('.', $str);
-                if (count($relationships) > 2) $prefix = '';
+                if (count($relationships) > 2) {
+                    $prefix = '';
+                }
                 $column = array_pop($relationships);
                 $currentModel = $this->model;
 
@@ -149,7 +154,7 @@ class FilterQueryBuilder
                     $callable = Str::camel($relationship);
                     $belongsTo = $currentModel->{$callable}();
 
-                    if (!$belongsTo instanceof BelongsTo) {
+                    if (! $belongsTo instanceof BelongsTo) {
                         return;
                     }
 
@@ -173,7 +178,7 @@ class FilterQueryBuilder
 
             $direction = $data['order_direction'];
             $query->orderByRaw("$str * 1 $direction, $str $direction");
-            //$query->orderBy($str, $data['order_direction']);
+            // $query->orderBy($str, $data['order_direction']);
         }
 
         $query->select("{$this->table}.*");
@@ -186,12 +191,12 @@ class FilterQueryBuilder
 
     public function contains($filter, $query)
     {
-        return $query->where($filter['column'], 'like', '%' . $filter['query_1'] . '%', $filter['match']);
+        return $query->where($filter['column'], 'like', '%'.$filter['query_1'].'%', $filter['match']);
     }
 
     public function orContains($filter, $query)
     {
-        return $query->where($filter['column'], 'like', '%' . $filter['query_1'] . '%', $filter['match']);
+        return $query->where($filter['column'], 'like', '%'.$filter['query_1'].'%', $filter['match']);
     }
 
     public function equals($filter, $query)
@@ -206,7 +211,10 @@ class FilterQueryBuilder
 
     public function boolNotEqualsZero($filter, $query)
     {
-        if(@$filter['query_1'][0] != 'true') return $query;
+        if (@$filter['query_1'][0] != 'true') {
+            return $query;
+        }
+
         return $query->where($filter['column'], '!=', 0);
     }
 
@@ -225,7 +233,8 @@ class FilterQueryBuilder
 
     public function dateRange($filter, $query)
     {
-        $dates = [$filter['query_1'],$filter['query_2']];
+        $dates = [$filter['query_1'], $filter['query_2']];
+
         return $query->whereBetween($filter['column'], $dates);
     }
 }

@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 
 class Message extends Model
 {
-    use HasFactory, HasAdvancedFilter;
+    use HasAdvancedFilter, HasFactory;
 
     protected array $orderable = ['id', 'subject', 'message', 'schedule_at', 'status'];
 
@@ -62,4 +62,3 @@ class Message extends Model
         return $this->belongsTo(Company::class);
     }
 }
-

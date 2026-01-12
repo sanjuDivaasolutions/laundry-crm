@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -22,15 +23,14 @@ return [
         'low_stock_threshold' => env('LOW_STOCK_THRESHOLD', 10),
     ],
     'reasons' => [
-        'subtraction'  => ['sales', 'damage', 'transfer_out', 'pos_sale'],
-        'addition'     => ['purchase', 'return', 'transfer_in'],
-        'sales'        => 'sales',
-        'pos_sale'     => 'POS Sale',
-        'purchase'     => 'purchase',
-        'damage'       => 'damage',
-        'return'       => 'return',
-        'transfer_in'  => 'transfer_in',
+        'subtraction' => ['sales', 'damage', 'transfer_out', 'pos_sale'],
+        'addition' => ['purchase', 'return', 'transfer_in'],
+        'sales' => 'sales',
+        'pos_sale' => 'POS Sale',
+        'purchase' => 'purchase',
+        'damage' => 'damage',
+        'return' => 'return',
+        'transfer_in' => 'transfer_in',
         'transfer_out' => 'transfer_out',
     ],
 ];
-

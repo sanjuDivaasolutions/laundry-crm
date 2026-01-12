@@ -12,6 +12,7 @@ class NewsletterEmail extends Mailable
     use Queueable, SerializesModels;
 
     public $company;
+
     public Message $message;
 
     public function __construct($message)
@@ -30,4 +31,3 @@ class NewsletterEmail extends Mailable
             ]);
     }
 }
-

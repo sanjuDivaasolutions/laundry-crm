@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -30,14 +31,14 @@ class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
-            'code'       => $this->faker->word(),
-            'name'       => $this->faker->name(),
-            'address_1'  => $this->faker->address(),
-            'address_2'  => $this->faker->address(),
-            'active'     => $this->faker->boolean(),
+            'code' => $this->faker->word(),
+            'name' => $this->faker->name(),
+            'address_1' => $this->faker->address(),
+            'address_2' => $this->faker->address(),
+            'active' => $this->faker->boolean(),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
-            'user_id'    => User::factory(),
+            'user_id' => User::factory(),
         ];
     }
 }

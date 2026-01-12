@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -37,11 +38,11 @@ class StoreProductRequest extends FormRequest
     ];
 
     private array $valueObjects = [
-        'type'
+        'type',
     ];
 
     private array $stringArrays = [
-        'features', 'opening', 'prices'
+        'features', 'opening', 'prices',
     ];
 
     public function authorize(): bool
@@ -62,69 +63,68 @@ class StoreProductRequest extends FormRequest
         $this->set('has_inventory', 1);
     }
 
-
     public function rules(): array
     {
         return [
-            'code'          => [
+            'code' => [
                 'string',
                 'required',
                 'unique:products',
             ],
-            'name'          => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'sku'           => [
+            'sku' => [
                 'string',
                 'required',
                 'unique:products',
             ],
-            'type'          => [
+            'type' => [
                 'string',
                 'required',
-                'in:' . implode(',', collect(Product::TYPE_SELECT)->pluck('value')->toArray()),
+                'in:'.implode(',', collect(Product::TYPE_SELECT)->pluck('value')->toArray()),
             ],
             'has_inventory' => [
                 'integer',
             ],
-            'category_id'   => [
+            'category_id' => [
                 'integer',
                 'exists:categories,id',
                 'nullable',
             ],
-            'company_id'    => [
+            'company_id' => [
                 'integer',
                 'exists:companies,id',
                 'required',
             ],
-            'description'   => [
+            'description' => [
                 'string',
                 'nullable',
             ],
-            'supplier_id'   => [
+            'supplier_id' => [
                 'integer',
                 'exists:suppliers,id',
                 'nullable',
             ],
-            'active'        => [
+            'active' => [
                 'boolean',
             ],
-            'user_id'       => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'nullable',
             ],
-            'manufacturer'  => [
+            'manufacturer' => [
                 'string',
                 'nullable',
             ],
-            'unit_01_id'    => [
+            'unit_01_id' => [
                 'integer',
                 'exists:units,id',
                 'nullable',
             ],
-            'unit_02_id'    => [
+            'unit_02_id' => [
                 'integer',
                 'exists:units,id',
                 'nullable',
@@ -140,8 +140,8 @@ class StoreProductRequest extends FormRequest
         $prefix = 'PRO-';
         $field = 'code';
         $config = [
-            'table'  => 'products',
-            'field'  => $field,
+            'table' => 'products',
+            'field' => $field,
             'prefix' => $prefix,
         ];
         $code = UtilityService::generateCode($config);

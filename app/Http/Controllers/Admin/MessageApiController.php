@@ -16,22 +16,32 @@ use Illuminate\Http\Response;
 class MessageApiController extends Controller
 {
     protected $className = Message::class;
+
     protected $scopes = [];
+
     protected $with = [];
+
     protected $exportResource = MessageResource::class;
+
     protected $fetcher = 'advancedFilter';
+
     protected $processListMethod = 'getProcessedList';
+
     protected $filterMethods = ['index', 'getCsv', 'getPdf'];
+
     protected $csvFilePrefix = 'messages-list-';
+
     protected $pdfFilePrefix = null;
+
     protected $fields = ['name'];
+
     protected $filters = [
-        //['request'=>'','field'=>'','operator'=>'in'],
+        // ['request'=>'','field'=>'','operator'=>'in'],
     ];
 
-    use SearchFilters;
     use ControllerRequest;
     use ExportRequest;
+    use SearchFilters;
 
     public function index()
     {

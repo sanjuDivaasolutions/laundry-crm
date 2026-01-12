@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -30,8 +31,9 @@ class ExpenseListResourceCollection extends ResourceCollection
     public function toArray($request)
     {
         $data = ExpenseListResource::collection($this->collection);
+
         return [
-            'data'    => $data,
+            'data' => $data,
             'columns' => $this->getColumns(),
             'summary' => $this->getSummary($data),
         ];
@@ -41,70 +43,70 @@ class ExpenseListResourceCollection extends ResourceCollection
     {
         return [
             [
-                'title'    => 'general.fields.id',
-                'field'    => 'id',
+                'title' => 'general.fields.id',
+                'field' => 'id',
                 'sortable' => true,
                 'colStyle' => 'width: 100px;',
             ],
             [
-                'title'    => 'general.fields.date',
-                'field'    => 'date',
+                'title' => 'general.fields.date',
+                'field' => 'date',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.invoice_number',
-                'field'    => 'invoice_number',
+                'title' => 'general.fields.invoice_number',
+                'field' => 'invoice_number',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.description',
-                'field'    => 'description',
+                'title' => 'general.fields.description',
+                'field' => 'description',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.company',
-                'field'    => 'company.name',
+                'title' => 'general.fields.company',
+                'field' => 'company.name',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.expense_type',
-                'field'    => 'expense_type.name',
+                'title' => 'general.fields.expense_type',
+                'field' => 'expense_type.name',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.payment_mode',
-                'field'    => 'payment_mode.name',
+                'title' => 'general.fields.payment_mode',
+                'field' => 'payment_mode.name',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.subTotal',
-                'field'    => 'sub_total_label',
+                'title' => 'general.fields.subTotal',
+                'field' => 'sub_total_label',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'general.fields.taxTotal',
-                'field'    => 'tax_total_label',
+                'title' => 'general.fields.taxTotal',
+                'field' => 'tax_total_label',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'general.fields.grandTotal',
-                'field'    => 'grand_total_label',
+                'title' => 'general.fields.grandTotal',
+                'field' => 'grand_total_label',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'general.fields.user',
-                'field'    => 'user.name',
+                'title' => 'general.fields.user',
+                'field' => 'user.name',
                 'sortable' => true,
             ],
             [
-                'title'     => 'Actions',
-                'field'     => 'title',
-                'tdComp'    => 'DatatableActions',
+                'title' => 'Actions',
+                'field' => 'title',
+                'tdComp' => 'DatatableActions',
                 'isActions' => true,
-                'sortable'  => true,
+                'sortable' => true,
             ],
         ];
     }
@@ -124,13 +126,14 @@ class ExpenseListResourceCollection extends ResourceCollection
             $taxTotal += $item->tax_total;
             $grandTotal += $item->grand_total;
         }
+
         return [
-            'sub_total'         => $subTotal,
-            'sub_total_label'   => $currencySign . number_format($subTotal, 2),
-            'tax_total'         => $taxTotal,
-            'tax_total_label'   => $currencySign . number_format($taxTotal, 2),
-            'grand_total'       => $grandTotal,
-            'grand_total_label' => $currencySign . number_format($grandTotal, 2),
+            'sub_total' => $subTotal,
+            'sub_total_label' => $currencySign.number_format($subTotal, 2),
+            'tax_total' => $taxTotal,
+            'tax_total_label' => $currencySign.number_format($taxTotal, 2),
+            'grand_total' => $grandTotal,
+            'grand_total_label' => $currencySign.number_format($grandTotal, 2),
         ];
     }
 }

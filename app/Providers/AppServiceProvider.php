@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -18,7 +19,6 @@
 
 namespace App\Providers;
 
-use App\Models\Buyer;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -46,9 +46,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Cashier::useCustomerModel(Buyer::class);
-        Cashier::calculateTaxes();
-
         $this->configureRateLimiting();
         $this->configureGates();
     }

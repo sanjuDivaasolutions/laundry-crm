@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -47,7 +48,7 @@ class PermissionDataService
             ['module' => 'country', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
             ['module' => 'state', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
             ['module' => 'city', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
-            ['module' => 'language', 'actions' => ['create', 'edit', 'show', 'delete', 'access'],'group'=>'General'],
+            ['module' => 'language', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
         ];
 
         $groups = PermissionGroup::all();
@@ -102,17 +103,17 @@ class PermissionDataService
         foreach ($defaultModules as $m) {
             foreach ($m['actions'] as $a) {
                 $g = $groups->where('name', $m['group'])->first();
-                $data[] = ['permission' => $m['module'] . '_' . $a, 'group_id' => $g->id];
+                $data[] = ['permission' => $m['module'].'_'.$a, 'group_id' => $g->id];
             }
         }
 
         foreach ($projectModules as $m) {
             foreach ($m['actions'] as $a) {
                 $g = $groups->where('name', $m['group'])->first();
-                if (!$g) {
+                if (! $g) {
                     dd($m['group']);
                 }
-                $data[] = ['permission' => $m['module'] . '_' . $a, 'group_id' => $g->id];
+                $data[] = ['permission' => $m['module'].'_'.$a, 'group_id' => $g->id];
             }
         }
 
@@ -120,6 +121,7 @@ class PermissionDataService
             $g = $groups->where('name', $s['group'])->first();
             $data[] = ['permission' => $s['module'], 'group_id' => $g->id];
         }
+
         return $data;
     }
 
@@ -133,7 +135,7 @@ class PermissionDataService
             'Sales',
             'Contract',
             'Report',
-            'Newsletter'
+            'Newsletter',
         ];
     }
 }

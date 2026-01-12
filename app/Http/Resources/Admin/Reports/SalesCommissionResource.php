@@ -16,10 +16,10 @@ class SalesCommissionResource extends JsonResource
         $currencySymbol = '$';
 
         return [
-            'id'                        => $this->id,
-            'agent_name'                => $this->name,
-            'total_commission'          => $totalCommission ?? 0,
-            'total_commission_label'    => $currencySymbol . number_format($totalCommission ?? 0, 2),
+            'id' => $this->id,
+            'agent_name' => $this->name,
+            'total_commission' => $totalCommission ?? 0,
+            'total_commission_label' => $currencySymbol.number_format($totalCommission ?? 0, 2),
         ];
     }
 }

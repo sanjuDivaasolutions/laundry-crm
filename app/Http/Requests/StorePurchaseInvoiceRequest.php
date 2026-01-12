@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -47,7 +48,7 @@ class StorePurchaseInvoiceRequest extends FormRequest
     public function rules()
     {
         return [
-            'company_id'        => [
+            'company_id' => [
                 'integer',
                 'exists:companies,id',
                 'required',
@@ -57,54 +58,54 @@ class StorePurchaseInvoiceRequest extends FormRequest
                 'exists:purchase_orders,id',
                 'required',
             ],
-            'invoice_number'    => [
+            'invoice_number' => [
                 'string',
                 'required',
                 'unique:purchase_invoices',
             ],
-            'date'              => [
-                'date_format:' . config('project.date_format'),
+            'date' => [
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
-            'due_date'          => [
-                'date_format:' . config('project.date_format'),
+            'due_date' => [
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
-            'supplier_id'       => [
+            'supplier_id' => [
                 'integer',
                 'exists:suppliers,id',
                 'nullable',
             ],
-            'remark'            => [
+            'remark' => [
                 'string',
                 'nullable',
             ],
-            'user_id'           => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'nullable',
             ],
-            'type'              => [
+            'type' => [
                 'nullable',
-                'in:' . implode(',', Arr::pluck(PurchaseInvoice::TYPE_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(PurchaseInvoice::TYPE_SELECT, 'value')),
             ],
-            'reference_no'      => [
+            'reference_no' => [
                 'string',
                 'nullable',
             ],
-            'sub_total'         => [
+            'sub_total' => [
                 'numeric',
                 'nullable',
             ],
-            'tax_total'         => [
+            'tax_total' => [
                 'numeric',
                 'nullable',
             ],
-            'tax_rate'          => [
+            'tax_rate' => [
                 'numeric',
                 'nullable',
             ],
-            'grand_total'       => [
+            'grand_total' => [
                 'numeric',
                 'nullable',
             ],
@@ -115,9 +116,9 @@ class StorePurchaseInvoiceRequest extends FormRequest
     {
         $field = 'invoice_number';
         $config = [
-            'table'  => 'purchase_invoices',
-            'field'  => $field,
-            'prefix' => 'PI-'
+            'table' => 'purchase_invoices',
+            'field' => $field,
+            'prefix' => 'PI-',
         ];
         $code = UtilityService::generateCode($config);
         $this->merge([$field => $code]);

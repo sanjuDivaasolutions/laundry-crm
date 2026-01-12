@@ -26,7 +26,7 @@ class SalesInvoiceResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
@@ -34,7 +34,7 @@ class SalesInvoiceResource extends JsonResource
         return [
             'id' => $this->id,
             'invoice_number' => $this->invoice_number,
-            'formatted_invoice_number' => 'SI-' . str_pad($this->id, 6, '0', STR_PAD_LEFT),
+            'formatted_invoice_number' => 'SI-'.str_pad($this->id, 6, '0', STR_PAD_LEFT),
             'date' => $this->date,
             'due_date' => $this->due_date,
             'buyer_id' => $this->buyer_id,
@@ -107,6 +107,7 @@ class SalesInvoiceResource extends JsonResource
                     'service' => 'Service',
                     'contract' => 'Contract',
                 ];
+
                 return $types[$this->order_type] ?? $this->order_type;
             }),
             'reference_no' => $this->reference_no,

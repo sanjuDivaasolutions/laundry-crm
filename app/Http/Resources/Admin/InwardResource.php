@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -27,31 +28,31 @@ class InwardResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'             => $this->id,
+            'id' => $this->id,
             'invoice_number' => $this->invoice_number,
-            'reference_no'   => $this->reference_no,
-            'date'           => $this->date,
-            'remark'         => $this->remark,
-            'currency_rate'  => $this->currency_rate,
-            'sub_total'      => $this->sub_total,
-            'tax_total'      => $this->tax_total,
-            'tax_rate'       => $this->tax_rate,
-            'grand_total'    => $this->grand_total,
-            'created_at'     => $this->created_at,
-            'updated_at'     => $this->updated_at,
+            'reference_no' => $this->reference_no,
+            'date' => $this->date,
+            'remark' => $this->remark,
+            'currency_rate' => $this->currency_rate,
+            'sub_total' => $this->sub_total,
+            'tax_total' => $this->tax_total,
+            'tax_rate' => $this->tax_rate,
+            'grand_total' => $this->grand_total,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
 
-            'company_id'   => $this->company_id,
-            'supplier_id'  => $this->supplier_id,
+            'company_id' => $this->company_id,
+            'supplier_id' => $this->supplier_id,
             'warehouse_id' => $this->warehouse_id,
-            'user_id'      => $this->user_id,
+            'user_id' => $this->user_id,
 
             'items' => InwardItemResource::collection($this->whenLoaded('items')),
 
-            'company'   => new CompanyResource($this->whenLoaded('company')),
-            'supplier'  => new SupplierResource($this->whenLoaded('supplier')),
+            'company' => new CompanyResource($this->whenLoaded('company')),
+            'supplier' => new SupplierResource($this->whenLoaded('supplier')),
             'warehouse' => new WarehouseResource($this->whenLoaded('warehouse')),
-            'state'     => $this->whenLoaded('state'),
-            'taxes'     => $this->whenLoaded('taxes'),
+            'state' => $this->whenLoaded('state'),
+            'taxes' => $this->whenLoaded('taxes'),
         ];
     }
 }

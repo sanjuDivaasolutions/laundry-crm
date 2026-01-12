@@ -22,8 +22,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use App\Models\Warehouse;
 use App\Models\Rack;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -32,7 +32,6 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request)
@@ -61,22 +60,22 @@ class ProductController extends Controller
         }
 
         if ($request->has('hsn_code')) {
-            $query->where('hsn_code', 'like', '%' . $request->hsn_code . '%');
+            $query->where('hsn_code', 'like', '%'.$request->hsn_code.'%');
         }
 
         if ($request->has('batch_number')) {
-            $query->where('batch_number', 'like', '%' . $request->batch_number . '%');
+            $query->where('batch_number', 'like', '%'.$request->batch_number.'%');
         }
 
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('code', 'like', '%' . $search . '%')
-                  ->orWhere('sku', 'like', '%' . $search . '%')
-                  ->orWhere('barcode', 'like', '%' . $search . '%')
-                  ->orWhere('hsn_code', 'like', '%' . $search . '%')
-                  ->orWhere('batch_number', 'like', '%' . $search . '%');
+                $q->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('code', 'like', '%'.$search.'%')
+                    ->orWhere('sku', 'like', '%'.$search.'%')
+                    ->orWhere('barcode', 'like', '%'.$search.'%')
+                    ->orWhere('hsn_code', 'like', '%'.$search.'%')
+                    ->orWhere('batch_number', 'like', '%'.$search.'%');
             });
         }
 
@@ -93,7 +92,6 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
      * @return ProductResource
      */
     public function store(Request $request)
@@ -123,14 +121,14 @@ class ProductController extends Controller
         ]);
 
         // Validate that rack belongs to warehouse if both are provided
-        if (!empty($validated['warehouse_id']) && !empty($validated['rack_id'])) {
+        if (! empty($validated['warehouse_id']) && ! empty($validated['rack_id'])) {
             $rack = Rack::find($validated['rack_id']);
             if ($rack && $rack->warehouse_id !== $validated['warehouse_id']) {
                 return response()->json([
                     'message' => 'Selected rack does not belong to the selected warehouse.',
                     'errors' => [
-                        'rack_id' => ['Rack must belong to the selected warehouse.']
-                    ]
+                        'rack_id' => ['Rack must belong to the selected warehouse.'],
+                    ],
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
@@ -143,37 +141,34 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param Product $product
      * @return ProductResource
      */
     public function show(Product $product)
     {
         return new ProductResource($product->load([
-            'warehouse', 
-            'rack', 
-            'category', 
-            'supplier', 
+            'warehouse',
+            'rack',
+            'category',
+            'supplier',
             'company',
             'unit_01',
             'unit_02',
             'features',
             'prices',
-            'stock'
+            'stock',
         ]));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param Product $product
      * @return ProductResource
      */
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'code' => 'sometimes|required|string|max:255|unique:products,code,' . $product->id,
+            'code' => 'sometimes|required|string|max:255|unique:products,code,'.$product->id,
             'type' => 'sometimes|required|in:product,service',
             'sku' => 'nullable|string|max:255',
             'barcode' => 'nullable|string|max:255',
@@ -196,14 +191,14 @@ class ProductController extends Controller
         ]);
 
         // Validate that rack belongs to warehouse if both are provided
-        if (!empty($validated['warehouse_id']) && !empty($validated['rack_id'])) {
+        if (! empty($validated['warehouse_id']) && ! empty($validated['rack_id'])) {
             $rack = Rack::find($validated['rack_id']);
             if ($rack && $rack->warehouse_id !== $validated['warehouse_id']) {
                 return response()->json([
                     'message' => 'Selected rack does not belong to the selected warehouse.',
                     'errors' => [
-                        'rack_id' => ['Rack must belong to the selected warehouse.']
-                    ]
+                        'rack_id' => ['Rack must belong to the selected warehouse.'],
+                    ],
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
@@ -216,7 +211,6 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Product $product
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Product $product)
@@ -249,7 +243,6 @@ class ProductController extends Controller
     /**
      * Get racks for dropdown based on warehouse.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function racks(Request $request)
@@ -275,7 +268,7 @@ class ProductController extends Controller
     /**
      * Get products by type.
      *
-     * @param string $type
+     * @param  string  $type
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function byType($type)

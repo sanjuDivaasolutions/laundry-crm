@@ -13,10 +13,10 @@ class PettyCashSummaryResource extends JsonResource
         $total = $this->amount;
 
         return [
-            'id'            => $this->id,
-            'account_name'  => $this->account ? $this->account->name : null,
-            'total'         => $total,
-            'total_label'   => $currencySymbol . number_format($total,2),
+            'id' => $this->id,
+            'account_name' => $this->account ? $this->account->name : null,
+            'total' => $total,
+            'total_label' => $currencySymbol.number_format($total, 2),
         ];
     }
 }

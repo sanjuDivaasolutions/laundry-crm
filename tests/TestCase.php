@@ -2,10 +2,9 @@
 
 namespace Tests;
 
-use App\Models\User;
 use App\Models\Company;
 use App\Models\Role;
-use App\Models\Permission;
+use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -35,9 +34,9 @@ abstract class TestCase extends BaseTestCase
     protected function createAuthenticatedUser(array $attributes = []): User
     {
         $user = User::factory()->create($attributes);
-        
+
         // Create a basic role and permissions if needed
-        if (!Role::where('title', 'admin')->exists()) {
+        if (! Role::where('title', 'admin')->exists()) {
             $role = Role::create(['title' => 'admin']);
             $user->roles()->attach($role);
         }
@@ -48,9 +47,9 @@ abstract class TestCase extends BaseTestCase
     /**
      * Get authentication headers for API requests.
      */
-    protected function getAuthHeaders(User $user = null): array
+    protected function getAuthHeaders(?User $user = null): array
     {
-        if (!$user) {
+        if (! $user) {
             $user = $this->createAuthenticatedUser();
         }
 
@@ -66,9 +65,9 @@ abstract class TestCase extends BaseTestCase
     /**
      * Create a test company for multi-tenant testing.
      */
-    protected function createTestCompany(User $user = null): Company
+    protected function createTestCompany(?User $user = null): Company
     {
-        if (!$user) {
+        if (! $user) {
             $user = $this->createAuthenticatedUser();
         }
 
@@ -88,7 +87,7 @@ abstract class TestCase extends BaseTestCase
                 'first',
                 'last',
                 'prev',
-                'next'
+                'next',
             ],
             'meta' => [
                 'current_page',
@@ -96,8 +95,8 @@ abstract class TestCase extends BaseTestCase
                 'last_page',
                 'per_page',
                 'to',
-                'total'
-            ]
+                'total',
+            ],
         ]);
     }
 
@@ -107,10 +106,10 @@ abstract class TestCase extends BaseTestCase
     protected function assertErrorResponse($response, int $statusCode = 422): void
     {
         $response->assertStatus($statusCode)
-                 ->assertJsonStructure([
-                     'message',
-                     'errors' => []
-                 ]);
+            ->assertJsonStructure([
+                'message',
+                'errors' => [],
+            ]);
     }
 
     /**
@@ -119,9 +118,9 @@ abstract class TestCase extends BaseTestCase
     protected function assertSuccessResponse($response, int $statusCode = 200): void
     {
         $response->assertStatus($statusCode)
-                 ->assertJsonStructure([
-                     'data'
-                 ]);
+            ->assertJsonStructure([
+                'data',
+            ]);
     }
 
     /**
@@ -132,9 +131,9 @@ abstract class TestCase extends BaseTestCase
         // Mock Stripe service if needed
         $this->mock(\App\Services\StripeService::class, function ($mock) {
             $mock->shouldReceive('createCustomer')->andReturn('cus_test123');
-            $mock->shouldReceive('createSubscription')->andReturn((object)['id' => 'sub_test123']);
+            $mock->shouldReceive('createSubscription')->andReturn((object) ['id' => 'sub_test123']);
         });
-        
+
         // Mock email services
         $this->mock(\Illuminate\Mail\Mailer::class, function ($mock) {
             $mock->shouldReceive('send')->andReturn(true);
@@ -147,7 +146,7 @@ abstract class TestCase extends BaseTestCase
     protected function seedBasicData(): void
     {
         // Seed permissions and roles
-        if (!Role::exists()) {
+        if (! Role::exists()) {
             $this->seed(\Database\Seeders\RolesTableSeeder::class);
             $this->seed(\Database\Seeders\PermissionsTableSeeder::class);
             $this->seed(\Database\Seeders\PermissionRoleTableSeeder::class);
@@ -163,7 +162,7 @@ abstract class TestCase extends BaseTestCase
     {
         // Clear any cached data
         cache()->flush();
-        
+
         parent::tearDown();
     }
 }

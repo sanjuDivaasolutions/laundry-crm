@@ -11,7 +11,7 @@ class PurchaseOrderEditResource extends JsonResource
     {
         $result = parent::toArray($request);
 
-        if($this->shipping_sample_required) {
+        if ($this->shipping_sample_required) {
             $shipping_sample_required = collect(PurchaseOrder::SHIPPING_SAMPLE_REQUIRED_SELECT)->firstWhere('value', $this->shipping_sample_required);
             $result['shipping_sample_required'] = [
                 'value' => $shipping_sample_required['value'],

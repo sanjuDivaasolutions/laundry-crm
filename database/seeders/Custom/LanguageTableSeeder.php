@@ -11,20 +11,20 @@ class LanguageTableSeeder extends Seeder
     {
         $data = [
             [
-                'id'        =>  config('system.defaults.language.id',1),
-                'locale'    =>  'en',
-                'active'    =>  1,
-                'name'      =>  'English',
-                'created_at'=>  now(),
-                'updated_at'=>  now(),
+                'id' => config('system.defaults.language.id', 1),
+                'locale' => 'en',
+                'active' => 1,
+                'name' => 'English',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'id'        =>  2,
-                'locale'    =>  'de',
-                'active'    =>  1,
-                'name'      =>  'German',
-                'created_at'=>  now(),
-                'updated_at'=>  now(),
+                'id' => 2,
+                'locale' => 'de',
+                'active' => 1,
+                'name' => 'German',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
         Language::insert($data);

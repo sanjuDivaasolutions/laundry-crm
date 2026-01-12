@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -28,7 +29,7 @@ class ProductListResourceCollection extends ResourceCollection
         $data = ProductListResource::collection($this->collection);
 
         return [
-            'data'    => $data,
+            'data' => $data,
             'summary' => $this->getSummary($data),
             'columns' => $this->getColumns(),
         ];
@@ -38,48 +39,48 @@ class ProductListResourceCollection extends ResourceCollection
     {
         return [
             [
-                'title'    => 'ID',
-                'field'    => 'id',
+                'title' => 'ID',
+                'field' => 'id',
                 'sortable' => true,
                 'colStyle' => 'width: 100px;',
             ],
             [
-                'title'    => 'Code',
-                'field'    => 'code',
+                'title' => 'Code',
+                'field' => 'code',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Name',
-                'field'    => 'name',
+                'title' => 'Name',
+                'field' => 'name',
                 'sortable' => true,
             ],
             [
-                'title'    => 'SKU',
-                'field'    => 'sku',
+                'title' => 'SKU',
+                'field' => 'sku',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Category',
-                'field'    => 'category.name',
+                'title' => 'Category',
+                'field' => 'category.name',
                 'sortable' => true,
             ],
             [
-                'title'    => 'In-Transit',
-                'field'    => 'in_transit_label',
+                'title' => 'In-Transit',
+                'field' => 'in_transit_label',
                 'sortable' => false,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'On-Hand',
-                'field'    => 'on_hand_label',
+                'title' => 'On-Hand',
+                'field' => 'on_hand_label',
                 'sortable' => false,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'     => 'Actions',
-                'field'     => 'title',
-                'thComp'    => 'TranslatedHeader',
-                'tdComp'    => 'DatatableActions',
+                'title' => 'Actions',
+                'field' => 'title',
+                'thComp' => 'TranslatedHeader',
+                'tdComp' => 'DatatableActions',
                 'isActions' => true,
             ],
         ];
@@ -108,7 +109,7 @@ class ProductListResourceCollection extends ResourceCollection
         }
 
         return [
-            'on_hand_label'    => $onHand,
+            'on_hand_label' => $onHand,
             'in_transit_label' => $inTransit,
         ];
     }

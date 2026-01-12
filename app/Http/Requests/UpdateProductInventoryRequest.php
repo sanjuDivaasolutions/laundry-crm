@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use App\Models\ProductInventory;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 
 class UpdateProductInventoryRequest extends FormRequest
@@ -44,10 +43,10 @@ class UpdateProductInventoryRequest extends FormRequest
             ],
             'reason' => [
                 'required',
-                'in:' . implode(',', Arr::pluck(ProductInventory::REASON_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(ProductInventory::REASON_SELECT, 'value')),
             ],
             'date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
             'rate' => [

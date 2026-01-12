@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Warehouse;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class UpdateWarehouseRequest extends FormRequest
 {
@@ -24,7 +22,7 @@ class UpdateWarehouseRequest extends FormRequest
             'code' => [
                 'string',
                 'required',
-                'unique:warehouses,code,' . request()->route('warehouse')->id,
+                'unique:warehouses,code,'.request()->route('warehouse')->id,
             ],
             'address_1' => [
                 'string',

@@ -14,23 +14,24 @@ class LanguageTermTableSeeder extends Seeder
         $data = LanguageService::getCrudTerms();
         $languageTermGroups = LanguageTermGroup::all();
         $insert = [];
-        if(!$data) return;
-        foreach ($data as $key=>$fields) {
+        if (! $data) {
+            return;
+        }
+        foreach ($data as $key => $fields) {
             $group = collect($languageTermGroups)->where('name', $key)->first();
-            if($group) {
+            if ($group) {
                 foreach ($fields as $k => $value) {
                     $insert[] = [
-                        'id'                     => null,
+                        'id' => null,
                         'language_term_group_id' => $group->id,
-                        'active'                 => 1,
-                        'name'                   => $k,
-                        'created_at'=>now(),
-                        'updated_at'=>now(),
+                        'active' => 1,
+                        'name' => $k,
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ];
                 }
             }
         }
         LanguageTerm::insert($insert);
     }
-
 }

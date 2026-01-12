@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -28,8 +29,8 @@ class ProductStockResourceCollection extends ResourceCollection
         $data = ProductStockResource::collection($this->collection);
 
         return [
-            'stock'      => $data,
-            'on_hand'    => $data->sum('on_hand'),
+            'stock' => $data,
+            'on_hand' => $data->sum('on_hand'),
             'in_transit' => $data->sum('in_transit'),
         ];
     }

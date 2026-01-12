@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -33,20 +34,28 @@ use Illuminate\Http\Response;
 class RoleApiController extends Controller
 {
     protected $className = Role::class;
+
     protected $scopes = [];
+
     protected $with = [];
+
     protected $exportResource = RoleResource::class;
+
     protected $fetcher = 'advancedFilter';
+
     protected $processListMethod = 'getProcessedList';
+
     protected $filterMethods = ['index', 'getCsv', 'getPdf'];
+
     protected $fields = ['title'];
+
     protected $filters = [
-        //['request'=>'','field'=>'','operator'=>'in'],
+        // ['request'=>'','field'=>'','operator'=>'in'],
     ];
 
-    use SearchFilters;
     use ControllerRequest;
     use ExportRequest;
+    use SearchFilters;
 
     public function index()
     {
@@ -106,7 +115,7 @@ class RoleApiController extends Controller
         abort_if(Gate::denies('role_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $protectedRoleIds = array_merge(config('system.auth.admin_role_id', []), config('system.auth.non_admin_role_id', []));
-        if (in_array($role->id, (array)$protectedRoleIds)) {
+        if (in_array($role->id, (array) $protectedRoleIds)) {
             return response('This role is protected and cannot be deleted.', Response::HTTP_FORBIDDEN);
         }
         $role->delete();

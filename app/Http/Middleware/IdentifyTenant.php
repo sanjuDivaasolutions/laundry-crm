@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Tenant;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\Tenant;
 
 class IdentifyTenant
 {
@@ -29,9 +29,6 @@ class IdentifyTenant
 
     /**
      * Identify tenant from request (subdomain or header)
-     *
-     * @param Request $request
-     * @return Tenant|null
      */
     protected function identifyTenant(Request $request): ?Tenant
     {

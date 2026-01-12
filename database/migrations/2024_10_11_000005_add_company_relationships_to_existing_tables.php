@@ -17,34 +17,6 @@ return new class extends Migration
             $table->foreignId('company_id')->nullable()->after('id')->constrained()->onDelete('cascade');
             $table->index(['company_id']);
         });
-
-        Schema::table('sales_orders', function (Blueprint $table) {
-            if (!Schema::hasColumn('sales_orders', 'company_id')) {
-                $table->foreignId('company_id')->nullable()->after('id')->constrained()->onDelete('cascade');
-                $table->index(['company_id']);
-            }
-        });
-
-        Schema::table('sales_invoices', function (Blueprint $table) {
-            if (!Schema::hasColumn('sales_invoices', 'company_id')) {
-                $table->foreignId('company_id')->nullable()->after('id')->constrained()->onDelete('cascade');
-                $table->index(['company_id']);
-            }
-        });
-
-        Schema::table('products', function (Blueprint $table) {
-            if (!Schema::hasColumn('products', 'company_id')) {
-                $table->foreignId('company_id')->nullable()->after('id')->constrained()->onDelete('cascade');
-                $table->index(['company_id']);
-            }
-        });
-
-        Schema::table('buyers', function (Blueprint $table) {
-            if (!Schema::hasColumn('buyers', 'company_id')) {
-                $table->foreignId('company_id')->nullable()->after('id')->constrained()->onDelete('cascade');
-                $table->index(['company_id']);
-            }
-        });
     }
 
     /**
@@ -58,38 +30,6 @@ return new class extends Migration
             $table->dropForeign(['company_id']);
             $table->dropIndex(['company_id']);
             $table->dropColumn('company_id');
-        });
-
-        Schema::table('sales_orders', function (Blueprint $table) {
-            if (Schema::hasColumn('sales_orders', 'company_id')) {
-                $table->dropForeign(['company_id']);
-                $table->dropIndex(['company_id']);
-                $table->dropColumn('company_id');
-            }
-        });
-
-        Schema::table('sales_invoices', function (Blueprint $table) {
-            if (Schema::hasColumn('sales_invoices', 'company_id')) {
-                $table->dropForeign(['company_id']);
-                $table->dropIndex(['company_id']);
-                $table->dropColumn('company_id');
-            }
-        });
-
-        Schema::table('products', function (Blueprint $table) {
-            if (Schema::hasColumn('products', 'company_id')) {
-                $table->dropForeign(['company_id']);
-                $table->dropIndex(['company_id']);
-                $table->dropColumn('company_id');
-            }
-        });
-
-        Schema::table('buyers', function (Blueprint $table) {
-            if (Schema::hasColumn('buyers', 'company_id')) {
-                $table->dropForeign(['company_id']);
-                $table->dropIndex(['company_id']);
-                $table->dropColumn('company_id');
-            }
         });
     }
 };

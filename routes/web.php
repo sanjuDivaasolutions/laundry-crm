@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -36,14 +37,15 @@ Route::get('/admin', function () {
 });
 
 Route::get('/', function () {
-    //return view('welcome');
+    // return view('welcome');
     return redirect('/admin');
 });
 
 Route::get('/subscription-checkout/{contract}', function (Contract $contract) {
-    if (!StripeService::isValidContract($contract)) {
+    if (! StripeService::isValidContract($contract)) {
         return redirect()->route('contract-invalid');
     }
+
     return StripeService::createContractSubscription($contract);
 })->name('subscription-checkout');
 
@@ -53,11 +55,13 @@ Route::get('/contract-success', function () {
 
 Route::get('/contract-cancel', function () {
     $message = 'Failed! Your subscription could not be activated.';
+
     return view('front-end.contract-failed', compact('message'));
 })->name('contract-cancel');
 
 Route::get('/contract-invalid', function () {
     $message = 'Failed! Your subscription is not stripe managed.';
+
     return view('front-end.contract-failed', compact('message'));
 })->name('contract-invalid');
 

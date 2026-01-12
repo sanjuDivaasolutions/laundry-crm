@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -27,18 +28,18 @@ class CompanyResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
-            'code'       => $this->code,
-            'name'       => $this->name,
-            'address_1'  => $this->address_1,
-            'address_2'  => $this->address_2,
-            'active'     => $this->active,
+            'id' => $this->id,
+            'code' => $this->code,
+            'name' => $this->name,
+            'address_1' => $this->address_1,
+            'address_2' => $this->address_2,
+            'active' => $this->active,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'user_id'    => $this->user_id,
-            'warehouse'  => $this->whenLoaded('warehouse'),
-            'image'      => $this->image ?: [],
-            'media'      => $this->media,
+            'user_id' => $this->user_id,
+            'warehouse' => $this->whenLoaded('warehouse'),
+            'image' => $this->image ?: [],
+            'media' => $this->media,
         ];
     }
 }

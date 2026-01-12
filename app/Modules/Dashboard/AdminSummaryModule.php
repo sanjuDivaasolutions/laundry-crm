@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -18,19 +19,23 @@
 
 namespace App\Modules\Dashboard;
 
-//use App\Models\PettyCashExpense;
+// use App\Models\PettyCashExpense;
 use App\Models\PurchaseInvoice;
 use App\Models\SalesInvoice;
 use App\Services\DashboardService;
 
-//use App\Models\Transaction;
+// use App\Models\Transaction;
 
 class AdminSummaryModule
 {
     public string $module = 'AdminSummaryModule';
+
     public string $title = 'Summary';
+
     public string $component = 'SummaryComponent';
+
     public int $columns = 12;
+
     public array $filters = [
         ['request' => 'f_company_id', 'field' => 'company_id', 'operator' => 'in'],
         ['request' => 'f_date_range', 'field' => 'date', 'operator' => 'date_range', 'separator' => ' to '],
@@ -48,14 +53,14 @@ class AdminSummaryModule
     public function get(): array
     {
         return [
-            'title'        => $this->title,
-            'component'    => $this->component,
-            'module'       => $this->module,
-            'query'        => $this->getQuery(),
+            'title' => $this->title,
+            'component' => $this->component,
+            'module' => $this->module,
+            'query' => $this->getQuery(),
             'defaultQuery' => $this->getQuery(),
-            'filters'      => $this->getFilters(),
-            'data'         => $this->getData(),
-            'columns'      => $this->columns,
+            'filters' => $this->getFilters(),
+            'data' => $this->getData(),
+            'columns' => $this->columns,
         ];
     }
 
@@ -81,12 +86,12 @@ class AdminSummaryModule
         $positiveVariant = 'primary';
 
         return [
-            ['label' => 'Sales', 'value' => $currencySign . number_format($salesTotal, 2), 'variant' => $salesTotal < 0 ? $NegativeVariant : $positiveVariant],
-            ['label' => 'Purchase', 'value' => $currencySign . number_format($purchaseTotal, 2), 'variant' => $purchaseTotal < 0 ? $NegativeVariant : $positiveVariant],
-            ['label' => 'Expense', 'value' => $currencySign . number_format($expenseTotal, 2), 'variant' => $expenseTotal < 0 ? $NegativeVariant : $positiveVariant],
-            ['label' => 'Profit', 'value' => $currencySign . number_format($profitTotal, 2), 'variant' => $profitTotal < 0 ? $NegativeVariant : $positiveVariant],
-            ['label' => 'Creditor Due', 'value' => $currencySign . number_format($creditorDue, 2), 'variant' => $creditorDue < 0 ? $NegativeVariant : $positiveVariant],
-            ['label' => 'Debtors Due', 'value' => $currencySign . number_format($debtorsDue, 2), 'variant' => $debtorsDue < 0 ? $NegativeVariant : $positiveVariant],
+            ['label' => 'Sales', 'value' => $currencySign.number_format($salesTotal, 2), 'variant' => $salesTotal < 0 ? $NegativeVariant : $positiveVariant],
+            ['label' => 'Purchase', 'value' => $currencySign.number_format($purchaseTotal, 2), 'variant' => $purchaseTotal < 0 ? $NegativeVariant : $positiveVariant],
+            ['label' => 'Expense', 'value' => $currencySign.number_format($expenseTotal, 2), 'variant' => $expenseTotal < 0 ? $NegativeVariant : $positiveVariant],
+            ['label' => 'Profit', 'value' => $currencySign.number_format($profitTotal, 2), 'variant' => $profitTotal < 0 ? $NegativeVariant : $positiveVariant],
+            ['label' => 'Creditor Due', 'value' => $currencySign.number_format($creditorDue, 2), 'variant' => $creditorDue < 0 ? $NegativeVariant : $positiveVariant],
+            ['label' => 'Debtors Due', 'value' => $currencySign.number_format($debtorsDue, 2), 'variant' => $debtorsDue < 0 ? $NegativeVariant : $positiveVariant],
         ];
     }
 
@@ -95,20 +100,20 @@ class AdminSummaryModule
         return [
             [
                 'outside' => true,
-                'type'    => 'date-range',
-                'label'   => 'Date Range',
-                'name'    => 'f_date_range',
-                'field'   => 'f_date_range',
-                'value'   => null,
+                'type' => 'date-range',
+                'label' => 'Date Range',
+                'name' => 'f_date_range',
+                'field' => 'f_date_range',
+                'value' => null,
             ],
             [
-                'outside'  => true,
-                'type'     => 'select-single',
-                'label'    => 'Company',
-                'name'     => 'company',
-                'field'    => 'f_company_id',
+                'outside' => true,
+                'type' => 'select-single',
+                'label' => 'Company',
+                'name' => 'company',
+                'field' => 'f_company_id',
                 'endpoint' => 'companies',
-                'value'    => null,
+                'value' => null,
             ],
         ];
     }
@@ -117,7 +122,7 @@ class AdminSummaryModule
     {
         return [
             'f_department_id' => null,
-            'f_date_range'    => null,
+            'f_date_range' => null,
         ];
     }
 

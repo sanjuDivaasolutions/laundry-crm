@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -45,81 +46,81 @@ class UpdatePurchaseOrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'company_id'              => [
+            'company_id' => [
                 'integer',
                 'exists:companies,id',
                 'required',
             ],
-            'po_number'               => [
+            'po_number' => [
                 'string',
                 'required',
             ],
-            'date'                    => [
-                'date_format:' . config('project.date_format'),
+            'date' => [
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
             'estimated_shipment_date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
-            'supplier_id'             => [
+            'supplier_id' => [
                 'integer',
                 'exists:suppliers,id',
                 'nullable',
             ],
-            'payment_term_id'         => [
+            'payment_term_id' => [
                 'integer',
                 'exists:payment_terms,id',
                 'nullable',
             ],
-            'shipment_mode_id'        => [
+            'shipment_mode_id' => [
                 'integer',
                 'exists:shipment_modes,id',
                 'nullable',
             ],
-            'warehouse_id'            => [
+            'warehouse_id' => [
                 'integer',
                 'exists:warehouses,id',
                 'required',
             ],
-            'remarks'                 => [
+            'remarks' => [
                 'string',
                 'nullable',
             ],
-            'user_id'                 => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'nullable',
             ],
-            'freight_total'           => [
+            'freight_total' => [
                 'numeric',
                 'nullable',
             ],
-            'discount_type'           => [
+            'discount_type' => [
                 'nullable',
-                'in:' . implode(',', Arr::pluck(PurchaseOrder::DISCOUNT_TYPE_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(PurchaseOrder::DISCOUNT_TYPE_SELECT, 'value')),
             ],
-            'discount_total'          => [
+            'discount_total' => [
                 'numeric',
                 'nullable',
             ],
-            'discount_rate'           => [
+            'discount_rate' => [
                 'numeric',
                 'nullable',
             ],
-            'sub_total'               => [
+            'sub_total' => [
                 'numeric',
                 'required',
             ],
-            'tax_rate'                => [
+            'tax_rate' => [
                 'numeric',
                 'required',
             ],
-            'tax_total'               => [
+            'tax_total' => [
                 'numeric',
                 'required',
             ],
-            'grand_total'             => [
+            'grand_total' => [
                 'numeric',
                 'required',
             ],

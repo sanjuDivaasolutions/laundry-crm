@@ -19,7 +19,7 @@ class MediaApiController
 
         $collection = $validated['collection_name'];
         $class = config("media.collection.$collection");
-        if(!$class) {
+        if (! $class) {
             return errorResponse('Invalid collection name', Response::HTTP_NOT_FOUND);
         }
 

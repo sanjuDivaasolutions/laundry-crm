@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -51,14 +52,14 @@ class UpdateCategoryRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'       => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'active'     => [
+            'active' => [
                 'boolean',
             ],
-            'parent_id'  => [
+            'parent_id' => [
                 'integer',
                 'exists:parent_categories,id',
                 'nullable',

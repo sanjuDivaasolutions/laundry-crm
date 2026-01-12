@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -63,13 +64,13 @@ class MessageRequest extends FormRequest
 
     public function rules(): array
     {
-        //'subject', 'message', 'schedule_at', 'status'
+        // 'subject', 'message', 'schedule_at', 'status'
         $rules = [
-            'company_id'  => 'required|integer|exists:companies,id',
-            'subject'     => 'required|string|max:255',
-            'message'     => 'required|string',
+            'company_id' => 'required|integer|exists:companies,id',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
             'schedule_at' => 'required',
-            'status'      => 'required|integer|in:0,1',
+            'status' => 'required|integer|in:0,1',
 
         ];
 

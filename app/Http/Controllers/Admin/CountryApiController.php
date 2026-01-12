@@ -8,7 +8,6 @@ use App\Http\Requests\UpdateCountryRequest;
 use App\Http\Resources\Admin\CountryResource;
 use App\Models\Country;
 use Gate;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class CountryApiController extends Controller

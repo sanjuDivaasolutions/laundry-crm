@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -30,8 +31,9 @@ class InwardListResourceCollection extends ResourceCollection
     public function toArray($request)
     {
         $data = InwardListResource::collection($this->collection);
+
         return [
-            'data'    => $data,
+            'data' => $data,
             'columns' => $this->getColumns(),
             'summary' => $this->getSummary($data),
         ];
@@ -41,65 +43,65 @@ class InwardListResourceCollection extends ResourceCollection
     {
         return [
             [
-                'title'    => 'ID',
-                'field'    => 'id',
+                'title' => 'ID',
+                'field' => 'id',
                 'sortable' => true,
                 'colStyle' => 'width: 100px;',
             ],
             [
-                'title'    => 'Date',
-                'field'    => 'date',
+                'title' => 'Date',
+                'field' => 'date',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Invoice Number',
-                'field'    => 'invoice_number',
+                'title' => 'Invoice Number',
+                'field' => 'invoice_number',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Company',
-                'field'    => 'company.name',
+                'title' => 'Company',
+                'field' => 'company.name',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Warehouse',
-                'field'    => 'warehouse.name',
+                'title' => 'Warehouse',
+                'field' => 'warehouse.name',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Supplier',
-                'field'    => 'supplier.display_name',
+                'title' => 'Supplier',
+                'field' => 'supplier.display_name',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Sub Total',
-                'field'    => 'sub_total_label',
+                'title' => 'Sub Total',
+                'field' => 'sub_total_label',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Tax Total',
-                'field'    => 'tax_total_label',
+                'title' => 'Tax Total',
+                'field' => 'tax_total_label',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Grand Total',
-                'field'    => 'grand_total_label',
+                'title' => 'Grand Total',
+                'field' => 'grand_total_label',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'User',
-                'field'    => 'user.name',
+                'title' => 'User',
+                'field' => 'user.name',
                 'sortable' => true,
             ],
             [
-                'title'     => 'Actions',
-                'field'     => 'title',
-                'tdComp'    => 'DatatableActions',
+                'title' => 'Actions',
+                'field' => 'title',
+                'tdComp' => 'DatatableActions',
                 'isActions' => true,
-                'sortable'  => true,
+                'sortable' => true,
             ],
         ];
     }
@@ -119,13 +121,14 @@ class InwardListResourceCollection extends ResourceCollection
             $taxTotal += $item->tax_total;
             $grandTotal += $item->grand_total;
         }
+
         return [
-            'sub_total'         => $subTotal,
-            'sub_total_label'   => $currencySign . number_format($subTotal, 2),
-            'tax_total'         => $taxTotal,
-            'tax_total_label'   => $currencySign . number_format($taxTotal, 2),
-            'grand_total'       => $grandTotal,
-            'grand_total_label' => $currencySign . number_format($grandTotal, 2),
+            'sub_total' => $subTotal,
+            'sub_total_label' => $currencySign.number_format($subTotal, 2),
+            'tax_total' => $taxTotal,
+            'tax_total_label' => $currencySign.number_format($taxTotal, 2),
+            'grand_total' => $grandTotal,
+            'grand_total_label' => $currencySign.number_format($grandTotal, 2),
         ];
     }
 }

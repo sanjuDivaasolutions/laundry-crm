@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -26,15 +27,15 @@ trait HasAdvancedFilter
     public function scopeAdvancedFilter($query)
     {
         $data = [
-            'order_column'    => explode(',', request('sort', 'id')),
+            'order_column' => explode(',', request('sort', 'id')),
             'order_direction' => request('order', 'desc'),
-            'limit'           => request('limit', 10),
-            's'               => request('s', null),
+            'limit' => request('limit', 10),
+            's' => request('s', null),
         ];
         $f = (request('f')) ? request('f') : [];
 
-        //replace $data['order_column'] with $this->orderableColumns
-        if (isset($this->overrideOrderFields) && !empty($this->overrideOrderFields)) {
+        // replace $data['order_column'] with $this->orderableColumns
+        if (isset($this->overrideOrderFields) && ! empty($this->overrideOrderFields)) {
             $orderColumns = [];
             foreach ($data['order_column'] as $oc) {
                 if (array_key_exists($oc, $this->overrideOrderFields)) {
@@ -47,12 +48,12 @@ trait HasAdvancedFilter
         }
 
         $strFilter = (request('strFilter')) ? request('strFilter') : [];
-        if (!empty($f)) {
+        if (! empty($f)) {
             foreach ($f as $item) {
                 $data['f'][] = $item;
             }
         }
-        if (!empty($strFilter)) {
+        if (! empty($strFilter)) {
             $data['strFilter'] = $strFilter;
         }
         if (empty($data['f'])) {
@@ -62,6 +63,7 @@ trait HasAdvancedFilter
             $data['addSelectRaw'] = request('addSelectRaw');
         }
         unset($data['s']);
+
         return $this->processQuery($query, $data)
             ->paginate(request('limit', 10));
     }
@@ -74,24 +76,24 @@ trait HasAdvancedFilter
         $data = $this->processGlobalSearch($data);
 
         $v = validator()->make($data, [
-            'order_column'         => 'sometimes|required|array|in:' . $this->orderableColumns(),
-            'order_direction'      => 'sometimes|required|in:asc,desc',
-            'limit'                => 'sometimes|required|integer|min:1',
-            's'                    => 'sometimes|nullable|string',
+            'order_column' => 'sometimes|required|array|in:'.$this->orderableColumns(),
+            'order_direction' => 'sometimes|required|in:asc,desc',
+            'limit' => 'sometimes|required|integer|min:1',
+            's' => 'sometimes|nullable|string',
 
             // advanced filter
-            'filter_match'         => 'sometimes|required|in:and,or',
-            'f'                    => 'sometimes|required|array',
-            'f.*.column'           => 'required|in:' . $this->whiteListColumns(),
-            'f.*.operator'         => 'required_with:f.*.column|in:' . $this->allowedOperators(),
-            'f.*.query_1'          => 'required',
-            'f.*.query_2'          => 'required_if:f.*.operator,between,not_between',
-            'strFilter'            => 'sometimes|required|array',
-            'strFilter.*.column'   => 'required|in:' . $this->whiteListColumns(),
-            'strFilter.*.operator' => 'required_with:f.*.column|in:' . $this->allowedOperators(),
-            'strFilter.*.query_1'  => 'required',
-            'strFilter.*.query_2'  => 'required_if:f.*.operator,between,not_between',
-            'addSelectRaw'         => 'sometimes|required|array',
+            'filter_match' => 'sometimes|required|in:and,or',
+            'f' => 'sometimes|required|array',
+            'f.*.column' => 'required|in:'.$this->whiteListColumns(),
+            'f.*.operator' => 'required_with:f.*.column|in:'.$this->allowedOperators(),
+            'f.*.query_1' => 'required',
+            'f.*.query_2' => 'required_if:f.*.operator,between,not_between',
+            'strFilter' => 'sometimes|required|array',
+            'strFilter.*.column' => 'required|in:'.$this->whiteListColumns(),
+            'strFilter.*.operator' => 'required_with:f.*.column|in:'.$this->allowedOperators(),
+            'strFilter.*.query_1' => 'required',
+            'strFilter.*.query_2' => 'required_if:f.*.operator,between,not_between',
+            'addSelectRaw' => 'sometimes|required|array',
         ]);
 
         if ($v->fails()) {
@@ -100,7 +102,7 @@ trait HasAdvancedFilter
 
         $data = $v->validated();
 
-        return (new FilterQueryBuilder())->apply($query, $data);
+        return (new FilterQueryBuilder)->apply($query, $data);
     }
 
     protected function orderableColumns()
@@ -116,14 +118,14 @@ trait HasAdvancedFilter
     protected function allowedOperators()
     {
         return implode(',', [
-            'contains', 'equals', 'in', 'orContains', 'between', 'date_range', 'check_bool', 'boolNotEqualsZero', 'scope'
+            'contains', 'equals', 'in', 'orContains', 'between', 'date_range', 'check_bool', 'boolNotEqualsZero', 'scope',
         ]);
     }
 
     protected function processGlobalSearch($data)
     {
         return $data;
-        if (isset($data['f']) || !isset($data['s'])) {
+        if (isset($data['f']) || ! isset($data['s'])) {
             return $data;
         }
 
@@ -131,9 +133,9 @@ trait HasAdvancedFilter
 
         $data['f'] = array_map(function ($column) use ($data) {
             return [
-                'column'   => $column,
+                'column' => $column,
                 'operator' => 'contains',
-                'query_1'  => $data['s'],
+                'query_1' => $data['s'],
             ];
         }, $this->filterable);
 

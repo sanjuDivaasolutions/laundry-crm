@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\PermissionGroup;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class UpdatePermissionGroupRequest extends FormRequest
 {
@@ -20,7 +18,7 @@ class UpdatePermissionGroupRequest extends FormRequest
             'name' => [
                 'string',
                 'required',
-                'unique:permission_groups,name,' . request()->route('permission_group')->id,
+                'unique:permission_groups,name,'.request()->route('permission_group')->id,
             ],
         ];
     }

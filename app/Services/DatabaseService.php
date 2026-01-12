@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -32,10 +33,11 @@ class DatabaseService
             DB::beginTransaction();
             $result = $callback();
             DB::commit();
+
             return $result;
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Transaction failed: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Transaction failed: '.$e->getMessage(), ['exception' => $e]);
             abort(500, 'An error occurred during the transaction.');
         }
     }

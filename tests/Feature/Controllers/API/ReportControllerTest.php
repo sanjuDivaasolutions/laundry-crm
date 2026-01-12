@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Controllers\API;
 
-use App\Models\User;
-use App\Models\SalesOrder;
-use App\Models\SalesInvoice;
 use App\Models\AgentCommission;
 use App\Models\Company;
 use App\Models\Product;
+use App\Models\SalesInvoice;
+use App\Models\SalesOrder;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,6 +16,7 @@ class ReportControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Company $company;
 
     protected function setUp(): void
@@ -89,7 +90,7 @@ class ReportControllerTest extends TestCase
                         'header',
                         'footer',
                         'data',
-                    ]
+                    ],
                 ],
                 'headers',
                 'title',
@@ -121,7 +122,7 @@ class ReportControllerTest extends TestCase
                     '*' => [
                         'month',
                         'total',
-                    ]
+                    ],
                 ],
                 'links',
                 'meta',
@@ -132,7 +133,7 @@ class ReportControllerTest extends TestCase
     {
         // Create test products and sales
         $products = Product::factory()->count(3)->create();
-        
+
         foreach ($products as $product) {
             SalesInvoice::factory()
                 ->hasItems(1, [
@@ -161,7 +162,7 @@ class ReportControllerTest extends TestCase
                             'rate',
                             'amount',
                         ],
-                    ]
+                    ],
                 ],
                 'links',
                 'meta',
@@ -172,7 +173,7 @@ class ReportControllerTest extends TestCase
     {
         // Create test products with stock
         $products = Product::factory()->count(3)->create();
-        
+
         $response = $this->actingAs($this->user)
             ->getJson('/api/v1/reports/stock/summary');
 
@@ -184,7 +185,7 @@ class ReportControllerTest extends TestCase
                         'name',
                         'total_stock',
                         'shelf_stock',
-                    ]
+                    ],
                 ],
                 'links',
                 'meta',
@@ -196,7 +197,7 @@ class ReportControllerTest extends TestCase
     {
         // Create test commissions
         $agent = \App\Models\Agent::factory()->create();
-        
+
         AgentCommission::factory()->count(3)->create([
             'agent_id' => $agent->id,
             'status' => 'pending',
@@ -229,7 +230,7 @@ class ReportControllerTest extends TestCase
     {
         // Create data for multiple companies
         $otherCompany = Company::factory()->create();
-        
+
         SalesOrder::factory()->count(3)->create([
             'company_id' => $this->company->id,
             'grand_total' => 1000.00,
@@ -246,7 +247,7 @@ class ReportControllerTest extends TestCase
             ]);
 
         $response->assertStatus(200);
-        
+
         // Should only include data from specified company
         $this->assertEquals(3, $response->json('order_statistics.total_orders'));
     }
@@ -277,7 +278,7 @@ class ReportControllerTest extends TestCase
             ]);
 
         $response->assertStatus(200);
-        
+
         // Should only include orders within date range
         $this->assertEquals(3, $response->json('order_statistics.total_orders'));
     }

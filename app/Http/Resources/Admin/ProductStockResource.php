@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -27,10 +28,10 @@ class ProductStockResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'           => $this->id,
-            'on_hand'      => $this->on_hand,
-            'in_transit'   => $this->in_transit,
-            'product_id'   => $this->product_id,
+            'id' => $this->id,
+            'on_hand' => $this->on_hand,
+            'in_transit' => $this->in_transit,
+            'product_id' => $this->product_id,
             'warehouse_id' => $this->warehouse_id,
         ];
     }

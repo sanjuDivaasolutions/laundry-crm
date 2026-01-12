@@ -11,7 +11,7 @@ class UpdateUserRequest extends FormRequest
 
     public function authorize()
     {
-        return true;//Gate::allows('user_edit');
+        return true; // Gate::allows('user_edit');
     }
 
     public function prepareForValidation()
@@ -22,26 +22,26 @@ class UpdateUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'        => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'email'       => [
+            'email' => [
                 'required',
-                'unique:users,email,' . request()->route('user')->id,
+                'unique:users,email,'.request()->route('user')->id,
             ],
-            'password'    => [
+            'password' => [
                 'nullable',
             ],
-            'roles'       => [
+            'roles' => [
                 'required',
                 'array',
             ],
-            'roles.*.id'  => [
+            'roles.*.id' => [
                 'integer',
                 'exists:roles,id',
             ],
-            'active'      => [
+            'active' => [
                 'boolean',
             ],
             'language_id' => [
@@ -49,7 +49,7 @@ class UpdateUserRequest extends FormRequest
                 'exists:languages,id',
                 'nullable',
             ],
-            'settings'    => [
+            'settings' => [
                 'string',
                 'nullable',
             ],

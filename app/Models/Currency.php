@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Currency extends Model
 {
-    use HasAdvancedFilter, HasFactory, Searchable, ModelCache;
+    use HasAdvancedFilter, HasFactory, ModelCache, Searchable;
 
     public $table = 'currencies';
 

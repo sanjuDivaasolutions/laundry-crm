@@ -11,7 +11,7 @@ class PermissionResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'group_name'   => $this->whenLoaded('group', $this->group ? $this->group->name : ''),
+            'group_name' => $this->whenLoaded('group', $this->group ? $this->group->name : ''),
         ];
     }
 }

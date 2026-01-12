@@ -2,16 +2,15 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Shipment;
 use App\Services\UtilityService;
 use App\Traits\CustomFormRequest;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class StoreShipmentRequest extends FormRequest
 {
     use CustomFormRequest;
+
     public function authorize()
     {
         return Gate::allows('shipment_create');
@@ -25,17 +24,17 @@ class StoreShipmentRequest extends FormRequest
 
     }
 
-      protected function generateCode()
+    protected function generateCode()
     {
         $field = 'code';
         $config = [
-            'table' =>  'shipments',
-            'field' =>  $field,
-            'prefix'=>  'SHP-'
+            'table' => 'shipments',
+            'field' => $field,
+            'prefix' => 'SHP-',
         ];
         $code = UtilityService::generateCode($config);
-        $this->merge([$field=>$code]);
-       
+        $this->merge([$field => $code]);
+
     }
 
     public function rules()
@@ -47,7 +46,7 @@ class StoreShipmentRequest extends FormRequest
                 'required',
             ],
             'shipment_date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
             'remarks' => [
@@ -60,7 +59,7 @@ class StoreShipmentRequest extends FormRequest
                 'unique:shipments',
             ],
             'delivery_date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
             'shipment_mode_id' => [

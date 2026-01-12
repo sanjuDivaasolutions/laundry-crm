@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -58,84 +59,84 @@ class StoreContractRequest extends FormRequest
     public function rules()
     {
         return [
-            'code'                         => [
+            'code' => [
                 'string',
                 'required',
                 'unique:contracts',
             ],
-            'company_id'                   => [
+            'company_id' => [
                 'integer',
                 'exists:companies,id',
                 'required',
             ],
-            'buyer_id'                     => [
+            'buyer_id' => [
                 'integer',
                 'exists:buyers,id',
                 'required',
             ],
-            'date'                         => [
-                'date_format:' . config('project.date_format'),
+            'date' => [
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
-            'other_terms'                  => [
+            'other_terms' => [
                 'string',
                 'nullable',
             ],
-            'remark'                       => [
+            'remark' => [
                 'string',
                 'nullable',
             ],
-            'term'                         => [
+            'term' => [
                 'array',
             ],
-            'term.*.id'                    => [
+            'term.*.id' => [
                 'integer',
                 'exists:contract_terms,id',
             ],
-            'revision.contract_type'       => [
+            'revision.contract_type' => [
                 'string',
                 'required',
             ],
-            'revision.start_date'          => [
-                'date_format:' . config('project.date_format'),
+            'revision.start_date' => [
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
-            'revision.end_date'            => [
-                'date_format:' . config('project.date_format'),
+            'revision.end_date' => [
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
             'revision.limited_installment' => [
                 'boolean',
                 'required',
             ],
-            'revision.installment_count'   => [
+            'revision.installment_count' => [
                 'integer',
                 'min:0',
                 'max:2147483647',
                 'required',
             ],
-            'revision.sub_total'           => [
+            'revision.sub_total' => [
                 'numeric',
                 'required',
             ],
-            'revision.tax_total'           => [
+            'revision.tax_total' => [
                 'numeric',
                 'required',
             ],
-            'revision.tax_rate'            => [
+            'revision.tax_rate' => [
                 'numeric',
                 'required',
             ],
-            'revision.grand_total'         => [
+            'revision.grand_total' => [
                 'numeric',
                 'required',
             ],
-            'revision.user_id'             => [
+            'revision.user_id' => [
                 'integer',
                 'exists:users,id',
                 'nullable',
             ],
-            'user_id'                      => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'required',
@@ -145,17 +146,18 @@ class StoreContractRequest extends FormRequest
 
     public function prepareItemArray()
     {
-        //$items = ContractService::getItemArray($this);
-        //$this->set('items', $items);
+        // $items = ContractService::getItemArray($this);
+        // $this->set('items', $items);
     }
 
     public function setEndDate()
     {
         $revision = $this->input('revision', []);
-        if (!$this->get('revision.limited_installment', false)) {
+        if (! $this->get('revision.limited_installment', false)) {
             $revision['end_date'] = null;
             $revision['installment_count'] = 0;
             $this->set('revision', $revision);
+
             return;
         }
         $startDate = Carbon::createFromFormat(config('project.date_format'), $this->get('start_date'));
@@ -169,9 +171,9 @@ class StoreContractRequest extends FormRequest
     {
         $field = 'code';
         $config = [
-            'table'  => 'contracts',
-            'field'  => $field,
-            'prefix' => 'CON-'
+            'table' => 'contracts',
+            'field' => $field,
+            'prefix' => 'CON-',
         ];
         $code = UtilityService::generateCode($config);
         $this->set($field, $code);

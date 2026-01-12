@@ -15,6 +15,7 @@ use Illuminate\Http\Response;
 class CityApiController extends Controller
 {
     protected array $filterMethods = ['index'];
+
     protected array $fields = ['name', 'state.name', 'state.country.name'];
 
     use SearchFilters;
@@ -26,7 +27,7 @@ class CityApiController extends Controller
         return CityResource::collection(City::query()
             ->with([
                 'state:id,name,country_id',
-                'state.country:id,name'
+                'state.country:id,name',
             ])
             ->advancedFilter());
     }

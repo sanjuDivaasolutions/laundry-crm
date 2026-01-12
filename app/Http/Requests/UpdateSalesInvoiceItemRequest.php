@@ -2,25 +2,25 @@
 
 namespace App\Http\Requests;
 
-use App\Models\SalesInvoiceItem;
 use App\Traits\CustomFormRequest;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class UpdateSalesInvoiceItemRequest extends FormRequest
 {
     use CustomFormRequest;
+
     public function authorize()
     {
         return Gate::allows('sales_invoice_item_edit');
     }
-     public function prepareForValidation()
+
+    public function prepareForValidation()
     {
         $this->setObjectId('buyer');
         $this->setObjectId('payment_term');
-         $this->setObjectId('warehouse');
-          $this->setObjectId('sales_order');
+        $this->setObjectId('warehouse');
+        $this->setObjectId('sales_order');
 
     }
 

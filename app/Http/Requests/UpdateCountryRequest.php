@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Country;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class UpdateCountryRequest extends FormRequest
 {
@@ -20,7 +18,7 @@ class UpdateCountryRequest extends FormRequest
             'name' => [
                 'string',
                 'required',
-                'unique:countries,name,' . request()->route('country')->id,
+                'unique:countries,name,'.request()->route('country')->id,
             ],
             'active' => [
                 'boolean',

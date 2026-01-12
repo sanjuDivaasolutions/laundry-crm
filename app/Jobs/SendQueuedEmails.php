@@ -1,4 +1,5 @@
 <?php
+
 // app/Jobs/SendQueuedEmails.php
 
 namespace App\Jobs;

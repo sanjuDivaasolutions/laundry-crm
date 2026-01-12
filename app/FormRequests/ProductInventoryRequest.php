@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -36,8 +37,8 @@ class ProductInventoryRequest
         $warehouseId = $i['warehouse_id'];
 
         foreach ($shelves as $shelf) {
-            $quantity = (float)$shelf['quantity'];
-            $amount = (float)$i['opening_stock_value'] / $quantity;
+            $quantity = (float) $shelf['quantity'];
+            $amount = (float) $i['opening_stock_value'] / $quantity;
 
             $rate = 0;
             if ($quantity > 0 && $amount > 0) {
@@ -45,20 +46,21 @@ class ProductInventoryRequest
             }
 
             $inventories[] = [
-                'id'           => null,
-                'product_id'   => $productId,
+                'id' => null,
+                'product_id' => $productId,
                 'warehouse_id' => $warehouseId,
-                'shelf_id'     => $shelf['shelf_id'],
-                'batch_id'     => null,
-                'quantity'     => $quantity,
-                'rate'         => $rate,
-                'amount'       => $amount,
-                'reason'       => $reason,
-                'user_id'      => $userId,
-                'date'         => $date,
+                'shelf_id' => $shelf['shelf_id'],
+                'batch_id' => null,
+                'quantity' => $quantity,
+                'rate' => $rate,
+                'amount' => $amount,
+                'reason' => $reason,
+                'user_id' => $userId,
+                'date' => $date,
             ];
 
         }
+
         return $inventories;
 
     }
@@ -78,6 +80,7 @@ class ProductInventoryRequest
                 $item['shelves'] = [];
             }
         }
+
         return $items;
     }
 
@@ -86,13 +89,13 @@ class ProductInventoryRequest
         $shelves = [];
         foreach ($items as $item) {
             $shelves[] = [
-                'id'                 => $item['id'] ?? null,
+                'id' => $item['id'] ?? null,
                 'product_opening_id' => $item['product_opening_id'],
-                'shelf_id'           => $item['shelf']['id'],
-                'quantity'           => $item['quantity'],
+                'shelf_id' => $item['shelf']['id'],
+                'quantity' => $item['quantity'],
             ];
         }
+
         return $shelves;
     }
-
 }

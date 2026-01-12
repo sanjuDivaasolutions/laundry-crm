@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -32,19 +33,19 @@ class ProductListResource extends JsonResource
         $inTransit = $stock->sum('in_transit');
 
         return [
-            'id'               => $this->id,
-            'code'             => $this->code,
-            'type'             => $this->type,
-            'name'             => $this->name,
-            'sku'              => $this->sku,
-            'description'      => $this->description,
-            'active'           => $this->active,
-            'category_id'      => $this->category_id,
-            'category'         => new CategoryResource($this->whenLoaded('category')),
-            'on_hand'          => $onHand,
-            'in_transit'       => $inTransit,
-            'on_hand_label'    => $onHand,
-            'in_transit_label' => $inTransit
+            'id' => $this->id,
+            'code' => $this->code,
+            'type' => $this->type,
+            'name' => $this->name,
+            'sku' => $this->sku,
+            'description' => $this->description,
+            'active' => $this->active,
+            'category_id' => $this->category_id,
+            'category' => new CategoryResource($this->whenLoaded('category')),
+            'on_hand' => $onHand,
+            'in_transit' => $inTransit,
+            'on_hand_label' => $onHand,
+            'in_transit_label' => $inTransit,
         ];
     }
 }

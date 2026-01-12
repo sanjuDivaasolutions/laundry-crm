@@ -15,8 +15,9 @@ class SalesByMonthResourceCollection extends ResourceCollection
     public function toArray($request): array
     {
         $data = SalesByMonthResource::collection($this->collection);
+
         return [
-            'data'    => $data,
+            'data' => $data,
             'summary' => $this->getSummary($data),
         ];
     }
@@ -28,9 +29,10 @@ class SalesByMonthResourceCollection extends ResourceCollection
         foreach ($data as $item) {
             $total += $item->total;
         }
+
         return [
-            'total'       => $total,
-            'total_label' => $currencySign . number_format($total, 2),
+            'total' => $total,
+            'total_label' => $currencySign.number_format($total, 2),
         ];
     }
 }

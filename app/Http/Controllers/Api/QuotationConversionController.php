@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Quotation\ConvertQuotationRequest;
 use App\Http\Resources\SalesOrderResource;
 use App\Models\Quotation;
-use App\Models\SalesOrder;
 use App\Services\QuotationConversionService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class QuotationConversionController extends Controller
@@ -22,10 +20,6 @@ class QuotationConversionController extends Controller
 
     /**
      * Convert quotation to sales order
-     *
-     * @param ConvertQuotationRequest $request
-     * @param Quotation $quotation
-     * @return JsonResponse
      */
     public function convert(ConvertQuotationRequest $request, Quotation $quotation): JsonResponse
     {
@@ -38,22 +32,19 @@ class QuotationConversionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Quotation converted to sales order successfully',
-                'data' => new SalesOrderResource($salesOrder)
+                'data' => new SalesOrderResource($salesOrder),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to convert quotation to sales order',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
 
     /**
      * Get preview of sales order data before conversion
-     *
-     * @param Quotation $quotation
-     * @return JsonResponse
      */
     public function preview(Quotation $quotation): JsonResponse
     {
@@ -62,13 +53,13 @@ class QuotationConversionController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $preview
+                'data' => $preview,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate preview',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

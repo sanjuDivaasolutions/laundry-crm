@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -35,7 +36,7 @@ class InventoryAdjustmentRequest extends FormRequest
     ];
 
     private array $valueObjects = [
-        'reason'
+        'reason',
     ];
 
     private array $stringArrays = [];
@@ -58,13 +59,13 @@ class InventoryAdjustmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code'              => ['required'],
-            'date'              => ['required'],
-            'reason'            => ['required'],
-            'remark'            => ['nullable'],
-            'product_id'        => ['required', 'exists:products,id'],
-            'shelf_id'          => ['required', 'exists:shelves,id'],
-            'target_shelf_id'   => ['required_if:reason,move', 'nullable', 'exists:shelves,id'],
+            'code' => ['required'],
+            'date' => ['required'],
+            'reason' => ['required'],
+            'remark' => ['nullable'],
+            'product_id' => ['required', 'exists:products,id'],
+            'shelf_id' => ['required', 'exists:shelves,id'],
+            'target_shelf_id' => ['required_if:reason,move', 'nullable', 'exists:shelves,id'],
             'adjusted_quantity' => [
                 'required',
                 'numeric',
@@ -74,7 +75,7 @@ class InventoryAdjustmentRequest extends FormRequest
                     }
                 },
             ],
-            'user_id'           => ['required', 'exists:users,id'],
+            'user_id' => ['required', 'exists:users,id'],
         ];
     }
 
@@ -87,9 +88,9 @@ class InventoryAdjustmentRequest extends FormRequest
     {
         $field = 'code';
         $config = [
-            'table'  => 'inventory_adjustments',
-            'field'  => $field,
-            'prefix' => 'ADJ-'
+            'table' => 'inventory_adjustments',
+            'field' => $field,
+            'prefix' => 'ADJ-',
         ];
         $code = UtilityService::generateCode($config);
         $this->set($field, $code);

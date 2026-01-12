@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -33,7 +34,7 @@ class CountryFactory extends Factory
     public function definition()
     {
         return [
-            'name'   => 'Canada',
+            'name' => 'Canada',
             'active' => 1,
         ];
     }
@@ -45,7 +46,7 @@ class CountryFactory extends Factory
      */
     public function unverified()
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

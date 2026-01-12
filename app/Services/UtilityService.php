@@ -9,16 +9,17 @@ class UtilityService
     public static function generateCode($config)
     {
         $c = [
-            'table'                  => $config['table'],
-            'field'                  => $config['field'] ?? null,
-            'length'                 => $config['length'] ?? 10,
-            'prefix'                 => $config['prefix'] ?? '',
-            'where'                  => $config['where'] ?? null,
+            'table' => $config['table'],
+            'field' => $config['field'] ?? null,
+            'length' => $config['length'] ?? 10,
+            'prefix' => $config['prefix'] ?? '',
+            'where' => $config['where'] ?? null,
             'reset_on_prefix_change' => isset($config['reset_on_prefix_change']) ? $config['reset_on_prefix_change'] : true,
         ];
-        if (isset($c['where']) && !$c['where']) {
+        if (isset($c['where']) && ! $c['where']) {
             unset($c['where']);
         }
+
         return IdGenerator::generate($c);
     }
 
@@ -27,9 +28,10 @@ class UtilityService
         if (empty($decimal)) {
             $decimal = config('project.default_decimals', 2);
         }
+
         /*$formatter = new NumberFormatter(config('project.default_locale','en_US'), NumberFormatter::DECIMAL_ALWAYS_SHOWN);
         return numfmt_format($formatter,(float)$value);*/
-        return number_format((float)$value, $decimal, '.', '');
+        return number_format((float) $value, $decimal, '.', '');
     }
 
     /*public static function dsMoneyRound($value,$decimal=null,$curr_sign='$') {
@@ -41,15 +43,16 @@ class UtilityService
 
     public static function dsMoneyRound($value, $code = 'USD', $locale = 'en_US')
     {
-        if (!$code) {
+        if (! $code) {
             $curr_code = config('project.default_currency_code', 'USD');
         } else {
             $curr_code = $code;
         }
-        if (!$locale) {
+        if (! $locale) {
             $locale = config('project.default_locale', 'en_US');
         }
         $fmt = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+
         return numfmt_format_currency($fmt, $value, $curr_code);
     }
 
@@ -62,6 +65,7 @@ class UtilityService
                 $current = implode(', ', $current);
             }
         }
+
         return $current;
     }
 }

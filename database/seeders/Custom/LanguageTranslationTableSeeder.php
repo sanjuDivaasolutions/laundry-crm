@@ -30,12 +30,12 @@ class LanguageTranslationTableSeeder extends Seeder
                 $term = collect($terms)->where('name', $key)->first();
                 if ($term) {
                     $insert[] = [
-                        'id'               => null,
-                        'language_id'      => $language->id,
+                        'id' => null,
+                        'language_id' => $language->id,
                         'language_term_id' => $term->id,
-                        'translation'      => $value,
-                        'created_at'       => now(),
-                        'updated_at'       => now(),
+                        'translation' => $value,
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ];
                 }
             }
@@ -50,6 +50,7 @@ class LanguageTranslationTableSeeder extends Seeder
         if (file_exists($path)) {
             return include $path;
         }
+
         return [];
     }
 
@@ -65,5 +66,4 @@ class LanguageTranslationTableSeeder extends Seeder
             }
         }
     }
-
 }

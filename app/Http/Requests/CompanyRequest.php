@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -25,12 +26,12 @@ class CompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code'      => ['required'],
-            'name'      => ['required'],
+            'code' => ['required'],
+            'name' => ['required'],
             'address_1' => ['required'],
             'address_2' => ['required'],
-            'active'    => ['boolean'],
-            'user_id'   => ['required', 'exists:users'],
+            'active' => ['boolean'],
+            'user_id' => ['required', 'exists:users'],
         ];
     }
 

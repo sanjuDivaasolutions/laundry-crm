@@ -16,10 +16,10 @@ class PermissionGroupsTableSeeder extends Seeder
         $count = 1;
         foreach ($data as $g) {
             $groups[] = [
-                'id'=>$count,
-                'name'=>$g,
-                'created_at'=>now(),
-                'updated_at'=>now(),
+                'id' => $count,
+                'name' => $g,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
             $count++;
         }

@@ -2,21 +2,19 @@
 
 namespace App\Modules\Dashboard;
 
-use App\Models\Payment;
-use App\Models\PettyCashExpense;
-use App\Models\PurchaseInvoice;
-use App\Models\SalesInvoice;
-use App\Models\Transaction;
-use App\Services\DashboardService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class AdminSalesVsPurchaseModule
 {
     public string $module = 'AdminSalesVsPurchaseModule';
+
     public string $title = 'Sales vs Purchase';
+
     public string $component = 'BarChartComponent';
+
     public int $columns = 12;
+
     public array $filters = [];
 
     public function __construct($params = [])
@@ -31,14 +29,14 @@ class AdminSalesVsPurchaseModule
     public function get(): array
     {
         return [
-            'title'        => $this->title,
-            'component'    => $this->component,
-            'module'       => $this->module,
-            'query'        => $this->getQuery(),
+            'title' => $this->title,
+            'component' => $this->component,
+            'module' => $this->module,
+            'query' => $this->getQuery(),
             'defaultQuery' => $this->getQuery(),
-            'filters'      => $this->getFilters(),
-            'data'         => $this->getData(),
-            'columns'      => $this->columns,
+            'filters' => $this->getFilters(),
+            'data' => $this->getData(),
+            'columns' => $this->columns,
         ];
     }
 
@@ -46,7 +44,7 @@ class AdminSalesVsPurchaseModule
     {
         $f_date_range_type = request('f_date_range_type', 'monthly');
 
-        //values for $f_date_range_type can be yearly,monthly, weekly, daily
+        // values for $f_date_range_type can be yearly,monthly, weekly, daily
         switch ($f_date_range_type) {
             case 'monthly':
                 return $this->getMonthlyData();
@@ -72,9 +70,9 @@ class AdminSalesVsPurchaseModule
             return Carbon::parse($month)->format('M y');
         });
 
-        $sales = DB::table(DB::raw('(' . $months->map(function ($month) {
-                return "SELECT '" . $month . "' AS month";
-            })->implode(' UNION ALL ') . ') as months'))
+        $sales = DB::table(DB::raw('('.$months->map(function ($month) {
+            return "SELECT '".$month."' AS month";
+        })->implode(' UNION ALL ').') as months'))
             ->leftJoin('sales_invoices', function ($join) {
                 $join->on(DB::raw("DATE_FORMAT(sales_invoices.date, '%Y-%m')"), '=', 'months.month');
             })
@@ -91,9 +89,9 @@ class AdminSalesVsPurchaseModule
             return round($item->total_sales, 2);
         });
 
-        $purchases = DB::table(DB::raw('(' . $months->map(function ($month) {
-                return "SELECT '" . $month . "' AS month";
-            })->implode(' UNION ALL ') . ') as months'))
+        $purchases = DB::table(DB::raw('('.$months->map(function ($month) {
+            return "SELECT '".$month."' AS month";
+        })->implode(' UNION ALL ').') as months'))
             ->leftJoin('purchase_invoices', function ($join) {
                 $join->on(DB::raw("DATE_FORMAT(purchase_invoices.date, '%Y-%m')"), '=', 'months.month');
             })
@@ -112,15 +110,15 @@ class AdminSalesVsPurchaseModule
 
         return [
             'categories' => $categories,
-            'series'     => [
+            'series' => [
                 [
                     'name' => 'Sales',
-                    'data' => $sales
+                    'data' => $sales,
                 ],
                 [
                     'name' => 'Purchases',
-                    'data' => $purchases
-                ]
+                    'data' => $purchases,
+                ],
             ],
         ];
     }
@@ -133,15 +131,15 @@ class AdminSalesVsPurchaseModule
 
         return [
             'categories' => $categories,
-            'series'     => [
+            'series' => [
                 [
                     'name' => 'Sales',
-                    'data' => $sales
+                    'data' => $sales,
                 ],
                 [
                     'name' => 'Purchases',
-                    'data' => $purchases
-                ]
+                    'data' => $purchases,
+                ],
             ],
         ];
     }
@@ -154,15 +152,15 @@ class AdminSalesVsPurchaseModule
 
         return [
             'categories' => $categories,
-            'series'     => [
+            'series' => [
                 [
                     'name' => 'Sales',
-                    'data' => $sales
+                    'data' => $sales,
                 ],
                 [
                     'name' => 'Purchases',
-                    'data' => $purchases
-                ]
+                    'data' => $purchases,
+                ],
             ],
         ];
     }
@@ -203,13 +201,13 @@ class AdminSalesVsPurchaseModule
                 'value'   => 'monthly',
             ],*/
             [
-                'outside'  => true,
-                'type'     => 'select-single',
-                'label'    => 'Department',
-                'name'     => 'department',
-                'field'    => 'f_department_id',
+                'outside' => true,
+                'type' => 'select-single',
+                'label' => 'Department',
+                'name' => 'department',
+                'field' => 'f_department_id',
                 'endpoint' => 'departments',
-                'value'    => null,
+                'value' => null,
             ],
         ];
     }
@@ -217,7 +215,7 @@ class AdminSalesVsPurchaseModule
     private function getQuery()
     {
         return [
-            'f_department_id'   => null,
+            'f_department_id' => null,
             'f_date_range_type' => 'monthly',
         ];
     }

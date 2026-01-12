@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -30,18 +31,18 @@ class SalesOrderListResource extends JsonResource
         $grandTotal = number_format($this->grand_total, 2);
 
         return [
-            'id'               => $this->id,
-            'so_number'        => $this->so_number,
-            'date'             => $this->date,
-            'buyer'            => $this->whenLoaded('buyer'),
-            'company'          => $this->whenLoaded('company'),
-            'user'             => $this->whenLoaded('user'),
-            'sub_total'        => $this->sub_total,
-            'sub_total_text'   => $currency . ' ' . $subTotal,
-            'tax_total'        => $this->tax_total,
-            'tax_total_text'   => $currency . ' ' . $taxTotal,
-            'grand_total'      => $this->grand_total,
-            'grand_total_text' => $currency . ' ' . $grandTotal,
+            'id' => $this->id,
+            'so_number' => $this->so_number,
+            'date' => $this->date,
+            'buyer' => $this->whenLoaded('buyer'),
+            'company' => $this->whenLoaded('company'),
+            'user' => $this->whenLoaded('user'),
+            'sub_total' => $this->sub_total,
+            'sub_total_text' => $currency.' '.$subTotal,
+            'tax_total' => $this->tax_total,
+            'tax_total_text' => $currency.' '.$taxTotal,
+            'grand_total' => $this->grand_total,
+            'grand_total_text' => $currency.' '.$grandTotal,
         ];
     }
 }

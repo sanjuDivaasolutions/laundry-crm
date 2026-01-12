@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
-use App\Scopes\TenantScope;
 use App\Models\Tenant;
+use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
@@ -14,8 +14,6 @@ trait BelongsToTenant
 {
     /**
      * Boot the trait.
-     *
-     * @return void
      */
     protected static function bootBelongsToTenant(): void
     {
@@ -31,8 +29,6 @@ trait BelongsToTenant
 
     /**
      * Get the tenant that owns the model.
-     *
-     * @return BelongsTo
      */
     public function tenant(): BelongsTo
     {

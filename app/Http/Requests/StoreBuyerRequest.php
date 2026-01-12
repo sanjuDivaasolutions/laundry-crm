@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -46,37 +47,37 @@ class StoreBuyerRequest extends FormRequest
     public function rules()
     {
         return [
-            'code'                => [
+            'code' => [
                 'string',
                 'required',
             ],
-            'display_name'        => [
+            'display_name' => [
                 'string',
                 'required',
             ],
-            'name'                => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'active'              => [
+            'active' => [
                 'boolean',
             ],
-            'currency_id'         => [
+            'currency_id' => [
                 'integer',
                 'exists:currencies,id',
                 'nullable',
             ],
-            'payment_term_id'     => [
+            'payment_term_id' => [
                 'integer',
                 'exists:payment_terms,id',
                 'nullable',
             ],
-            'agent_id'            => [
+            'agent_id' => [
                 'integer',
                 'exists:suppliers,id',
                 'nullable',
             ],
-            'billing_address_id'  => [
+            'billing_address_id' => [
                 'integer',
                 'exists:contact_addresses,id',
                 'nullable',
@@ -89,25 +90,25 @@ class StoreBuyerRequest extends FormRequest
             'shipping_same_as_billing' => [
                 'boolean',
             ],
-            'phone'               => [
+            'phone' => [
                 'string',
                 'nullable',
             ],
-            'email'               => [
+            'email' => [
                 'email',
                 'nullable',
             ],
-            'agent_name'         => [
+            'agent_name' => [
                 'string',
                 'max:255',
                 'nullable',
             ],
-            'commission_rate'    => [
+            'commission_rate' => [
                 'numeric',
                 'min:0',
                 'nullable',
             ],
-            'remarks'             => [
+            'remarks' => [
                 'string',
                 'nullable',
             ],
@@ -118,9 +119,9 @@ class StoreBuyerRequest extends FormRequest
     {
         $field = 'code';
         $config = [
-            'table'  => 'buyers',
-            'field'  => $field,
-            'prefix' => 'BUY-'
+            'table' => 'buyers',
+            'field' => $field,
+            'prefix' => 'BUY-',
         ];
         $code = UtilityService::generateCode($config);
         $this->merge([$field => $code]);

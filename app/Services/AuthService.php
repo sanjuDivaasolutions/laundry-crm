@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -35,7 +36,7 @@ class AuthService
         }
 
         $token = self::getTokenById($user->id, $auth);
-        $newToken = $token;//auth($auth)->refresh($token);
+        $newToken = $token; // auth($auth)->refresh($token);
         $user->api_token = $newToken;
 
         $payload = JWTAuth::manager()->getJWTProvider()->decode($token);
@@ -62,9 +63,9 @@ class AuthService
         $user->roles = $roles;
 
         return [
-            'status'    => 'success',
-            'expires'   => $expiresIn,
-            'user'      => $user,
+            'status' => 'success',
+            'expires' => $expiresIn,
+            'user' => $user,
             'abilities' => $permissions,
         ];
     }
@@ -72,12 +73,14 @@ class AuthService
     public static function getUser($auth = null)
     {
         $auth = $auth ?: self::getDefaultGuard();
+
         return auth($auth)->user();
     }
 
     public static function getTokenById($id, $auth = null)
     {
         $auth = $auth ?: self::getDefaultGuard();
+
         return auth($auth)->tokenById($id);
     }
 
@@ -90,6 +93,7 @@ class AuthService
     {
         $user = self::getUser();
         $settings = $user->settings;
+
         return $settings['company_id'] ?? null;
     }
 }

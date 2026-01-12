@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -28,21 +29,21 @@ class ContractListResource extends JsonResource
         $currencySign = '$';
         $amount = $revision ? $revision->sub_total : 0;
 
-        $amount_label = $currencySign . number_format($amount, 2);
+        $amount_label = $currencySign.number_format($amount, 2);
 
         return [
-            'id'                    => $this->id,
-            'code'                  => $this->code,
-            'contract_type'         => $revision?->contract_type,
-            'buyer'                 => $this->whenLoaded('buyer'),
-            'description'           => $this->description,
-            'start_date'            => $revision?->start_date,
-            'end_date'              => $revision?->end_date,
-            'date'                  => $this->date,
-            'installment_count'     => $this->installment_count,
+            'id' => $this->id,
+            'code' => $this->code,
+            'contract_type' => $revision?->contract_type,
+            'buyer' => $this->whenLoaded('buyer'),
+            'description' => $this->description,
+            'start_date' => $revision?->start_date,
+            'end_date' => $revision?->end_date,
+            'date' => $this->date,
+            'installment_count' => $this->installment_count,
             'installment_remaining' => $this->installment_count,
-            'amount'                => $amount,
-            'amount_label'          => $amount_label,
+            'amount' => $amount,
+            'amount_label' => $amount_label,
         ];
     }
 }

@@ -17,20 +17,26 @@ use Illuminate\Http\Response;
 class PermissionsApiController extends Controller
 {
     protected $className = Permission::class;
+
     protected $scopes = [];
+
     protected $with = [];
+
     protected $fetcher = 'advancedFilter';
-    protected $filterMethods = ['index','getCsv','getPdf'];
+
+    protected $filterMethods = ['index', 'getCsv', 'getPdf'];
+
     protected $fields = ['title'];
+
     protected $filters = [
-        ['request'=>'f_permission_group','field'=>'permission_group_id','operator'=>'in'],
+        ['request' => 'f_permission_group', 'field' => 'permission_group_id', 'operator' => 'in'],
     ];
 
-    use SearchFilters;
     use ControllerRequest;
     use ExportRequest;
-
     use SearchFilters;
+    use SearchFilters;
+
     public function index()
     {
         abort_if(Gate::denies('permission_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -88,8 +94,8 @@ class PermissionsApiController extends Controller
         abort_if(Gate::denies('permission_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         abort(Response::HTTP_FORBIDDEN, 'Permission delete is not allowed');
-        //$permission->delete();
+        // $permission->delete();
 
-        //return response(null, Response::HTTP_NO_CONTENT);
+        // return response(null, Response::HTTP_NO_CONTENT);
     }
 }

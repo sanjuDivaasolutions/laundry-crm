@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -19,7 +20,6 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Admin\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
@@ -51,7 +51,7 @@ class ResetPasswordController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {
                 $user->forceFill([
-                    'password' => Hash::make($password)
+                    'password' => Hash::make($password),
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();
@@ -63,14 +63,14 @@ class ResetPasswordController extends Controller
         if ($status === Password::PASSWORD_RESET) {
             return response()->json([
                 'message' => 'Password has been reset successfully.',
-                'status' => 'success'
+                'status' => 'success',
             ], Response::HTTP_OK);
         }
 
         return response()->json([
             'message' => 'Unable to reset password. Please check your credentials and try again.',
             'errors' => ['email' => [__($status)]],
-            'status' => 'error'
+            'status' => 'error',
         ], Response::HTTP_BAD_REQUEST);
     }
 }

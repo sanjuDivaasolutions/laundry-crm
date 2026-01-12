@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\SalesInvoiceActivity;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class UpdateSalesInvoiceActivityRequest extends FormRequest
 {
@@ -20,7 +18,7 @@ class UpdateSalesInvoiceActivityRequest extends FormRequest
             'title' => [
                 'string',
                 'required',
-                'unique:sales_invoice_activities,title,' . request()->route('sales_invoice_activity')->id,
+                'unique:sales_invoice_activities,title,'.request()->route('sales_invoice_activity')->id,
             ],
             'description' => [
                 'string',

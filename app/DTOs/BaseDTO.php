@@ -14,14 +14,14 @@ abstract class BaseDTO implements Arrayable
     {
         $reflection = new ReflectionClass($this);
         $properties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
-        
+
         $data = [];
         foreach ($properties as $property) {
             if ($property->isInitialized($this)) {
                 $data[$property->getName()] = $property->getValue($this);
             }
         }
-        
+
         return $data;
     }
 

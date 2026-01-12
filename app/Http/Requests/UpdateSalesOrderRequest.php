@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -44,71 +45,71 @@ class UpdateSalesOrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'company_id'              => [
+            'company_id' => [
                 'integer',
                 'exists:companies,id',
                 'required',
             ],
-            'so_number'               => [
+            'so_number' => [
                 'string',
                 'required',
             ],
-            'quotation_no'            => [
+            'quotation_no' => [
                 'string',
                 'nullable',
             ],
-            'reference_no'            => [
+            'reference_no' => [
                 'string',
                 'nullable',
             ],
-            'warehouse_id'            => [
+            'warehouse_id' => [
                 'integer',
                 'exists:warehouses,id',
                 'required',
             ],
-            'type'                    => [
+            'type' => [
                 'required',
-                'in:' . implode(',', Arr::pluck(SalesOrder::TYPE_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(SalesOrder::TYPE_SELECT, 'value')),
             ],
-            'date'                    => [
-                'date_format:' . config('project.date_format'),
+            'date' => [
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
             'estimated_shipment_date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
-            'buyer_id'                => [
+            'buyer_id' => [
                 'integer',
                 'exists:buyers,id',
                 'nullable',
             ],
-            'payment_term_id'         => [
+            'payment_term_id' => [
                 'integer',
                 'exists:payment_terms,id',
                 'nullable',
             ],
-            'remarks'                 => [
+            'remarks' => [
                 'string',
                 'nullable',
             ],
-            'sub_total'               => [
+            'sub_total' => [
                 'numeric',
                 'required',
             ],
-            'tax_total'               => [
+            'tax_total' => [
                 'numeric',
                 'nullable',
             ],
-            'tax_rate'                => [
+            'tax_rate' => [
                 'numeric',
                 'required',
             ],
-            'grand_total'             => [
+            'grand_total' => [
                 'numeric',
                 'required',
             ],
-            'user_id'                 => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'required',

@@ -15,7 +15,7 @@ class StoreContractTermRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'        => [
+            'name' => [
                 'string',
                 'required',
             ],
@@ -23,13 +23,13 @@ class StoreContractTermRequest extends FormRequest
                 'string',
                 'nullable',
             ],
-            'sequence'    => [
+            'sequence' => [
                 'integer',
                 'min:-2147483648',
                 'max:2147483647',
                 'nullable',
             ],
-            'active'      => [
+            'active' => [
                 'boolean',
             ],
         ];

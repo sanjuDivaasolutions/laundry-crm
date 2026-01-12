@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -33,8 +34,9 @@ class ContractInvoiceListResourceCollection extends ResourceCollection
     public function toArray($request)
     {
         $data = ContractInvoiceListResource::collection($this->collection);
+
         return [
-            'data'    => $data,
+            'data' => $data,
             'columns' => $this->getColumns(),
             'summary' => $this->getSummary($data),
         ];
@@ -44,42 +46,42 @@ class ContractInvoiceListResourceCollection extends ResourceCollection
     {
         $columns = [
             [
-                'title'    => 'Invoice Number',
-                'field'    => 'invoice_number',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Invoice Number',
+                'field' => 'invoice_number',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Date',
-                'field'    => 'date',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Date',
+                'field' => 'date',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Sub Total',
-                'field'    => 'sub_total_text',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Sub Total',
+                'field' => 'sub_total_text',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Tax Total',
-                'field'    => 'tax_total_text',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Tax Total',
+                'field' => 'tax_total_text',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Grand Total',
-                'field'    => 'grand_total_text',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Grand Total',
+                'field' => 'grand_total_text',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Status',
-                'field'    => 'payment_status_label',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Status',
+                'field' => 'payment_status_label',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
         ];
@@ -125,13 +127,13 @@ class ContractInvoiceListResourceCollection extends ResourceCollection
         }
         if ($revision->contract_type['value'] == 'default') {
             $columns[] = [
-                'title'     => 'Actions',
-                'field'     => 'id',
-                'thComp'    => 'TranslatedHeader',
-                'tdComp'    => 'DatatableActions',
-                'align'     => 'center',
+                'title' => 'Actions',
+                'field' => 'id',
+                'thComp' => 'TranslatedHeader',
+                'tdComp' => 'DatatableActions',
+                'align' => 'center',
                 'isActions' => true,
-                'sortable'  => false,
+                'sortable' => false,
             ];
         }
 
@@ -149,13 +151,14 @@ class ContractInvoiceListResourceCollection extends ResourceCollection
             $taxTotal += $item->tax_total;
             $grandTotal += $item->grand_total;
         }
+
         return [
-            'sub_total'        => $subTotal,
-            'sub_total_text'   => $currencySign . number_format($subTotal, 2),
-            'tax_total'        => $taxTotal,
-            'tax_total_text'   => $currencySign . number_format($taxTotal, 2),
-            'grand_total'      => $grandTotal,
-            'grand_total_text' => $currencySign . number_format($grandTotal, 2),
+            'sub_total' => $subTotal,
+            'sub_total_text' => $currencySign.number_format($subTotal, 2),
+            'tax_total' => $taxTotal,
+            'tax_total_text' => $currencySign.number_format($taxTotal, 2),
+            'grand_total' => $grandTotal,
+            'grand_total_text' => $currencySign.number_format($grandTotal, 2),
         ];
     }
 }

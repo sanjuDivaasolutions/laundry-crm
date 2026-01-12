@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -71,15 +72,14 @@ class ControllerService
     /**
      * Update child records for a model
      *
-     * @param Request|array $request The request object or array containing child data
-     * @param object $modelObj The parent model object
-     * @param string $field The field name in the request containing child records
-     * @param string $model The child model class name
-     * @param string $relationField The relation method name in parent model
-     * @param string $updateField The field to update with parent ID
-     * @param array $syncFields Fields to sync in child models
-     * @param array $subItems Nested child items to update
-     * @return void
+     * @param  Request|array  $request  The request object or array containing child data
+     * @param  object  $modelObj  The parent model object
+     * @param  string  $field  The field name in the request containing child records
+     * @param  string  $model  The child model class name
+     * @param  string  $relationField  The relation method name in parent model
+     * @param  string  $updateField  The field to update with parent ID
+     * @param  array  $syncFields  Fields to sync in child models
+     * @param  array  $subItems  Nested child items to update
      */
     public static function updateChild($request, $modelObj, string $field, string $model, string $relationField, string $updateField, array $syncFields = [], array $subItems = []): void
     {
@@ -91,7 +91,7 @@ class ControllerService
 
             // Get records from request
             $records = $request->input($field, []);
-            if ($records && !is_array($records)) {
+            if ($records && ! is_array($records)) {
                 $records = json_decode($records, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     throw new \InvalidArgumentException("Invalid JSON in field {$field}");
@@ -99,20 +99,20 @@ class ControllerService
             }
 
             $ignoreIds = [];
-            if (!empty($records)) {
+            if (! empty($records)) {
                 foreach ($records as $s) {
-                    if (!is_array($s)) {
+                    if (! is_array($s)) {
                         continue;
                     }
 
                     // Find or create model
                     $newItem = null;
-                    if (isset($s['id']) && !empty($s['id'])) {
+                    if (isset($s['id']) && ! empty($s['id'])) {
                         $newItem = $model::find($s['id']);
                     }
 
                     if (empty($newItem)) {
-                        $newItem = new $model();
+                        $newItem = new $model;
                     }
 
                     // Fill only necessary values and avoid mass assignment
@@ -122,16 +122,16 @@ class ControllerService
                     $newItem->save();
 
                     // Add to ignore IDs if not already present
-                    if (!in_array($newItem->id, $ignoreIds)) {
+                    if (! in_array($newItem->id, $ignoreIds)) {
                         $ignoreIds[] = $newItem->id;
                     }
 
                     // Process sync fields
                     if ($syncFields) {
                         foreach ($syncFields as $syncField) {
-                            if (!isset($s[$syncField['field']]) ||
-                                !isset($syncField['relation']) ||
-                                !method_exists($newItem, $syncField['relation'])) {
+                            if (! isset($s[$syncField['field']]) ||
+                                ! isset($syncField['relation']) ||
+                                ! method_exists($newItem, $syncField['relation'])) {
                                 continue;
                             }
                             $newItem->{$syncField['relation']}()->sync($s[$syncField['field']]);
@@ -141,10 +141,10 @@ class ControllerService
                     // Update sub-items if available
                     if ($subItems) {
                         foreach ($subItems as $subItem) {
-                            if (!isset($s[$subItem['field']]) ||
-                                !isset($subItem['model']) ||
-                                !isset($subItem['relation']) ||
-                                !isset($subItem['update_field'])) {
+                            if (! isset($s[$subItem['field']]) ||
+                                ! isset($subItem['model']) ||
+                                ! isset($subItem['relation']) ||
+                                ! isset($subItem['update_field'])) {
                                 continue;
                             }
                             self::updateChild(
@@ -163,7 +163,7 @@ class ControllerService
             }
 
             // Delete items not in the ignore list
-            if (!empty($ignoreIds)) {
+            if (! empty($ignoreIds)) {
                 $modelObj->{$relationField}()->whereNotIn('id', $ignoreIds)->delete();
             } else {
                 // If no valid records were processed, delete all related records
@@ -171,10 +171,10 @@ class ControllerService
             }
         } catch (\Exception $e) {
             // Log the exception
-            Log::error("Error updating child records: " . $e->getMessage(), [
-                'model'    => get_class($modelObj),
-                'field'    => $field,
-                'relation' => $relationField
+            Log::error('Error updating child records: '.$e->getMessage(), [
+                'model' => get_class($modelObj),
+                'field' => $field,
+                'relation' => $relationField,
             ]);
 
             // Re-throw as a more specific exception if needed

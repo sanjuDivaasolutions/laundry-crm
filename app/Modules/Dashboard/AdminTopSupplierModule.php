@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -23,9 +24,13 @@ use App\Models\PurchaseInvoice;
 class AdminTopSupplierModule
 {
     public string $module = 'AdminTopSupplierModule';
+
     public string $title = 'Top 5 Suppliers';
+
     public string $component = 'BasicTableComponent';
+
     public int $columns = 4;
+
     public array $filters = [];
 
     public function __construct($params = [])
@@ -40,14 +45,14 @@ class AdminTopSupplierModule
     public function get(): array
     {
         return [
-            'title'        => $this->title,
-            'component'    => $this->component,
-            'module'       => $this->module,
-            'query'        => $this->getQuery(),
+            'title' => $this->title,
+            'component' => $this->component,
+            'module' => $this->module,
+            'query' => $this->getQuery(),
             'defaultQuery' => $this->getQuery(),
-            'filters'      => $this->getFilters(),
-            'data'         => $this->getData(),
-            'columns'      => $this->columns,
+            'filters' => $this->getFilters(),
+            'data' => $this->getData(),
+            'columns' => $this->columns,
         ];
     }
 
@@ -68,8 +73,8 @@ class AdminTopSupplierModule
         $data = [];
         foreach ($topFiveSuppliers as $s) {
             $data[] = [
-                'name'   => $s->supplier->name,
-                'amount' => $currencySign . number_format($s->converted_sub_total, 2),
+                'name' => $s->supplier->name,
+                'amount' => $currencySign.number_format($s->converted_sub_total, 2),
             ];
         }
 
@@ -117,9 +122,9 @@ class AdminTopSupplierModule
                 'value' => 'name',
             ],
             [
-                'label'   => 'Amount',
-                'value'   => 'amount',
-                'class'   => 'text-end',
+                'label' => 'Amount',
+                'value' => 'amount',
+                'class' => 'text-end',
                 'thClass' => '',
                 'tdClass' => 'text-info fw-bold',
             ],

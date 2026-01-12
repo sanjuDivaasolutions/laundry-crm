@@ -13,7 +13,7 @@ class StoreUserRequest extends FormRequest
 
     public function authorize()
     {
-        return true;//Gate::allows('user_create');
+        return true; // Gate::allows('user_create');
     }
 
     public function prepareForValidation()
@@ -26,26 +26,26 @@ class StoreUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'        => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'email'       => [
+            'email' => [
                 'required',
                 'unique:users',
             ],
-            'password'    => [
+            'password' => [
                 'required',
             ],
-            'roles'       => [
+            'roles' => [
                 'required',
                 'array',
             ],
-            'roles.*.id'  => [
+            'roles.*.id' => [
                 'integer',
                 'exists:roles,id',
             ],
-            'active'      => [
+            'active' => [
                 'boolean',
             ],
             'language_id' => [
@@ -53,7 +53,7 @@ class StoreUserRequest extends FormRequest
                 'exists:languages,id',
                 'required',
             ],
-            'settings'    => [
+            'settings' => [
                 'string',
                 'nullable',
             ],

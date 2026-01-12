@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -23,7 +24,6 @@ use Illuminate\Support\Facades\Route;
 
 trait SearchFilters
 {
-
     public function __construct()
     {
         if (isset($this->filterMethods) && count($this->filterMethods)) {
@@ -74,7 +74,7 @@ trait SearchFilters
             $filter = [];
             foreach ($data as $d) {
                 $request = request($d['request']);
-                if (!is_null($request)) {
+                if (! is_null($request)) {
                     $operator = $d['operator'] ?? 'in';
                     if ($operator == 'date_range') {
                         $range = is_array($request) ? $request : explode($d['separator'], request($d['request'], []));

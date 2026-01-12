@@ -12,7 +12,7 @@ class ShipmentEditResource extends JsonResource
     {
         $result = parent::toArray($request);
 
-        if($this->payment_type) {
+        if ($this->payment_type) {
             $payment_type = collect(Shipment::PAYMENT_TYPE_SELECT)->firstWhere('value', $this->payment_type);
             $result['payment_type'] = [
                 'value' => $payment_type['value'],
@@ -20,9 +20,9 @@ class ShipmentEditResource extends JsonResource
             ];
         }
 
-        if(isset($result['items']) && is_array($result['items'])) {
+        if (isset($result['items']) && is_array($result['items'])) {
             foreach ($result['items'] as &$i) {
-                if($i['location']) {
+                if ($i['location']) {
                     $obj = collect(ShipmentItem::LOCATION_SELECT)->firstWhere('value', $i['location']);
                     $i['location'] = [
                         'value' => $obj['value'],

@@ -1,11 +1,11 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLanguageRequest;
 use App\Http\Requests\UpdateLanguageRequest;
 use App\Http\Resources\Admin\LanguageResource;
-use App\Models\FirItem;
 use App\Models\Language;
 use App\Models\Translation;
 use App\Services\LanguageService;
@@ -18,20 +18,29 @@ use Illuminate\Http\Response;
 class LanguageApiController extends Controller
 {
     protected $className = Language::class;
+
     protected $scopes = [];
+
     protected $with = [];
+
     protected $exportResource = LanguageResource::class;
+
     protected $fetcher = 'advancedFilter';
+
     protected $processListMethod = 'getProcessedList';
-    protected $filterMethods = ['index','getCsv','getPdf'];
+
+    protected $filterMethods = ['index', 'getCsv', 'getPdf'];
+
     protected $fields = ['name'];
+
     protected $filters = [
-        //['request'=>'','field'=>'','operator'=>'in'],
+        // ['request'=>'','field'=>'','operator'=>'in'],
     ];
 
-    use SearchFilters;
     use ControllerRequest;
     use ExportRequest;
+    use SearchFilters;
+
     public function index()
     {
         abort_if(Gate::denies('language_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -43,7 +52,7 @@ class LanguageApiController extends Controller
     {
         $language = Language::create($request->validated());
 
-        $this->updateRelations($language,$request,true);
+        $this->updateRelations($language, $request, true);
 
         return (new LanguageResource($language))
             ->response()
@@ -70,7 +79,7 @@ class LanguageApiController extends Controller
     {
         $language->update($request->validated());
 
-        $this->updateRelations($language,$request);
+        $this->updateRelations($language, $request);
 
         return (new LanguageResource($language))
             ->response()
@@ -100,18 +109,20 @@ class LanguageApiController extends Controller
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
-    private function updateRelations($obj,$request,$isNew = false) {
-        if($isNew) {
+    private function updateRelations($obj, $request, $isNew = false)
+    {
+        if ($isNew) {
             LanguageService::copyTranslations($obj);
+
             return;
         }
-        $this->updateTranslations($obj,$request);
+        $this->updateTranslations($obj, $request);
     }
 
-    public function updateTranslations($obj,$request)
+    public function updateTranslations($obj, $request)
     {
         $translations = stringToArray($request->input('translations', ''));
-        $request->merge(['translations'=>$translations]);
-        $this->updateChild($request, $obj, 'translations', Translation::class,'translations','language_id');
+        $request->merge(['translations' => $translations]);
+        $this->updateChild($request, $obj, 'translations', Translation::class, 'translations', 'language_id');
     }
 }

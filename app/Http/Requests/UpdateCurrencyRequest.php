@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Currency;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class UpdateCurrencyRequest extends FormRequest
 {
@@ -20,7 +18,7 @@ class UpdateCurrencyRequest extends FormRequest
             'code' => [
                 'string',
                 'required',
-                'unique:currencies,code,' . request()->route('currency')->id,
+                'unique:currencies,code,'.request()->route('currency')->id,
             ],
             'name' => [
                 'string',

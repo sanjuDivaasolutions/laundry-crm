@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -53,92 +54,92 @@ class UpdateSalesInvoiceRequest extends FormRequest
     public function rules()
     {
         return [
-            'company_id'       => [
+            'company_id' => [
                 'integer',
                 'exists:companies,id',
                 'required',
             ],
-            'warehouse_id'     => [
+            'warehouse_id' => [
                 'integer',
                 'exists:warehouses,id',
                 'required',
             ],
-            'state_id'         => [
+            'state_id' => [
                 'integer',
                 'exists:states,id',
                 'required',
             ],
-            'invoice_number'   => [
+            'invoice_number' => [
                 'string',
                 'required',
-                'unique:sales_invoices,invoice_number,' . request()->route('sales_invoice')->id,
+                'unique:sales_invoices,invoice_number,'.request()->route('sales_invoice')->id,
             ],
-            'sales_order_id'   => [
+            'sales_order_id' => [
                 'integer',
                 'exists:sales_orders,id',
                 'nullable',
             ],
-            'date'             => [
-                'date_format:' . config('project.date_format'),
+            'date' => [
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
-            'due_date'         => [
-                'date_format:' . config('project.date_format'),
+            'due_date' => [
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
-            'payment_term_id'  => [
+            'payment_term_id' => [
                 'integer',
                 'exists:payment_terms,id',
                 'nullable',
             ],
-            'buyer_id'         => [
+            'buyer_id' => [
                 'integer',
                 'exists:buyers,id',
                 'nullable',
             ],
-            'agent_id'         => [
+            'agent_id' => [
                 'integer',
                 'exists:suppliers,id',
                 'nullable',
             ],
-            'remark'           => [
+            'remark' => [
                 'string',
                 'nullable',
             ],
-            'user_id'          => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'required',
             ],
-            'type'             => [
+            'type' => [
                 'nullable',
-                'in:' . implode(',', Arr::pluck(SalesInvoice::TYPE_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(SalesInvoice::TYPE_SELECT, 'value')),
             ],
-            'order_type'       => [
+            'order_type' => [
                 'required',
                 'in:service,product',
             ],
-            'reference_no'     => [
+            'reference_no' => [
                 'string',
                 'nullable',
             ],
-            'sub_total'        => [
+            'sub_total' => [
                 'numeric',
                 'required',
             ],
-            'tax_total'        => [
+            'tax_total' => [
                 'numeric',
                 'required',
             ],
-            'tax_rate'         => [
+            'tax_rate' => [
                 'numeric',
                 'required',
             ],
-            'grand_total'      => [
+            'grand_total' => [
                 'numeric',
                 'required',
             ],
-            'commission'       => [
+            'commission' => [
                 'numeric',
                 'min:0',
                 'max:100',
@@ -148,7 +149,7 @@ class UpdateSalesInvoiceRequest extends FormRequest
                 'numeric',
                 'nullable',
             ],
-            'is_taxable'       => [
+            'is_taxable' => [
                 'boolean',
                 'required',
             ],

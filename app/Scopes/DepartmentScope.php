@@ -14,11 +14,10 @@ class DepartmentScope implements Scope
     {
         $this->prefix = $prefix;
     }
+
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
     public function apply(Builder $builder, Model $model)
@@ -30,6 +29,4 @@ class DepartmentScope implements Scope
             $q->orWhere('user_id', auth()->id());
         });*/
     }
-
-
 }

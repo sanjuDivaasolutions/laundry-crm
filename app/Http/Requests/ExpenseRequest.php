@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -39,7 +40,7 @@ class ExpenseRequest extends FormRequest
 
     private array $stringArrays = [
         'attachment',
-        'taxes'
+        'taxes',
     ];
 
     public function __construct()
@@ -78,20 +79,20 @@ class ExpenseRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'code'            => ['required'],
-            'description'     => ['required'],
-            'invoice_number'  => ['nullable'],
-            'sub_total'       => ['required', 'numeric'],
-            'tax_rate'        => ['required', 'numeric'],
-            'tax_total'       => ['required', 'numeric'],
-            'grand_total'     => ['required', 'numeric'],
-            'is_taxable'      => ['required', 'boolean'],
-            'date'            => ['required'],
+            'code' => ['required'],
+            'description' => ['required'],
+            'invoice_number' => ['nullable'],
+            'sub_total' => ['required', 'numeric'],
+            'tax_rate' => ['required', 'numeric'],
+            'tax_total' => ['required', 'numeric'],
+            'grand_total' => ['required', 'numeric'],
+            'is_taxable' => ['required', 'boolean'],
+            'date' => ['required'],
             'expense_type_id' => ['required', 'exists:expense_types,id'],
             'payment_mode_id' => ['required', 'exists:payment_modes,id'],
-            'state_id'        => ['required', 'exists:states,id'],
-            'company_id'      => ['required', 'exists:companies,id'],
-            'user_id'         => ['nullable', 'exists:users,id'],
+            'state_id' => ['required', 'exists:states,id'],
+            'company_id' => ['required', 'exists:companies,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
         ];
 
         if ($this->isCreateRequest()) {
@@ -114,9 +115,9 @@ class ExpenseRequest extends FormRequest
     {
         $field = 'code';
         $config = [
-            'table'  => 'expenses',
-            'field'  => $field,
-            'prefix' => 'EXP-'
+            'table' => 'expenses',
+            'field' => $field,
+            'prefix' => 'EXP-',
         ];
         $code = UtilityService::generateCode($config);
         $this->set($field, $code);

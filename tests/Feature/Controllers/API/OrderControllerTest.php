@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Controllers\API;
 
-use App\Models\User;
-use App\Models\SalesOrder;
-use App\Models\Buyer;
 use App\Models\Agent;
+use App\Models\Buyer;
 use App\Models\Company;
 use App\Models\Product;
+use App\Models\SalesOrder;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,8 +16,11 @@ class OrderControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Company $company;
+
     protected Buyer $buyer;
+
     protected Agent $agent;
 
     protected function setUp(): void
@@ -51,15 +54,15 @@ class OrderControllerTest extends TestCase
                         'buyer_id',
                         'grand_total',
                         'status',
-                    ]
-                ]
+                    ],
+                ],
             ]);
     }
 
     public function test_can_create_order()
     {
         $product = Product::factory()->create();
-        
+
         $orderData = [
             'order_number' => 'SO-001',
             'buyer_id' => $this->buyer->id,
@@ -80,7 +83,7 @@ class OrderControllerTest extends TestCase
                     'tax_total' => 50.00,
                     'sub_total' => 1000.00,
                     'grand_total' => 1050.00,
-                ]
+                ],
             ],
         ];
 

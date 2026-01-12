@@ -8,15 +8,15 @@ use Mpdf\Mpdf;
 
 trait ExportRequest
 {
-
     public function getCsv()
     {
 
         $data = $this->getList();
-        $data = !is_array($data) ? json_decode($data->toJson(), true) : $data;
+        $data = ! is_array($data) ? json_decode($data->toJson(), true) : $data;
         if (isset($data['data'])) {
             $data = $data['data'];
         }
+
         return $this->generateCsv($data);
     }
 
@@ -24,23 +24,23 @@ trait ExportRequest
     {
 
         $postColumns = request('columns');
-        abort_if(!$postColumns, Response::HTTP_FORBIDDEN, 'Invalid Columns supplied');
+        abort_if(! $postColumns, Response::HTTP_FORBIDDEN, 'Invalid Columns supplied');
 
         $columns = stringToArray($postColumns);
-        abort_if(!$columns, Response::HTTP_FORBIDDEN, 'Invalid Columns supplied');
+        abort_if(! $columns, Response::HTTP_FORBIDDEN, 'Invalid Columns supplied');
 
         $headerColumns = collect($columns)->pluck('l')->toArray();
 
         $filePrefix = $this->csvFilePrefix ?? 'reports-';
-        $fileName = $filePrefix . date(config('project.datetime_format')) . '.csv';
+        $fileName = $filePrefix.date(config('project.datetime_format')).'.csv';
 
-        $headers = array(
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        );
+        $headers = [
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=$fileName",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
 
         $callback = function () use ($data, $headerColumns, $columns) {
             $file = fopen('php://output', 'w');
@@ -63,13 +63,13 @@ trait ExportRequest
 
     public function generateCsvV2($data, $columns, $headerColumns, $fileName)
     {
-        $headers = array(
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        );
+        $headers = [
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=$fileName",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
 
         $callback = function () use ($data, $headerColumns, $columns) {
             $file = fopen('php://output', 'w');
@@ -105,13 +105,13 @@ trait ExportRequest
         $mpdf->WriteHTML($pdf_html);
         $pdf = $mpdf->Output($fileName, 'D');
 
-        $headers = array(
-            "Content-type"        => "application/pdf",
-            "Content-Disposition" => "inline; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        );
+        $headers = [
+            'Content-type' => 'application/pdf',
+            'Content-Disposition' => "inline; filename=$fileName",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
 
         $callback = function () use ($pdf) {
             $file = fopen('php://output', 'w');
@@ -121,5 +121,4 @@ trait ExportRequest
 
         return response()->stream($callback, 200, $headers);
     }
-
 }

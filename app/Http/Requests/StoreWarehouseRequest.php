@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -39,41 +40,40 @@ class StoreWarehouseRequest extends FormRequest
         $this->setObjectId('country');
         $this->setObjectId('state');
 
-
         $this->generateCode();
     }
 
     public function rules(): array
     {
         return [
-            'name'        => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'code'        => [
+            'code' => [
                 'string',
                 'required',
                 'unique:warehouses',
             ],
-            'address_1'   => [
+            'address_1' => [
                 'string',
                 'nullable',
             ],
-            'address_2'   => [
+            'address_2' => [
                 'string',
                 'nullable',
             ],
-            'city_id'     => [
+            'city_id' => [
                 'integer',
                 'exists:cities,id',
                 'nullable',
             ],
-            'state_id'    => [
+            'state_id' => [
                 'integer',
                 'exists:states,id',
                 'nullable',
             ],
-            'country_id'  => [
+            'country_id' => [
                 'integer',
                 'exists:countries,id',
                 'nullable',
@@ -82,11 +82,11 @@ class StoreWarehouseRequest extends FormRequest
                 'string',
                 'nullable',
             ],
-            'email'       => [
+            'email' => [
                 'email',
                 'nullable',
             ],
-            'phone'       => [
+            'phone' => [
                 'string',
                 'nullable',
             ],
@@ -97,9 +97,9 @@ class StoreWarehouseRequest extends FormRequest
     {
         $field = 'code';
         $config = [
-            'table'  => 'warehouses',
-            'field'  => $field,
-            'prefix' => 'WH-'
+            'table' => 'warehouses',
+            'field' => $field,
+            'prefix' => 'WH-',
         ];
         $code = UtilityService::generateCode($config);
         $this->set($field, $code);

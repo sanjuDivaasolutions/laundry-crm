@@ -58,6 +58,7 @@ class AgentResource extends JsonResource
                                     'number' => $commission->commissionable->order_number ?? $commission->commissionable->invoice_number ?? null,
                                 ];
                             }
+
                             return null;
                         }),
                         'approved_by' => $this->when($commission->relationLoaded('approvedBy'), function () use ($commission) {

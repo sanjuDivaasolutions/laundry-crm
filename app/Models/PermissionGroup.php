@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Traits\Searchable;
-use \DateTimeInterface;
 use App\Support\HasAdvancedFilter;
+use App\Traits\Searchable;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

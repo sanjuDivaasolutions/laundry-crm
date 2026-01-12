@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -29,7 +30,7 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, HasAdvancedFilter, Searchable;
+    use HasAdvancedFilter, HasFactory, Notifiable, Searchable;
 
     /**
      * The table associated with the model.
@@ -85,7 +86,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'settings'          => 'array',
+        'settings' => 'array',
     ];
 
     /**
@@ -125,8 +126,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Role::class);
     }
 
-
-
     public function language()
     {
         return $this->belongsTo(Language::class);
@@ -134,7 +133,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getActiveLabelAttribute()
     {
-        return $this->active ? "Active" : 'Inactive';
+        return $this->active ? 'Active' : 'Inactive';
     }
 
     /**

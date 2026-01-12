@@ -1,4 +1,5 @@
 <?php
+
 // app/Console/Commands/SendPendingEmails.php
 
 namespace App\Console\Commands;
@@ -10,6 +11,7 @@ use Illuminate\Console\Command;
 class SendPendingEmails extends Command
 {
     protected $signature = 'emails:send-pending';
+
     protected $description = 'Send pending emails with status=0';
 
     public function handle()

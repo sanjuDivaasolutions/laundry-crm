@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -59,7 +60,7 @@ class PaymentMethodRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'   => ['required'],
+            'name' => ['required'],
             'active' => ['boolean'],
         ];
     }

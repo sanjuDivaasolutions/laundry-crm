@@ -2,9 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\SalesInvoice;
-use Illuminate\Auth\Access\Response;
+use App\Models\User;
 
 class SalesInvoicePolicy
 {
@@ -23,8 +22,8 @@ class SalesInvoicePolicy
     {
         // Users can view invoices from their own company
         if ($user->company_id && $invoice->company_id) {
-            return $user->company_id === $invoice->company_id || 
-                   $user->hasPermission('manage-orders') || 
+            return $user->company_id === $invoice->company_id ||
+                   $user->hasPermission('manage-orders') ||
                    $user->isAdmin();
         }
 
@@ -46,8 +45,8 @@ class SalesInvoicePolicy
     {
         // Users can update invoices from their own company
         if ($user->company_id && $invoice->company_id) {
-            return $user->company_id === $invoice->company_id || 
-                   $user->hasPermission('manage-orders') || 
+            return $user->company_id === $invoice->company_id ||
+                   $user->hasPermission('manage-orders') ||
                    $user->isAdmin();
         }
 
@@ -61,8 +60,8 @@ class SalesInvoicePolicy
     {
         // Users can delete invoices from their own company
         if ($user->company_id && $invoice->company_id) {
-            return $user->company_id === $invoice->company_id || 
-                   $user->hasPermission('manage-orders') || 
+            return $user->company_id === $invoice->company_id ||
+                   $user->hasPermission('manage-orders') ||
                    $user->isAdmin();
         }
 
@@ -76,8 +75,8 @@ class SalesInvoicePolicy
     {
         // Users can update payment status of invoices from their own company
         if ($user->company_id && $invoice->company_id) {
-            return $user->company_id === $invoice->company_id || 
-                   $user->hasPermission('manage-orders') || 
+            return $user->company_id === $invoice->company_id ||
+                   $user->hasPermission('manage-orders') ||
                    $user->isAdmin();
         }
 

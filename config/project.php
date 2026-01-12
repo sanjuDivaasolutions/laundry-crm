@@ -1,6 +1,7 @@
 <?php
+
 return [
-    //'date_format' => 'd.m.Y',
+    // 'date_format' => 'd.m.Y',
     'date_format' => 'd/m/Y',
     'datetime_format' => 'd/m/Y H:i:s',
     'moment_date_format' => 'DD/MM/YYYY',

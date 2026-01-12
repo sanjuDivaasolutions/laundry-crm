@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -30,18 +31,19 @@ trait ControllerRequest
         foreach ($this->scopes as $s) {
             $obj = $obj->$s();
         }
+
         return $obj->{$this->fetcher}();
     }
 
     private function updateChildOld($request, $modelObj, $field, $model, $relationField, $updateField, $syncFields = [])
     {
         $records = $request->input($field, []);
-        if ($records && !is_array($records)) {
+        if ($records && ! is_array($records)) {
             $records = json_decode($records, true);
         }
 
         $existing = $modelObj->$relationField()->get();
-        if (!empty($existing)) {
+        if (! empty($existing)) {
             foreach ($existing as $s) {
                 $found = false;
                 foreach ($records as $r) {
@@ -50,17 +52,17 @@ trait ControllerRequest
                         break;
                     }
                 }
-                if (!$found) {
+                if (! $found) {
                     $s->delete();
                 }
             }
         }
 
-        if (!empty($records)) {
+        if (! empty($records)) {
             foreach ($records as $s) {
                 $newItem = $model::find($s['id']);
                 if (empty($newItem)) {
-                    $newItem = new $model();
+                    $newItem = new $model;
                 }
                 $fillValues = $s;
                 $newItem->fill($fillValues);
@@ -68,7 +70,7 @@ trait ControllerRequest
                 $newItem->save();
                 if ($syncFields) {
                     foreach ($syncFields as $syncField) {
-                        if (!isset($s[$syncField['field']])) {
+                        if (! isset($s[$syncField['field']])) {
                             continue;
                         }
                         $newItem->{$syncField['relation']}()->sync($s[$syncField['field']]);
@@ -78,18 +80,17 @@ trait ControllerRequest
         }
     }
 
-
     private function updateChild($request, $modelObj, $field, $model, $relationField, $updateField, $syncFields = [], $subItems = [])
     {
         if (gettype($request) == 'array') {
             $request = new \Illuminate\Http\Request($request);
         }
         $records = $request->input($field, []);
-        if ($records && !is_array($records)) {
+        if ($records && ! is_array($records)) {
             $records = json_decode($records, true);
         }
 
-        //$existing = $modelObj->$relationField()->get();
+        // $existing = $modelObj->$relationField()->get();
         $ignoreIds = [];
         /*if (!empty($existing)) {
             foreach ($existing as $s) {
@@ -112,20 +113,20 @@ trait ControllerRequest
             }
         }*/
 
-        if (!empty($records)) {
+        if (! empty($records)) {
             foreach ($records as $s) {
                 $newItem = $model::find($s['id']);
                 if (empty($newItem)) {
-                    $newItem = new $model();
+                    $newItem = new $model;
                 }
                 $fillValues = $s;
                 $newItem->fill($fillValues);
                 $newItem->{$updateField} = $modelObj->id;
                 $newItem->save();
-                $ignoreIds[] = !in_array($newItem->id, $ignoreIds) ? $newItem->id : null;
+                $ignoreIds[] = ! in_array($newItem->id, $ignoreIds) ? $newItem->id : null;
                 if ($syncFields) {
                     foreach ($syncFields as $syncField) {
-                        if (!isset($s[$syncField['field']])) {
+                        if (! isset($s[$syncField['field']])) {
                             continue;
                         }
                         $newItem->{$syncField['relation']}()->sync($s[$syncField['field']]);
@@ -135,7 +136,7 @@ trait ControllerRequest
                 // Update sub-items if available or delete if not available
                 if ($subItems) {
                     foreach ($subItems as $subItem) {
-                        if (!isset($s[$subItem['field']])) {
+                        if (! isset($s[$subItem['field']])) {
                             continue;
                         }
                         $this->updateChild($s, $newItem, $subItem['field'], $subItem['model'], $subItem['relation'], $subItem['update_field']);
@@ -150,22 +151,22 @@ trait ControllerRequest
 
     public function bulkDestroy()
     {
-        abort_if(Gate::denies($this->permissionKey . '_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies($this->permissionKey.'_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $ids = request('ids');
-        if (!$ids) {
+        if (! $ids) {
             return false;
         }
-        if (!is_array($ids)) {
+        if (! is_array($ids)) {
             $ids = json_decode($ids);
         }
         $class = $this->serviceClassName ?: null;
 
-        if (!$class) {
+        if (! $class) {
             return false;
         }
 
-        if (!method_exists($class, 'removeBulk')) {
+        if (! method_exists($class, 'removeBulk')) {
             return false;
         }
 
@@ -175,5 +176,4 @@ trait ControllerRequest
 
         return okResponse("$count item(s) were deleted successfully");
     }
-
 }

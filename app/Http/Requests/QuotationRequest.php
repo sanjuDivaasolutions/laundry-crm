@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -37,7 +38,7 @@ class QuotationRequest extends FormRequest
     private array $valueObjects = [];
 
     private array $stringArrays = [
-        'items'
+        'items',
     ];
 
     public function __construct()
@@ -63,7 +64,7 @@ class QuotationRequest extends FormRequest
             $company = Company::query()->find($this->company_id);
             $this->set('order_no', QuotationService::getCode($company, 'quotations'));
         }
-        //dd($this->all());
+        // dd($this->all());
     }
 
     private function isUpdateRequest(): bool
@@ -79,24 +80,24 @@ class QuotationRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'order_no'               => ['required', 'unique:quotations,order_no'],
-            'reference_no'           => ['nullable'],
-            'company_id'             => ['required', 'exists:companies,id'],
-            'buyer_id'               => ['required', 'exists:buyers,id'],
-            'warehouse_id'           => ['nullable', 'exists:warehouses,id'],
-            'date'                   => ['required'],
-            'sub_total'              => ['required', 'numeric'],
-            'tax_total'              => ['required', 'numeric'],
-            'grand_total'            => ['required', 'numeric'],
-            'remark'                 => ['nullable'],
+            'order_no' => ['required', 'unique:quotations,order_no'],
+            'reference_no' => ['nullable'],
+            'company_id' => ['required', 'exists:companies,id'],
+            'buyer_id' => ['required', 'exists:buyers,id'],
+            'warehouse_id' => ['nullable', 'exists:warehouses,id'],
+            'date' => ['required'],
+            'sub_total' => ['required', 'numeric'],
+            'tax_total' => ['required', 'numeric'],
+            'grand_total' => ['required', 'numeric'],
+            'remark' => ['nullable'],
             'expected_delivery_date' => ['nullable'],
-            'state_id'               => ['required', 'exists:states,id'],
-            'user_id'                => ['nullable', 'exists:users,id'],
-            'items'                  => ['required', 'array'],
+            'state_id' => ['required', 'exists:states,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
+            'items' => ['required', 'array'],
         ];
 
         if ($this->isUpdateRequest()) {
-            $rules['order_no'] = ['required', 'unique:quotations,order_no,' . request()->route('quotation')->id];
+            $rules['order_no'] = ['required', 'unique:quotations,order_no,'.request()->route('quotation')->id];
         }
 
         return $rules;

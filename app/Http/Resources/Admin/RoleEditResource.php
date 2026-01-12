@@ -9,14 +9,15 @@ class RoleEditResource extends JsonResource
     public function toArray($request)
     {
         $permissions = [];
-        if($this->whenLoaded('permissions')) {
+        if ($this->whenLoaded('permissions')) {
             $permissions = $this->permissions->pluck('id')->toArray();
         }
-        //return parent::toArray($request);
+
+        // return parent::toArray($request);
         return [
-            'id'            =>  $this->id,
-            'title'         =>  $this->whenNotNull($this->title),
-            'permissions'   =>  $permissions,
+            'id' => $this->id,
+            'title' => $this->whenNotNull($this->title),
+            'permissions' => $permissions,
         ];
     }
 }

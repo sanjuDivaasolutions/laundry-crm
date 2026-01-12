@@ -8,8 +8,8 @@ use App\Http\Requests\API\AgentUpdateRequest;
 use App\Http\Resources\API\AgentResource;
 use App\Models\Agent;
 use App\Services\OrderService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -98,7 +98,7 @@ class AgentController extends Controller
             'commission_ids.*' => 'exists:agent_commissions,id',
         ]);
 
-        $orderService = new OrderService();
+        $orderService = new OrderService;
         $approvedCount = $orderService->approveCommissions($request->get('commission_ids'));
 
         return response()->json([
@@ -114,7 +114,7 @@ class AgentController extends Controller
             'commission_ids.*' => 'exists:agent_commissions,id',
         ]);
 
-        $orderService = new OrderService();
+        $orderService = new OrderService;
         $paidCount = $orderService->markCommissionsAsPaid($request->get('commission_ids'));
 
         return response()->json([

@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -18,7 +19,7 @@
 
 return [
     'collection' => [
-        'company_image'      => 'App\Models\Company',
+        'company_image' => 'App\Models\Company',
         'expense_attachment' => 'App\Models\Expense',
     ],
 ];

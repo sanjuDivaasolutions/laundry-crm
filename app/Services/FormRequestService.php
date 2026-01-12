@@ -14,7 +14,7 @@ class FormRequestService
         $method = $config['method'] ?? 'POST';
 
         $request = Request::create($dummyRoute, $method, $data);
-        $obj = $requestObject::createFrom($request, new $requestObject());
+        $obj = $requestObject::createFrom($request, new $requestObject);
 
         // Check if the prepareForValidation method exists and is callable
         if (method_exists($obj, 'prepareForValidation')) {

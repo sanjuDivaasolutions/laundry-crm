@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -49,39 +50,39 @@ class StoreCompanyRequest extends FormRequest
     public function rules()
     {
         return [
-            'code'              => [
+            'code' => [
                 'string',
                 'required',
                 'unique:companies,code',
             ],
-            'name'              => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'address_1'         => [
+            'address_1' => [
                 'string',
                 'nullable',
             ],
-            'address_2'         => [
+            'address_2' => [
                 'string',
                 'nullable',
             ],
-            'country_id'        => [
+            'country_id' => [
                 'integer',
                 'exists:countries,id',
                 'nullable',
             ],
-            'state_id'          => [
+            'state_id' => [
                 'integer',
                 'exists:states,id',
                 'nullable',
             ],
-            'city_id'           => [
+            'city_id' => [
                 'integer',
                 'exists:cities,id',
                 'nullable',
             ],
-            'postal_code'       => [
+            'postal_code' => [
                 'string',
                 'nullable',
             ],
@@ -89,19 +90,18 @@ class StoreCompanyRequest extends FormRequest
                 'string',
                 'nullable',
             ],
-            'department'        => [
+            'department' => [
                 'array',
             ],
-            'department.*.id'   => [
+            'department.*.id' => [
                 'integer',
                 'exists:departments,id',
             ],
-            'warehouse_id'      => [
+            'warehouse_id' => [
                 'integer',
                 'exists:warehouses,id',
                 'nullable',
             ],
         ];
     }
-
 }

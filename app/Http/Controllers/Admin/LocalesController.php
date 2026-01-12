@@ -13,7 +13,7 @@ class LocalesController extends Controller
     {
         return okResponse([
             'languages' => Language::orderBy('name')->get(),
-            'locale'    => app()->getLocale(),
+            'locale' => app()->getLocale(),
         ]);
     }
 
@@ -28,7 +28,7 @@ class LocalesController extends Controller
             ->whereHas('language', function ($query) use ($locale) {
                 $query->where('locale', $locale);
             })
-            ->with(['language','languageTerm'])
+            ->with(['language', 'languageTerm'])
             ->get();
 
         $translations = [];

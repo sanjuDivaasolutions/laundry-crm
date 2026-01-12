@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -29,7 +30,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Company extends Model implements HasMedia
 {
-    use HasAdvancedFilter, InteractsWithMedia, HasFactory, Searchable;
+    use HasAdvancedFilter, HasFactory, InteractsWithMedia, Searchable;
 
     protected $appends = [
         'image',
@@ -74,7 +75,7 @@ class Company extends Model implements HasMedia
         return $this->belongsTo(User::class);
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $thumbnailWidth = 70;
         $thumbnailHeight = 70;
@@ -104,13 +105,14 @@ class Company extends Model implements HasMedia
     public function getImageAttribute()
     {
         $images = $this->getMedia('company_image');
+
         return $images->map(function ($media) {
             return [
-                'id'                => $media->id,
-                'original_url'      => $media->getFullUrl(),
+                'id' => $media->id,
+                'original_url' => $media->getFullUrl(),
                 'preview_thumbnail' => $media->getFullUrl('preview_thumbnail'),
-                'thumbnail'         => $media->getFullUrl('thumbnail'),
-                'mime_type'         => $media->mime_type,
+                'thumbnail' => $media->getFullUrl('thumbnail'),
+                'mime_type' => $media->mime_type,
             ];
         });
     }
@@ -122,13 +124,14 @@ class Company extends Model implements HasMedia
             return null;
         }
         $mediaPath = $media->getPath('pdf_preview');
-        if (!file_exists($mediaPath)) {
+        if (! file_exists($mediaPath)) {
             return null;
         }
         $fileContent = file_get_contents($mediaPath);
         if ($fileContent === false) {
             return null;
         }
-        return 'data:' . $media->mime_type . ';base64,' . base64_encode($fileContent);
+
+        return 'data:'.$media->mime_type.';base64,'.base64_encode($fileContent);
     }
 }

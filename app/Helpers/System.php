@@ -37,36 +37,42 @@ if (! function_exists('generateCode')) {
     }
 }*/
 if (! function_exists('projectNowDate')) {
-    function projectNowDate() {
+    function projectNowDate()
+    {
         return Carbon::now()->format(config('project.date_format'));
     }
 }
 if (! function_exists('projectNowDateTime')) {
-    function projectNowDateTime() {
+    function projectNowDateTime()
+    {
         return Carbon::now()->format(config('project.datetime_format'));
     }
 }
 if (! function_exists('detectDateFormat')) {
-    function detectDateFormat($value) : String {
+    function detectDateFormat($value): string
+    {
         return count(explode(' ', $value)) > 1 ? 'Y-m-d H:i:s' : 'Y-m-d';
     }
 }
 
 if (! function_exists('stringToArray')) {
-    function stringToArray($arg) : Array {
-        if(!is_array($arg)) {
-            return json_decode($arg,true);
+    function stringToArray($arg): array
+    {
+        if (! is_array($arg)) {
+            return json_decode($arg, true);
         }
+
         return $arg;
     }
 }
 
 if (! function_exists('ddr')) {
-    function ddr($data,$toArray=false) : \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+    function ddr($data, $toArray = false): \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
     {
-        if($toArray) {
+        if ($toArray) {
             return okResponse($data->toArray());
         }
+
         return okResponse($data);
     }
 }

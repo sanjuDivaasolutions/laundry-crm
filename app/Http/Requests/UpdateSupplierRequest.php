@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -44,24 +45,24 @@ class UpdateSupplierRequest extends FormRequest
     public function rules()
     {
         return [
-            'code'                => [
+            'code' => [
                 'string',
                 'required',
             ],
-            'display_name'        => [
+            'display_name' => [
                 'string',
                 'required',
             ],
-            'name'                => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'payment_term_id'     => [
+            'payment_term_id' => [
                 'integer',
                 'exists:payment_terms,id',
                 'nullable',
             ],
-            'billing_address_id'  => [
+            'billing_address_id' => [
                 'integer',
                 'exists:contact_addresses,id',
                 'nullable',
@@ -74,26 +75,26 @@ class UpdateSupplierRequest extends FormRequest
             'shipping_same_as_billing' => [
                 'boolean',
             ],
-            'active'              => [
+            'active' => [
                 'boolean',
             ],
-            'is_agent'            => [
+            'is_agent' => [
                 'boolean',
             ],
-            'currency_id'         => [
+            'currency_id' => [
                 'integer',
                 'exists:currencies,id',
                 'nullable',
             ],
-            'email'               => [
+            'email' => [
                 'email',
                 'nullable',
             ],
-            'phone'               => [
+            'phone' => [
                 'string',
                 'nullable',
             ],
-            'remarks'             => [
+            'remarks' => [
                 'string',
                 'nullable',
             ],

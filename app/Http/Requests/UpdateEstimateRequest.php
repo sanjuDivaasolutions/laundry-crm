@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use App\Models\Estimate;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 
 class UpdateEstimateRequest extends FormRequest
@@ -33,7 +32,7 @@ class UpdateEstimateRequest extends FormRequest
             ],
             'type' => [
                 'required',
-                'in:' . implode(',', Arr::pluck(Estimate::TYPE_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(Estimate::TYPE_SELECT, 'value')),
             ],
             'buyer_id' => [
                 'integer',
@@ -41,11 +40,11 @@ class UpdateEstimateRequest extends FormRequest
                 'required',
             ],
             'date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
             'estimated_shipment_date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
             'payment_term_id' => [

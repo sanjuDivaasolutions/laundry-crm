@@ -3,8 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -19,7 +17,7 @@ class ContactAddressFactory extends Factory
     public function definition()
     {
         return [
-            'name'  =>  fake()->unique()->name(),
+            'name' => fake()->unique()->name(),
             'address_1' => fake()->address(),
             'address_2' => fake()->address(),
             'country_id' => 1,
@@ -27,8 +25,8 @@ class ContactAddressFactory extends Factory
             'city_id' => 1,
             'postal_code' => '12345',
             'phone' => fake()->phoneNumber(),
-            'created_at'=>now(),
-            'updated_at'=>now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 
@@ -37,7 +35,5 @@ class ContactAddressFactory extends Factory
      *
      * @return static
      */
-    public function unverified()
-    {
-    }
+    public function unverified() {}
 }

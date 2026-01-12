@@ -8,8 +8,6 @@ class SalesOrderUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -26,7 +24,7 @@ class SalesOrderUpdateRequest extends FormRequest
         $orderId = $this->route('order')->id;
 
         return [
-            'order_number' => 'sometimes|required|string|max:50|unique:sales_orders,order_number,' . $orderId,
+            'order_number' => 'sometimes|required|string|max:50|unique:sales_orders,order_number,'.$orderId,
             'buyer_id' => 'sometimes|required|exists:buyers,id',
             'agent_id' => 'nullable|exists:agents,id',
             'company_id' => 'sometimes|required|exists:companies,id',
@@ -56,8 +54,6 @@ class SalesOrderUpdateRequest extends FormRequest
 
     /**
      * Get custom messages for validator errors.
-     *
-     * @return array
      */
     public function messages(): array
     {

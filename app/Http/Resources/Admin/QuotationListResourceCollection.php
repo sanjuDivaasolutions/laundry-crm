@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -30,8 +31,9 @@ class QuotationListResourceCollection extends ResourceCollection
     public function toArray($request)
     {
         $data = QuotationListResource::collection($this->collection);
+
         return [
-            'data'    => $data,
+            'data' => $data,
             'columns' => $this->getColumns(),
             'summary' => $this->getSummary($data),
         ];
@@ -41,64 +43,64 @@ class QuotationListResourceCollection extends ResourceCollection
     {
         return [
             [
-                'title'    => 'general.fields.id',
-                'field'    => 'id',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'general.fields.id',
+                'field' => 'id',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
                 'colStyle' => 'width: 100px;',
             ],
             [
-                'title'    => 'general.fields.date',
-                'field'    => 'date',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'general.fields.date',
+                'field' => 'date',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.order_no',
-                'field'    => 'order_no',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'general.fields.order_no',
+                'field' => 'order_no',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.buyer',
-                'field'    => 'buyer.display_name',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'general.fields.buyer',
+                'field' => 'buyer.display_name',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.subTotal',
-                'field'    => 'sub_total_text',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'general.fields.subTotal',
+                'field' => 'sub_total_text',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'general.fields.taxTotal',
-                'field'    => 'tax_total_text',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'general.fields.taxTotal',
+                'field' => 'tax_total_text',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'general.fields.grandTotal',
-                'field'    => 'grand_total_text',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'general.fields.grandTotal',
+                'field' => 'grand_total_text',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'general.fields.user',
-                'field'    => 'user.name',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'general.fields.user',
+                'field' => 'user.name',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'     => 'Actions',
-                'field'     => 'title',
-                'thComp'    => 'TranslatedHeader',
-                'tdComp'    => 'DatatableActions',
+                'title' => 'Actions',
+                'field' => 'title',
+                'thComp' => 'TranslatedHeader',
+                'tdComp' => 'DatatableActions',
                 'isActions' => true,
-                'sortable'  => true,
+                'sortable' => true,
             ],
         ];
     }
@@ -114,13 +116,14 @@ class QuotationListResourceCollection extends ResourceCollection
             $taxTotal += $item->tax_total;
             $grandTotal += $item->grand_total;
         }
+
         return [
-            'sub_total'        => $subTotal,
-            'sub_total_text'   => $currencySign . number_format($subTotal, 2),
-            'tax_total'        => $taxTotal,
-            'tax_total_text'   => $currencySign . number_format($taxTotal, 2),
-            'grand_total'      => $grandTotal,
-            'grand_total_text' => $currencySign . number_format($grandTotal, 2),
+            'sub_total' => $subTotal,
+            'sub_total_text' => $currencySign.number_format($subTotal, 2),
+            'tax_total' => $taxTotal,
+            'tax_total_text' => $currencySign.number_format($taxTotal, 2),
+            'grand_total' => $grandTotal,
+            'grand_total_text' => $currencySign.number_format($grandTotal, 2),
         ];
     }
 }

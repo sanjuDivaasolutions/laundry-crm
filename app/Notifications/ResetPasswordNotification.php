@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -19,9 +20,8 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ResetPasswordNotification extends Notification
 {
@@ -52,13 +52,13 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $resetUrl = url('/admin#/reset-password?' . http_build_query([
+        $resetUrl = url('/admin#/reset-password?'.http_build_query([
             'token' => $this->token,
             'email' => $notifiable->email,
         ]));
 
         return (new MailMessage)
-            ->subject('Reset Password - ' . config('app.name'))
+            ->subject('Reset Password - '.config('app.name'))
             ->view('auth.passwords.email', [
                 'actionUrl' => $resetUrl,
                 'user' => $notifiable,

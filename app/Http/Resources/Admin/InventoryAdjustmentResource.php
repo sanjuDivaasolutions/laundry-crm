@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -26,22 +27,23 @@ class InventoryAdjustmentResource extends JsonResource
 {
     public function toArray($request)
     {
-        $reason = !is_array($this->reason) ? collect(InventoryAdjustment::REASON_SELECT)->firstWhere('value', $this->reason) : $this->reason;
+        $reason = ! is_array($this->reason) ? collect(InventoryAdjustment::REASON_SELECT)->firstWhere('value', $this->reason) : $this->reason;
+
         return [
-            'id'                => $this->id,
-            'code'              => $this->code,
-            'date'              => $this->date,
-            'reason'            => $reason,
-            'reason_label'      => is_array($reason) ? $reason['label'] : $reason,
-            'remark'            => $this->remark,
+            'id' => $this->id,
+            'code' => $this->code,
+            'date' => $this->date,
+            'reason' => $reason,
+            'reason_label' => is_array($reason) ? $reason['label'] : $reason,
+            'remark' => $this->remark,
             'adjusted_quantity' => $this->adjusted_quantity,
-            'created_at'        => $this->created_at,
-            'updated_at'        => $this->updated_at,
-            'product_id'        => $this->product_id,
-            'user_id'           => $this->user_id,
-            'product'           => $this->whenLoaded('product'),
-            'shelf'             => $this->whenLoaded('shelf'),
-            'user'              => $this->whenLoaded('user'),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'product_id' => $this->product_id,
+            'user_id' => $this->user_id,
+            'product' => $this->whenLoaded('product'),
+            'shelf' => $this->whenLoaded('shelf'),
+            'user' => $this->whenLoaded('user'),
         ];
     }
 }

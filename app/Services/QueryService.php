@@ -11,7 +11,7 @@ class QueryService
         $obj = $class::query();
 
         $trimmedQ = trim((string) $q);
-        //ranked relevance-based search for all models
+        // ranked relevance-based search for all models
         if ($trimmedQ !== '') {
             $qLower = mb_strtolower($trimmedQ);
             // where clause: only fetch related matches
@@ -30,7 +30,7 @@ class QueryService
                     "%{$qLower}%",
                 ]
             );
-         } else {
+        } else {
             $obj->orderBy($field, 'asc');
         }
 

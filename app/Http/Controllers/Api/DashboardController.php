@@ -36,11 +36,11 @@ class DashboardController extends Controller
     public function cards(Request $request)
     {
         $data = $this->dashboardService->getDashboardCardsData();
-        
+
         return response()->json([
             'success' => true,
             'data' => $data,
-            'message' => 'Dashboard cards data retrieved successfully'
+            'message' => 'Dashboard cards data retrieved successfully',
         ]);
     }
 }

@@ -13,17 +13,17 @@ class AdminAuthGates
     {
         $user = adminAuth()->user();
 
-        if (!$user) {
+        if (! $user) {
             return $next($request);
         }
 
-        $roles            = Role::with('permissions')->get();
+        $roles = Role::with('permissions')->get();
         $permissionsArray = [];
         $excludePermissions = config('auth.protected_permissions', []);
 
         foreach ($roles as $role) {
             foreach ($role->permissions as $permissions) {
-                if(!in_array($permissions->title, $excludePermissions)) {
+                if (! in_array($permissions->title, $excludePermissions)) {
                     $permissionsArray[$permissions->title][] = $role->id;
                 }
             }

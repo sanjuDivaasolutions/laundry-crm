@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -46,25 +47,25 @@ class StorePaymentRequest extends FormRequest
     public function rules()
     {
         return [
-            'payment_type'        => [
+            'payment_type' => [
                 'required',
-                'in:' . implode(',', Arr::pluck(Payment::PAYMENT_TYPE_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(Payment::PAYMENT_TYPE_SELECT, 'value')),
             ],
-            'tran_type'           => [
+            'tran_type' => [
                 'required',
-                'in:' . implode(',', Arr::pluck(Payment::TRAN_TYPE_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(Payment::TRAN_TYPE_SELECT, 'value')),
             ],
-            'sales_order_id'      => [
+            'sales_order_id' => [
                 'integer',
                 'exists:sales_orders,id',
                 'nullable',
             ],
-            'sales_invoice_id'    => [
+            'sales_invoice_id' => [
                 'integer',
                 'exists:sales_invoices,id',
                 'nullable',
             ],
-            'purchase_order_id'   => [
+            'purchase_order_id' => [
                 'integer',
                 'exists:purchase_orders,id',
                 'nullable',
@@ -74,33 +75,33 @@ class StorePaymentRequest extends FormRequest
                 'exists:purchase_orders,id',
                 'nullable',
             ],
-            'payment_mode_id'     => [
+            'payment_mode_id' => [
                 'integer',
                 'exists:payment_modes,id',
                 'required',
             ],
-            'order_no'            => [
+            'order_no' => [
                 'string',
                 'required',
                 'unique:payments',
             ],
-            'reference_no'        => [
+            'reference_no' => [
                 'string',
                 'nullable',
             ],
-            'payment_date'        => [
-                'date_format:' . config('project.date_format'),
+            'payment_date' => [
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
-            'remarks'             => [
+            'remarks' => [
                 'string',
                 'nullable',
             ],
-            'amount'              => [
+            'amount' => [
                 'numeric',
                 'nullable',
             ],
-            'user_id'             => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'required',
@@ -116,12 +117,12 @@ class StorePaymentRequest extends FormRequest
             }
 
             $salesInvoiceId = (int) $this->input('sales_invoice_id');
-            if (!$salesInvoiceId) {
+            if (! $salesInvoiceId) {
                 return;
             }
 
             $invoice = SalesInvoice::find($salesInvoiceId);
-            if (!$invoice) {
+            if (! $invoice) {
                 return;
             }
 
@@ -137,9 +138,9 @@ class StorePaymentRequest extends FormRequest
     {
         $field = 'order_no';
         $config = [
-            'table'  => 'payments',
-            'field'  => $field,
-            'prefix' => 'PAY-'
+            'table' => 'payments',
+            'field' => $field,
+            'prefix' => 'PAY-',
         ];
         $code = UtilityService::generateCode($config);
         $this->merge([$field => $code]);

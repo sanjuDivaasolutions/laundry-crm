@@ -6,7 +6,6 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
 use Throwable;
 
 abstract class BaseService
@@ -14,8 +13,6 @@ abstract class BaseService
     /**
      * Execute a callback within a database transaction.
      *
-     * @param callable $callback
-     * @return mixed
      * @throws Throwable
      */
     protected function transaction(callable $callback): mixed
@@ -30,13 +27,10 @@ abstract class BaseService
 
     /**
      * Handle exceptions uniformly.
-     *
-     * @param Throwable $e
-     * @return void
      */
     protected function handleException(Throwable $e): void
     {
-        Log::error('Service Error: ' . $e->getMessage(), [
+        Log::error('Service Error: '.$e->getMessage(), [
             'service' => static::class,
             'file' => $e->getFile(),
             'line' => $e->getLine(),

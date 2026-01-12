@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -27,22 +28,22 @@ class InwardItemResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'          => $this->id,
-            'sku'         => $this->sku,
+            'id' => $this->id,
+            'sku' => $this->sku,
             'description' => $this->description,
-            'rate'        => $this->rate,
-            'quantity'    => $this->quantity,
-            'amount'      => $this->amount,
-            'created_at'  => $this->created_at,
-            'updated_at'  => $this->updated_at,
+            'rate' => $this->rate,
+            'quantity' => $this->quantity,
+            'amount' => $this->amount,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
 
-            'inward_id'  => $this->inward_id,
+            'inward_id' => $this->inward_id,
             'product_id' => $this->product_id,
-            'unit_id'    => $this->unit_id,
+            'unit_id' => $this->unit_id,
 
             'product' => new ProductResource($this->whenLoaded('product')),
-            'unit'    => new UnitResource($this->whenLoaded('unit')),
-            'shelf'   => $this->shelf ?? null,
+            'unit' => new UnitResource($this->whenLoaded('unit')),
+            'shelf' => $this->shelf ?? null,
         ];
     }
 }

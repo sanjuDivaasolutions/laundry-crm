@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -30,8 +31,9 @@ class SalesOrderListResourceCollection extends ResourceCollection
     public function toArray($request)
     {
         $data = SalesOrderListResource::collection($this->collection);
+
         return [
-            'data'    => $data,
+            'data' => $data,
             'columns' => $this->getColumns(),
             'summary' => $this->getSummary($data),
         ];
@@ -41,64 +43,64 @@ class SalesOrderListResourceCollection extends ResourceCollection
     {
         return [
             [
-                'title'    => 'ID',
-                'field'    => 'id',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'ID',
+                'field' => 'id',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
                 'colStyle' => 'width: 100px;',
             ],
             [
-                'title'    => 'SO Number',
-                'field'    => 'so_number',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'SO Number',
+                'field' => 'so_number',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Date',
-                'field'    => 'date',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Date',
+                'field' => 'date',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Buyer',
-                'field'    => 'buyer.display_name',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Buyer',
+                'field' => 'buyer.display_name',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Sub Total',
-                'field'    => 'sub_total_text',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Sub Total',
+                'field' => 'sub_total_text',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Tax Total',
-                'field'    => 'tax_total_text',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Tax Total',
+                'field' => 'tax_total_text',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Grand Total',
-                'field'    => 'grand_total_text',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'Grand Total',
+                'field' => 'grand_total_text',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'User',
-                'field'    => 'user.name',
-                'thComp'   => 'TranslatedHeader',
+                'title' => 'User',
+                'field' => 'user.name',
+                'thComp' => 'TranslatedHeader',
                 'sortable' => true,
             ],
             [
-                'title'     => 'Actions',
-                'field'     => 'title',
-                'thComp'    => 'TranslatedHeader',
-                'tdComp'    => 'DatatableActions',
+                'title' => 'Actions',
+                'field' => 'title',
+                'thComp' => 'TranslatedHeader',
+                'tdComp' => 'DatatableActions',
                 'isActions' => true,
-                'sortable'  => true,
+                'sortable' => true,
             ],
         ];
     }
@@ -114,13 +116,14 @@ class SalesOrderListResourceCollection extends ResourceCollection
             $taxTotal += $item->tax_total;
             $grandTotal += $item->grand_total;
         }
+
         return [
-            'sub_total'        => $subTotal,
-            'sub_total_text'   => $currencySign . number_format($subTotal, 2),
-            'tax_total'        => $taxTotal,
-            'tax_total_text'   => $currencySign . number_format($taxTotal, 2),
-            'grand_total'      => $grandTotal,
-            'grand_total_text' => $currencySign . number_format($grandTotal, 2),
+            'sub_total' => $subTotal,
+            'sub_total_text' => $currencySign.number_format($subTotal, 2),
+            'tax_total' => $taxTotal,
+            'tax_total_text' => $currencySign.number_format($taxTotal, 2),
+            'grand_total' => $grandTotal,
+            'grand_total_text' => $currencySign.number_format($grandTotal, 2),
         ];
     }
 }

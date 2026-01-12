@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -27,6 +28,7 @@ class PaymentModeRequest extends FormRequest
     use CustomFormRequest;
 
     private string $moduleId = 'payment_mode';
+
     private string $requestType;
 
     private array $idObjects = [];
@@ -63,13 +65,14 @@ class PaymentModeRequest extends FormRequest
     public function authorize()
     {
         $permission = $this->isUpdateRequest() ? '_edit' : '_create';
-        return Gate::allows($this->moduleId . $permission);
+
+        return Gate::allows($this->moduleId.$permission);
     }
 
     public function rules(): array
     {
         return [
-            'name'   => [
+            'name' => [
                 'string',
                 'required',
             ],

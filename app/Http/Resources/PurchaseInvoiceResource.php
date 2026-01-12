@@ -26,7 +26,7 @@ class PurchaseInvoiceResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
@@ -34,7 +34,7 @@ class PurchaseInvoiceResource extends JsonResource
         return [
             'id' => $this->id,
             'invoice_number' => $this->invoice_number,
-            'formatted_invoice_number' => $this->formatted_invoice_number ?? 'PI-' . str_pad($this->id, 6, '0', STR_PAD_LEFT),
+            'formatted_invoice_number' => $this->formatted_invoice_number ?? 'PI-'.str_pad($this->id, 6, '0', STR_PAD_LEFT),
             'date' => $this->date,
             'due_date' => $this->due_date,
             'supplier_id' => $this->supplier_id,

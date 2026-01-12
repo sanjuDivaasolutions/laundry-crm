@@ -2,9 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\SalesOrder;
-use Illuminate\Auth\Access\Response;
+use App\Models\User;
 
 class SalesOrderPolicy
 {
@@ -23,8 +22,8 @@ class SalesOrderPolicy
     {
         // Users can view orders from their own company
         if ($user->company_id && $order->company_id) {
-            return $user->company_id === $order->company_id || 
-                   $user->hasPermission('manage-orders') || 
+            return $user->company_id === $order->company_id ||
+                   $user->hasPermission('manage-orders') ||
                    $user->isAdmin();
         }
 
@@ -46,8 +45,8 @@ class SalesOrderPolicy
     {
         // Users can update orders from their own company
         if ($user->company_id && $order->company_id) {
-            return $user->company_id === $order->company_id || 
-                   $user->hasPermission('manage-orders') || 
+            return $user->company_id === $order->company_id ||
+                   $user->hasPermission('manage-orders') ||
                    $user->isAdmin();
         }
 
@@ -61,8 +60,8 @@ class SalesOrderPolicy
     {
         // Users can delete orders from their own company
         if ($user->company_id && $order->company_id) {
-            return $user->company_id === $order->company_id || 
-                   $user->hasPermission('manage-orders') || 
+            return $user->company_id === $order->company_id ||
+                   $user->hasPermission('manage-orders') ||
                    $user->isAdmin();
         }
 
@@ -81,8 +80,8 @@ class SalesOrderPolicy
 
         // Users can convert orders from their own company
         if ($user->company_id && $order->company_id) {
-            return $user->company_id === $order->company_id || 
-                   $user->hasPermission('manage-orders') || 
+            return $user->company_id === $order->company_id ||
+                   $user->hasPermission('manage-orders') ||
                    $user->isAdmin();
         }
 
@@ -96,8 +95,8 @@ class SalesOrderPolicy
     {
         // Users can update status of orders from their own company
         if ($user->company_id && $order->company_id) {
-            return $user->company_id === $order->company_id || 
-                   $user->hasPermission('manage-orders') || 
+            return $user->company_id === $order->company_id ||
+                   $user->hasPermission('manage-orders') ||
                    $user->isAdmin();
         }
 

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Admin\AbilityResource;
 
 class AbilitiesController extends Controller
 {

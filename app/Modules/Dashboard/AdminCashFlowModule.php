@@ -8,9 +8,13 @@ use Illuminate\Support\Facades\DB;
 class AdminCashFlowModule
 {
     public string $module = 'AdminCashFlowModule';
+
     public string $title = 'Cash Flow';
+
     public string $component = 'LineChartComponent';
+
     public int $columns = 6;
+
     public array $filters = [];
 
     public function __construct($params = [])
@@ -25,14 +29,14 @@ class AdminCashFlowModule
     public function get(): array
     {
         return [
-            'title'        => $this->title,
-            'component'    => $this->component,
-            'module'       => $this->module,
-            'query'        => $this->getQuery(),
+            'title' => $this->title,
+            'component' => $this->component,
+            'module' => $this->module,
+            'query' => $this->getQuery(),
             'defaultQuery' => $this->getQuery(),
-            'filters'      => $this->getFilters(),
-            'data'         => $this->getData(),
-            'columns'      => $this->columns,
+            'filters' => $this->getFilters(),
+            'data' => $this->getData(),
+            'columns' => $this->columns,
         ];
     }
 
@@ -40,7 +44,7 @@ class AdminCashFlowModule
     {
         $f_date_range_type = request('f_date_range_type', 'monthly');
 
-        //values for $f_date_range_type can be yearly,monthly, weekly, daily
+        // values for $f_date_range_type can be yearly,monthly, weekly, daily
         switch ($f_date_range_type) {
             case 'monthly':
                 return $this->getMonthlyData();
@@ -66,9 +70,9 @@ class AdminCashFlowModule
             return Carbon::parse($month)->format('M y');
         });
 
-        $sales = DB::table(DB::raw('(' . $months->map(function ($month) {
-                return "SELECT '" . $month . "' AS month";
-            })->implode(' UNION ALL ') . ') as months'))
+        $sales = DB::table(DB::raw('('.$months->map(function ($month) {
+            return "SELECT '".$month."' AS month";
+        })->implode(' UNION ALL ').') as months'))
             ->leftJoin('sales_invoices', function ($join) {
                 $join->on(DB::raw("DATE_FORMAT(sales_invoices.date, '%Y-%m')"), '=', 'months.month');
             })
@@ -85,9 +89,9 @@ class AdminCashFlowModule
             return round($item->total_sales, 2);
         });
 
-        $purchases = DB::table(DB::raw('(' . $months->map(function ($month) {
-                return "SELECT '" . $month . "' AS month";
-            })->implode(' UNION ALL ') . ') as months'))
+        $purchases = DB::table(DB::raw('('.$months->map(function ($month) {
+            return "SELECT '".$month."' AS month";
+        })->implode(' UNION ALL ').') as months'))
             ->leftJoin('purchase_invoices', function ($join) {
                 $join->on(DB::raw("DATE_FORMAT(purchase_invoices.date, '%Y-%m')"), '=', 'months.month');
             })
@@ -106,15 +110,15 @@ class AdminCashFlowModule
 
         return [
             'categories' => $categories,
-            'series'     => [
+            'series' => [
                 [
                     'name' => 'Sales',
-                    'data' => $sales
+                    'data' => $sales,
                 ],
                 [
                     'name' => 'Purchases',
-                    'data' => $purchases
-                ]
+                    'data' => $purchases,
+                ],
             ],
         ];
     }
@@ -127,15 +131,15 @@ class AdminCashFlowModule
 
         return [
             'categories' => $categories,
-            'series'     => [
+            'series' => [
                 [
                     'name' => 'Sales',
-                    'data' => $sales
+                    'data' => $sales,
                 ],
                 [
                     'name' => 'Purchases',
-                    'data' => $purchases
-                ]
+                    'data' => $purchases,
+                ],
             ],
         ];
     }
@@ -148,15 +152,15 @@ class AdminCashFlowModule
 
         return [
             'categories' => $categories,
-            'series'     => [
+            'series' => [
                 [
                     'name' => 'Sales',
-                    'data' => $sales
+                    'data' => $sales,
                 ],
                 [
                     'name' => 'Purchases',
-                    'data' => $purchases
-                ]
+                    'data' => $purchases,
+                ],
             ],
         ];
     }
@@ -197,13 +201,13 @@ class AdminCashFlowModule
                 'value'   => 'monthly',
             ],*/
             [
-                'outside'  => true,
-                'type'     => 'select-single',
-                'label'    => 'Department',
-                'name'     => 'department',
-                'field'    => 'f_department_id',
+                'outside' => true,
+                'type' => 'select-single',
+                'label' => 'Department',
+                'name' => 'department',
+                'field' => 'f_department_id',
                 'endpoint' => 'departments',
-                'value'    => null,
+                'value' => null,
             ],
         ];
     }
@@ -211,7 +215,7 @@ class AdminCashFlowModule
     private function getQuery()
     {
         return [
-            'f_department_id'   => null,
+            'f_department_id' => null,
             'f_date_range_type' => 'monthly',
         ];
     }

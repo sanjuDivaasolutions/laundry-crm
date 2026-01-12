@@ -3,20 +3,17 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\API\GeneralResource;
 use App\Http\Resources\Admin\Reports\SalesByMonthResourceCollection;
-use App\Http\Resources\Admin\Reports\SalesByProductResource;
-use App\Http\Resources\Admin\Reports\InwardsByProductResource;
-use App\Http\Resources\Admin\Reports\SalesCommissionResource;
-use App\Services\ReportService;
 use App\Services\OrderService;
-use Illuminate\Http\Request;
+use App\Services\ReportService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ReportController extends Controller
 {
     protected ReportService $reportService;
+
     protected OrderService $orderService;
 
     public function __construct(ReportService $reportService, OrderService $orderService)

@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -29,9 +30,9 @@ class ExpenseListResource extends JsonResource
         $result = parent::toArray($request);
         $currencySign = '$';
 
-        $result['sub_total_label'] = $currencySign . number_format($result['sub_total'], 2);
-        $result['tax_total_label'] = $currencySign . number_format($result['tax_total'], 2);
-        $result['grand_total_label'] = $currencySign . number_format($result['grand_total'], 2);
+        $result['sub_total_label'] = $currencySign.number_format($result['sub_total'], 2);
+        $result['tax_total_label'] = $currencySign.number_format($result['tax_total'], 2);
+        $result['grand_total_label'] = $currencySign.number_format($result['grand_total'], 2);
 
         return $result;
     }

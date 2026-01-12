@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\ProductBatch;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class StoreProductBatchRequest extends FormRequest
 {
@@ -31,14 +29,14 @@ class StoreProductBatchRequest extends FormRequest
                 'nullable',
             ],
             'manufacturer_date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
             'active' => [
                 'boolean',
             ],
             'expiry_date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
         ];

@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\LanguageTerm;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class UpdateLanguageTermRequest extends FormRequest
 {
@@ -20,7 +18,7 @@ class UpdateLanguageTermRequest extends FormRequest
             'name' => [
                 'string',
                 'required',
-                'unique:language_terms,name,' . request()->route('language_term')->id,
+                'unique:language_terms,name,'.request()->route('language_term')->id,
             ],
             'active' => [
                 'boolean',

@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -43,7 +44,7 @@ class UpdatePurchaseInvoiceRequest extends FormRequest
     public function rules()
     {
         return [
-            'company_id'        => [
+            'company_id' => [
                 'integer',
                 'exists:companies,id',
                 'required',
@@ -53,54 +54,54 @@ class UpdatePurchaseInvoiceRequest extends FormRequest
                 'exists:purchase_orders,id',
                 'required',
             ],
-            'invoice_number'    => [
+            'invoice_number' => [
                 'string',
                 'required',
-                'unique:purchase_invoices,invoice_number,' . request()->route('purchase_invoice')->id,
+                'unique:purchase_invoices,invoice_number,'.request()->route('purchase_invoice')->id,
             ],
-            'date'              => [
-                'date_format:' . config('project.date_format'),
+            'date' => [
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
-            'due_date'          => [
-                'date_format:' . config('project.date_format'),
+            'due_date' => [
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
-            'supplier_id'       => [
+            'supplier_id' => [
                 'integer',
                 'exists:suppliers,id',
                 'required',
             ],
-            'remark'            => [
+            'remark' => [
                 'string',
                 'nullable',
             ],
-            'user_id'           => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'nullable',
             ],
-            'type'              => [
+            'type' => [
                 'nullable',
-                'in:' . implode(',', Arr::pluck(PurchaseInvoice::TYPE_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(PurchaseInvoice::TYPE_SELECT, 'value')),
             ],
-            'reference_no'      => [
+            'reference_no' => [
                 'string',
                 'nullable',
             ],
-            'sub_total'         => [
+            'sub_total' => [
                 'numeric',
                 'nullable',
             ],
-            'tax_total'         => [
+            'tax_total' => [
                 'numeric',
                 'nullable',
             ],
-            'tax_rate'          => [
+            'tax_rate' => [
                 'numeric',
                 'nullable',
             ],
-            'grand_total'       => [
+            'grand_total' => [
                 'numeric',
                 'nullable',
             ],

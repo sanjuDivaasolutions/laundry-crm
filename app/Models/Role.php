@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Traits\Searchable;
-use \DateTimeInterface;
 use App\Support\HasAdvancedFilter;
+use App\Traits\Searchable;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,9 +12,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Role extends Model
 {
     use HasAdvancedFilter;
-    use SoftDeletes;
     use HasFactory;
     use Searchable;
+    use SoftDeletes;
 
     public $table = 'roles';
 
@@ -45,6 +45,7 @@ class Role extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
     public function users()
     {
         return $this->belongsToMany(User::class);

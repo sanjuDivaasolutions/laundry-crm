@@ -33,7 +33,6 @@ class PurchaseInvoiceController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request)
@@ -68,9 +67,9 @@ class PurchaseInvoiceController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('invoice_number', 'like', '%' . $search . '%')
-                  ->orWhere('reference_no', 'like', '%' . $search . '%')
-                  ->orWhere('remark', 'like', '%' . $search . '%');
+                $q->where('invoice_number', 'like', '%'.$search.'%')
+                    ->orWhere('reference_no', 'like', '%'.$search.'%')
+                    ->orWhere('remark', 'like', '%'.$search.'%');
             });
         }
 
@@ -87,7 +86,6 @@ class PurchaseInvoiceController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
      * @return PurchaseInvoiceResource
      */
     public function store(Request $request)
@@ -159,7 +157,6 @@ class PurchaseInvoiceController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param PurchaseInvoice $purchaseInvoice
      * @return PurchaseInvoiceResource
      */
     public function show(PurchaseInvoice $purchaseInvoice)
@@ -172,21 +169,19 @@ class PurchaseInvoiceController extends Controller
             'purchaseOrder',
             'items.product',
             'items.product.unit_01',
-            'items.product.unit_02'
+            'items.product.unit_02',
         ]));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param PurchaseInvoice $purchaseInvoice
      * @return PurchaseInvoiceResource
      */
     public function update(Request $request, PurchaseInvoice $purchaseInvoice)
     {
         $validated = $request->validate([
-            'invoice_number' => 'sometimes|required|string|max:255|unique:purchase_invoices,invoice_number,' . $purchaseInvoice->id,
+            'invoice_number' => 'sometimes|required|string|max:255|unique:purchase_invoices,invoice_number,'.$purchaseInvoice->id,
             'date' => 'sometimes|required|date',
             'due_date' => 'nullable|date|after_or_equal:date',
             'supplier_id' => 'sometimes|required|exists:suppliers,id',
@@ -237,7 +232,7 @@ class PurchaseInvoiceController extends Controller
             // Update items if provided
             if (isset($validated['items'])) {
                 $purchaseInvoice->items()->delete();
-                
+
                 foreach ($validated['items'] as $item) {
                     $purchaseInvoice->items()->create([
                         'product_id' => $item['product_id'],
@@ -258,7 +253,6 @@ class PurchaseInvoiceController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param PurchaseInvoice $purchaseInvoice
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(PurchaseInvoice $purchaseInvoice)
@@ -316,14 +310,14 @@ class PurchaseInvoiceController extends Controller
         $prefix = 'PI';
         $year = date('Y');
         $month = date('m');
-        
+
         $latest = PurchaseInvoice::whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->orderBy('id', 'desc')
             ->first();
 
         $sequence = $latest ? intval(substr($latest->invoice_number, -4)) + 1 : 1;
-        $invoiceNumber = "{$prefix}-{$year}{$month}-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        $invoiceNumber = "{$prefix}-{$year}{$month}-".str_pad($sequence, 4, '0', STR_PAD_LEFT);
 
         return response()->json(['invoice_number' => $invoiceNumber]);
     }

@@ -22,12 +22,12 @@ class SalesByProductResource extends JsonResource
         }
 
         return [
-            'id'          => $this->id,
-            'sku'         => $this->sku,
-            'name'        => $this->name,
-            'quantity'    => $totalQuantity ?? 0,
-            'total'       => $grandTotal,
-            'total_label' => $currencySymbol . number_format($grandTotal, 2),
+            'id' => $this->id,
+            'sku' => $this->sku,
+            'name' => $this->name,
+            'quantity' => $totalQuantity ?? 0,
+            'total' => $grandTotal,
+            'total_label' => $currencySymbol.number_format($grandTotal, 2),
         ];
     }
 }

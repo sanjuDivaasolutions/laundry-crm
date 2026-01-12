@@ -29,11 +29,11 @@ trait ModelCache
      */
     public function clearCache()
     {
-        if(!$this->cacheKey && !$this->table) {
+        if (! $this->cacheKey && ! $this->table) {
             return;
         }
         $cacheKey = $this->cacheKey;
-        if(!$cacheKey) {
+        if (! $cacheKey) {
             $cacheKey = $this->table;
         }
         ModelCacheService::forget($cacheKey);

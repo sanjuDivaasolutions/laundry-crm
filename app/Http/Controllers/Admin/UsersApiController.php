@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -35,7 +36,9 @@ use Illuminate\Support\Facades\Password;
 class UsersApiController extends Controller
 {
     protected $filterMethods = ['index'];
+
     protected $fields = ['name', 'email'];
+
     protected $filters = [
         ['request' => 'f_role_id', 'field' => 'roles.id', 'operator' => 'in'],
     ];
@@ -51,8 +54,7 @@ class UsersApiController extends Controller
 
     private function getList()
     {
-        return User
-            ::with(['roles', 'language'])
+        return User::with(['roles', 'language'])
             ->advancedFilter();
     }
 
@@ -119,6 +121,7 @@ class UsersApiController extends Controller
 
         $user = User::with(['roles:id,title'])->find(auth()->id())->toArray();
         $user['type'] = @$user['roles'][0]['title'] ?? 'Admin';
+
         return $user;
 
     }
@@ -158,8 +161,10 @@ class UsersApiController extends Controller
         $language = Language::query()->where('locale', $locale)->first();
         if ($language) {
             $user->update(['language_id' => $language->id]);
+
             return okResponse('Language was updated successfully.');
         }
+
         return errorResponse('Language was not found.');
     }
 
@@ -177,11 +182,13 @@ class UsersApiController extends Controller
 
             if ($language) {
                 $user->update(['language_id' => $language->id]);
+
                 return okResponse([
                     'message' => 'Language preference updated successfully.',
                     'language' => $language,
                 ]);
             }
+
             return errorResponse('Language not found or inactive.', 404);
         }
 
@@ -191,7 +198,7 @@ class UsersApiController extends Controller
     public function passwordResetRequest(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-        
+
         $status = Password::sendResetLink(
             $request->only('email')
         );
@@ -199,14 +206,14 @@ class UsersApiController extends Controller
         if ($status === Password::RESET_LINK_SENT) {
             return response()->json([
                 'message' => 'A reset link has been sent to the email address.',
-                'status' => 'success'
+                'status' => 'success',
             ], Response::HTTP_OK);
         }
 
         return response()->json([
             'message' => 'Unable to send reset link. Please check your email address and try again.',
             'errors' => ['email' => [__($status)]],
-            'status' => 'error'
+            'status' => 'error',
         ], Response::HTTP_BAD_REQUEST);
     }
 }

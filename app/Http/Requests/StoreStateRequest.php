@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\State;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class StoreStateRequest extends FormRequest
 {
@@ -17,7 +15,7 @@ class StoreStateRequest extends FormRequest
     protected function prepareForValidation()
     {
         $country_id = null;
-        if($this->country) {
+        if ($this->country) {
             $country_id = $this->country['id'];
         }
         $this->merge([

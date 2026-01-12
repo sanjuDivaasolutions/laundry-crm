@@ -2,20 +2,18 @@
 
 namespace Tests\Feature\Controllers\API;
 
-use App\Models\User;
 use App\Models\Agent;
 use App\Models\AgentCommission;
-use App\Models\SalesOrder;
-use App\Models\Company;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Laravel\Sanctum\Sanctum;
 
 class AgentControllerTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $user;
+
     protected Agent $agent;
 
     protected function setUp(): void
@@ -44,8 +42,8 @@ class AgentControllerTest extends TestCase
                         'commission_rate',
                         'commission_type',
                         'active',
-                    ]
-                ]
+                    ],
+                ],
             ]);
     }
 

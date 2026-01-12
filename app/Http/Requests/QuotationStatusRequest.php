@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -25,12 +26,12 @@ class QuotationStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date'         => ['required'],
-            'active'       => ['boolean'],
-            'status'       => ['required'],
-            'remark'       => ['nullable'],
+            'date' => ['required'],
+            'active' => ['boolean'],
+            'status' => ['required'],
+            'remark' => ['nullable'],
             'quotation_id' => ['required', 'exists:quotations'],
-            'user_id'      => ['required', 'exists:users'],
+            'user_id' => ['required', 'exists:users'],
         ];
     }
 

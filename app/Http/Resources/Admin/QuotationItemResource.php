@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -27,22 +28,22 @@ class QuotationItemResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
-            'title'      => $this->title,
-            'sku'        => $this->sku,
-            'rate'       => $this->rate,
-            'quantity'   => $this->quantity,
-            'amount'     => $this->amount,
-            'remark'     => $this->remark,
+            'id' => $this->id,
+            'title' => $this->title,
+            'sku' => $this->sku,
+            'rate' => $this->rate,
+            'quantity' => $this->quantity,
+            'amount' => $this->amount,
+            'remark' => $this->remark,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
             'quotation_id' => $this->quotation_id,
-            'product_id'   => $this->product_id,
-            'unit_id'      => $this->unit_id,
+            'product_id' => $this->product_id,
+            'unit_id' => $this->unit_id,
 
             'quotation' => new QuotationResource($this->whenLoaded('quotation')),
-            'product'   => new ProductListResource($this->whenLoaded('product')),
+            'product' => new ProductListResource($this->whenLoaded('product')),
         ];
     }
 }

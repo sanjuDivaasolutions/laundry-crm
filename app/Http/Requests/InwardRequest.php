@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -72,32 +73,32 @@ class InwardRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'invoice_number'      => ['required', 'unique:inwards'],
-            'reference_no'        => ['nullable'],
-            'date'                => ['nullable', 'string'],
-            'remark'              => ['nullable'],
-            'currency_rate'       => ['required', 'numeric'],
-            'sub_total'           => ['required', 'numeric'],
-            'tax_total'           => ['required', 'numeric'],
-            'tax_rate'            => ['required', 'numeric'],
-            'grand_total'         => ['required', 'numeric'],
-            'company_id'          => ['nullable', 'exists:companies,id'],
-            'state_id'            => ['nullable', 'exists:states,id'],
-            'supplier_id'         => ['nullable', 'exists:suppliers,id'],
-            'warehouse_id'        => ['nullable', 'exists:warehouses,id'],
-            'user_id'             => ['nullable', 'exists:users,id'],
-            'items'               => ['required', 'array'],
-            'items.*.product_id'  => ['required', 'exists:products,id'],
-            'items.*.unit_id'     => ['required', 'exists:units,id'],
-            'items.*.quantity'    => ['required', 'numeric'],
-            'items.*.rate'        => ['required', 'numeric'],
-            'items.*.amount'      => ['required', 'numeric'],
-            'items.*.sku'         => ['nullable'],
+            'invoice_number' => ['required', 'unique:inwards'],
+            'reference_no' => ['nullable'],
+            'date' => ['nullable', 'string'],
+            'remark' => ['nullable'],
+            'currency_rate' => ['required', 'numeric'],
+            'sub_total' => ['required', 'numeric'],
+            'tax_total' => ['required', 'numeric'],
+            'tax_rate' => ['required', 'numeric'],
+            'grand_total' => ['required', 'numeric'],
+            'company_id' => ['nullable', 'exists:companies,id'],
+            'state_id' => ['nullable', 'exists:states,id'],
+            'supplier_id' => ['nullable', 'exists:suppliers,id'],
+            'warehouse_id' => ['nullable', 'exists:warehouses,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
+            'items' => ['required', 'array'],
+            'items.*.product_id' => ['required', 'exists:products,id'],
+            'items.*.unit_id' => ['required', 'exists:units,id'],
+            'items.*.quantity' => ['required', 'numeric'],
+            'items.*.rate' => ['required', 'numeric'],
+            'items.*.amount' => ['required', 'numeric'],
+            'items.*.sku' => ['nullable'],
             'items.*.description' => ['nullable'],
         ];
 
         if ($this->isUpdateRequest()) {
-            $rules['invoice_number'] = ['required', 'unique:inwards,invoice_number,' . $this->route('inward')->id];
+            $rules['invoice_number'] = ['required', 'unique:inwards,invoice_number,'.$this->route('inward')->id];
         }
 
         return $rules;
@@ -112,9 +113,9 @@ class InwardRequest extends FormRequest
     {
         $field = 'invoice_number';
         $config = [
-            'table'  => 'inwards',
-            'field'  => $field,
-            'prefix' => 'INW-'
+            'table' => 'inwards',
+            'field' => $field,
+            'prefix' => 'INW-',
         ];
         $code = UtilityService::generateCode($config);
         $this->merge([$field => $code]);
@@ -146,7 +147,7 @@ class InwardRequest extends FormRequest
 
             $shelves = [];
             $shelves[] = [
-                'id'       => isset($i['shelf']['parent_id']) ? $i['shelf']['parent_id'] : null,
+                'id' => isset($i['shelf']['parent_id']) ? $i['shelf']['parent_id'] : null,
                 'shelf_id' => $i['shelf']['id'],
                 'quantity' => $i['quantity'],
             ];

@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\ProductStock;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class UpdateProductStockRequest extends FormRequest
 {
@@ -36,7 +34,7 @@ class UpdateProductStockRequest extends FormRequest
                 'nullable',
             ],
             'modified' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
         ];

@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -34,22 +35,32 @@ use Illuminate\Http\Response;
 class CompanyApiController extends Controller
 {
     protected $className = Company::class;
+
     protected $scopes = [];
+
     protected $with = ['warehouse:id,name'];
+
     protected $exportResource = CompanyResource::class;
+
     protected $fetcher = 'advancedFilter';
+
     protected $processListMethod = 'getProcessedList';
+
     protected $filterMethods = ['index', 'getCsv', 'getPdf'];
+
     protected $csvFilePrefix = 'companies-list-';
+
     protected $pdfFilePrefix = null;
+
     protected $fields = ['name'];
+
     protected $filters = [
-        //['request'=>'','field'=>'','operator'=>'in'],
+        // ['request'=>'','field'=>'','operator'=>'in'],
     ];
 
-    use SearchFilters;
     use ControllerRequest;
     use ExportRequest;
+    use SearchFilters;
 
     public function index()
     {

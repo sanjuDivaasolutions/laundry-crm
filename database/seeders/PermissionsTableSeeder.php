@@ -16,11 +16,11 @@ class PermissionsTableSeeder extends Seeder
         $count = 1;
         foreach ($data as $p) {
             $permissions[] = [
-                'id'=>$count,
-                'title'=>$p['permission'],
-                'permission_group_id'=>$p['group_id'],
-                'created_at'=>now(),
-                'updated_at'=>now(),
+                'id' => $count,
+                'title' => $p['permission'],
+                'permission_group_id' => $p['group_id'],
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
             $count++;
         }

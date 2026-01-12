@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -27,16 +28,16 @@ class QuotationStatusResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
-            'date'       => $this->date,
-            'active'     => $this->active,
-            'status'     => $this->status,
-            'remark'     => $this->remark,
+            'id' => $this->id,
+            'date' => $this->date,
+            'active' => $this->active,
+            'status' => $this->status,
+            'remark' => $this->remark,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
             'quotation_id' => $this->quotation_id,
-            'user_id'      => $this->user_id,
+            'user_id' => $this->user_id,
 
             'quotation' => new QuotationResource($this->whenLoaded('quotation')),
         ];

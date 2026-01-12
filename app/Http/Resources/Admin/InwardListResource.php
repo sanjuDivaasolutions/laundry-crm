@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -29,33 +30,33 @@ class InwardListResource extends JsonResource
         $currencySign = '$';
 
         return [
-            'id'             => $this->id,
+            'id' => $this->id,
             'invoice_number' => $this->invoice_number,
-            'reference_no'   => $this->reference_no,
-            'date'           => $this->date,
-            'remark'         => $this->remark,
-            'currency_rate'  => $this->currency_rate,
-            'sub_total'      => $this->sub_total,
-            'tax_total'      => $this->tax_total,
-            'tax_rate'       => $this->tax_rate,
-            'grand_total'    => $this->grand_total,
+            'reference_no' => $this->reference_no,
+            'date' => $this->date,
+            'remark' => $this->remark,
+            'currency_rate' => $this->currency_rate,
+            'sub_total' => $this->sub_total,
+            'tax_total' => $this->tax_total,
+            'tax_rate' => $this->tax_rate,
+            'grand_total' => $this->grand_total,
 
-            'sub_total_label'   => $currencySign . number_format($this->sub_total, 2),
-            'tax_total_label'   => $currencySign . number_format($this->tax_total, 2),
-            'grand_total_label' => $currencySign . number_format($this->grand_total, 2),
+            'sub_total_label' => $currencySign.number_format($this->sub_total, 2),
+            'tax_total_label' => $currencySign.number_format($this->tax_total, 2),
+            'grand_total_label' => $currencySign.number_format($this->grand_total, 2),
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'company_id'   => $this->company_id,
-            'supplier_id'  => $this->supplier_id,
+            'company_id' => $this->company_id,
+            'supplier_id' => $this->supplier_id,
             'warehouse_id' => $this->warehouse_id,
-            'user_id'      => $this->user_id,
+            'user_id' => $this->user_id,
 
-            'company'   => new CompanyResource($this->whenLoaded('company')),
-            'supplier'  => new SupplierResource($this->whenLoaded('supplier')),
+            'company' => new CompanyResource($this->whenLoaded('company')),
+            'supplier' => new SupplierResource($this->whenLoaded('supplier')),
             'warehouse' => new WarehouseResource($this->whenLoaded('warehouse')),
-            'user'      => new UserResource($this->whenLoaded('user')),
+            'user' => new UserResource($this->whenLoaded('user')),
         ];
     }
 }

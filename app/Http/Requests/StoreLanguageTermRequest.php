@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\LanguageTerm;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class StoreLanguageTermRequest extends FormRequest
 {

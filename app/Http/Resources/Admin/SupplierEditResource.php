@@ -11,9 +11,9 @@ class SupplierEditResource extends JsonResource
     {
         $record = parent::toArray($request);
 
-        if($this->type) {
+        if ($this->type) {
             $obj = collect(Supplier::TYPE_SELECT)->firstWhere('value', $this->type);
-            if($obj) {
+            if ($obj) {
                 $record['type'] = [
                     'value' => $obj['value'],
                     'label' => $obj['label'],

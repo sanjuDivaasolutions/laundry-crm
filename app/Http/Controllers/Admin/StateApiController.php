@@ -9,7 +9,6 @@ use App\Http\Resources\Admin\StateResource;
 use App\Models\Country;
 use App\Models\State;
 use Gate;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class StateApiController extends Controller

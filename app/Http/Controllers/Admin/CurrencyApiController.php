@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -15,22 +16,33 @@ use Illuminate\Http\Response;
 class CurrencyApiController extends Controller
 {
     protected $className = Currency::class;
+
     protected $scopes = [];
+
     protected $with = [];
+
     protected $exportResource = CurrencyResource::class;
+
     protected $fetcher = 'advancedFilter';
+
     protected $processListMethod = 'getProcessedList';
-    protected $filterMethods = ['index','getCsv','getPdf'];
+
+    protected $filterMethods = ['index', 'getCsv', 'getPdf'];
+
     protected $csvFilePrefix = null;
+
     protected $pdfFilePrefix = null;
+
     protected $fields = ['name'];
+
     protected $filters = [
-        //['request'=>'','field'=>'','operator'=>'in'],
+        // ['request'=>'','field'=>'','operator'=>'in'],
     ];
 
-    use SearchFilters;
     use ControllerRequest;
     use ExportRequest;
+    use SearchFilters;
+
     public function index()
     {
         abort_if(Gate::denies('currency_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');

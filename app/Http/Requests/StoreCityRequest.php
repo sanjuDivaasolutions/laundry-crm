@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\City;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class StoreCityRequest extends FormRequest
 {
@@ -17,7 +15,7 @@ class StoreCityRequest extends FormRequest
     protected function prepareForValidation()
     {
         $state_id = null;
-        if($this->state) {
+        if ($this->state) {
             $state_id = $this->state['id'];
         }
         $this->merge([

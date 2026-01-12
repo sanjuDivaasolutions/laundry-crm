@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -30,18 +31,18 @@ class PurchaseOrderListResource extends JsonResource
         $grandTotal = number_format($this->grand_total, 2);
 
         return [
-            'id'                => $this->id,
-            'po_number'         => $this->po_number,
-            'date'              => $this->date,
-            'company'           => $this->whenLoaded('company'),
-            'supplier'          => $this->whenLoaded('supplier'),
-            'user'              => $this->whenLoaded('user'),
-            'sub_total'         => $this->sub_total,
-            'sub_total_label'   => $currency . ' ' . $subTotal,
-            'tax_total'         => $this->tax_total,
-            'tax_total_label'   => $currency . ' ' . $taxTotal,
-            'grand_total'       => $this->grand_total,
-            'grand_total_label' => $currency . ' ' . $grandTotal,
+            'id' => $this->id,
+            'po_number' => $this->po_number,
+            'date' => $this->date,
+            'company' => $this->whenLoaded('company'),
+            'supplier' => $this->whenLoaded('supplier'),
+            'user' => $this->whenLoaded('user'),
+            'sub_total' => $this->sub_total,
+            'sub_total_label' => $currency.' '.$subTotal,
+            'tax_total' => $this->tax_total,
+            'tax_total_label' => $currency.' '.$taxTotal,
+            'grand_total' => $this->grand_total,
+            'grand_total_label' => $currency.' '.$grandTotal,
         ];
     }
 }

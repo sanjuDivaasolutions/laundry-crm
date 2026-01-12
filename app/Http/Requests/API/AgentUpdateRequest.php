@@ -8,8 +8,6 @@ class AgentUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -26,9 +24,9 @@ class AgentUpdateRequest extends FormRequest
         $agentId = $this->route('agent')->id;
 
         return [
-            'code' => 'sometimes|required|string|max:50|unique:agents,code,' . $agentId,
+            'code' => 'sometimes|required|string|max:50|unique:agents,code,'.$agentId,
             'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|max:255|unique:agents,email,' . $agentId,
+            'email' => 'sometimes|required|email|max:255|unique:agents,email,'.$agentId,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'commission_rate' => 'sometimes|required|numeric|min:0|max:100',
@@ -42,8 +40,6 @@ class AgentUpdateRequest extends FormRequest
 
     /**
      * Get custom messages for validator errors.
-     *
-     * @return array
      */
     public function messages(): array
     {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -40,11 +41,11 @@ class StoreShelfRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'         => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'active'       => [
+            'active' => [
                 'boolean',
             ],
             'warehouse_id' => [

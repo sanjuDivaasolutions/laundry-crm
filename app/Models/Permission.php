@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Permission extends Model
 {
-    use HasAdvancedFilter, SoftDeletes, HasFactory, ModelCache;
+    use HasAdvancedFilter, HasFactory, ModelCache, SoftDeletes;
 
     public $table = 'permissions';
 

@@ -15,9 +15,9 @@ class SalesByMonthResource extends JsonResource
         $month = Carbon::createFromFormat('Y-m', $this->month)->format('F Y');
 
         return [
-            'month'       => $month,
-            'total'       => $this->total,
-            'total_label' => $currencySymbol . number_format($this->total, 2),
+            'month' => $month,
+            'total' => $this->total,
+            'total_label' => $currencySymbol.number_format($this->total, 2),
         ];
     }
 }

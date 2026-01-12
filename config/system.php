@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -17,28 +18,28 @@
  */
 
 return [
-    'auth'                       => [
-        'admin'             => 'admin',
-        'admin_role_id'     => [1],
+    'auth' => [
+        'admin' => 'admin',
+        'admin_role_id' => [1],
         'non_admin_role_id' => [2],
-        'hidden_role_id'    => [], //[] for none
+        'hidden_role_id' => [], // [] for none
     ],
-    'model'                      => [
+    'model' => [
         'cache' => [
             'enabled' => false,
-            'prefix'  => 'model-keys',
-            'ttl'     => 3600, //1 hour
+            'prefix' => 'model-keys',
+            'ttl' => 3600, // 1 hour
         ],
     ],
-    'query'                      => [
-        'limit'  => 10,
-        'users'  => [
+    'query' => [
+        'limit' => 10,
+        'users' => [
             'limit' => 10,
         ],
         'search' => [
-            'type'               => 'anywhere', //start, anywhere, end
-            'key_expire_timeout' => 300, //5 minutes
-            'key_preserve_list'  => [
+            'type' => 'anywhere', // start, anywhere, end
+            'key_expire_timeout' => 300, // 5 minutes
+            'key_preserve_list' => [
                 'yes-nos',
                 'units',
                 'payment-terms',
@@ -49,7 +50,7 @@ return [
                 'warehouses',
                 'features',
             ],
-            'preload_options'    => [
+            'preload_options' => [
                 'yes-nos',
                 'units',
                 'payment-terms',
@@ -59,64 +60,64 @@ return [
             ],
         ],
     ],
-    'defaults'                   => [
-        'currency'           => [
-            'id'     => 1,
-            'code'   => 'USD',
+    'defaults' => [
+        'currency' => [
+            'id' => 1,
+            'code' => 'USD',
             'symbol' => '$',
         ],
-        'service_company'    => [
+        'service_company' => [
             'id' => 2,
         ],
-        'company'            => [
+        'company' => [
             'id' => 1,
         ],
-        'warehouse'          => [
+        'warehouse' => [
             'id' => 1,
         ],
-        'state'              => [
+        'state' => [
             'id' => 1,
         ],
-        'language'           => [
-            'id'        => 1,
+        'language' => [
+            'id' => 1,
             'protected' => [1, 2],
         ],
-        'language_group'     => [
-            'id'   => 1,
+        'language_group' => [
+            'id' => 1,
             'name' => 'general',
         ],
-        'department'         => [
+        'department' => [
             'gz' => [
-                'id'   => 4,
+                'id' => 4,
                 'name' => 'GZ',
             ],
         ],
         'opening_stock_date' => '01/01/2024',
     ],
-    'restricted'                 => [
+    'restricted' => [
         'company' => [1, 2, 3],
     ],
-    'reports'                    => [
+    'reports' => [
         'profit_loss' => [
             'use_cogs_calculation' => true, // Set to false to revert to original purchase-based calculation
         ],
     ],
-    'currency'                   => [
+    'currency' => [
         'usd' => 1,
         'cny' => 2,
     ],
-    'account'                    => [
-        'buyer'          => 1,
-        'customer'       => 1,
-        'supplier'       => 2,
+    'account' => [
+        'buyer' => 1,
+        'customer' => 1,
+        'supplier' => 2,
         'order_expenses' => 4,
-        'sales'          => 5,
-        'purchase'       => 6,
-        'commission'     => 7,
+        'sales' => 5,
+        'purchase' => 6,
+        'commission' => 7,
     ],
     'opening_balance_account_id' => 29,
-    'prefix'                     => [
+    'prefix' => [
         'sample_order' => 'YDG',
-        'inquiry'      => 'INQ',
+        'inquiry' => 'INQ',
     ],
 ];

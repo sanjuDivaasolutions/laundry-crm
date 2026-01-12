@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -30,8 +31,9 @@ class SalesInvoiceListResourceCollection extends ResourceCollection
     public function toArray($request)
     {
         $data = SalesInvoiceListResource::collection($this->collection);
+
         return [
-            'data'    => $data,
+            'data' => $data,
             'columns' => $this->getColumns(),
             'summary' => $this->getSummary($data),
         ];
@@ -41,73 +43,73 @@ class SalesInvoiceListResourceCollection extends ResourceCollection
     {
         return [
             [
-                'title'    => 'ID',
-                'field'    => 'id',
+                'title' => 'ID',
+                'field' => 'id',
                 'sortable' => true,
                 'colStyle' => 'width: 100px;',
             ],
             [
-                'title'    => 'Date',
-                'field'    => 'date',
+                'title' => 'Date',
+                'field' => 'date',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Invoice Number',
-                'field'    => 'invoice_number',
+                'title' => 'Invoice Number',
+                'field' => 'invoice_number',
                 'sortable' => true,
             ],
             [
-                'title'    => 'general.fields.po_number',
-                'field'    => 'reference_no',
+                'title' => 'general.fields.po_number',
+                'field' => 'reference_no',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Buyer',
-                'field'    => 'buyer.display_name',
+                'title' => 'Buyer',
+                'field' => 'buyer.display_name',
                 'sortable' => true,
             ],
             [
-                'title'    => 'Sub Total',
-                'field'    => 'sub_total_text',
+                'title' => 'Sub Total',
+                'field' => 'sub_total_text',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Commission',
-                'field'    => 'commission_total_text',
+                'title' => 'Commission',
+                'field' => 'commission_total_text',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Tax Total',
-                'field'    => 'tax_total_text',
+                'title' => 'Tax Total',
+                'field' => 'tax_total_text',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'    => 'Grand Total',
-                'field'    => 'grand_total_text',
+                'title' => 'Grand Total',
+                'field' => 'grand_total_text',
                 'sortable' => true,
-                'align'    => 'end',
+                'align' => 'end',
             ],
             [
-                'title'         => 'Payment Status',
-                'field'         => 'payment_status',
-                'tdComp'        => 'PaymentStatusLink',
+                'title' => 'Payment Status',
+                'field' => 'payment_status',
+                'tdComp' => 'PaymentStatusLink',
                 'downloadField' => 'payment_status_label',
-                'sortable'      => false,
+                'sortable' => false,
             ],
             [
-                'title'    => 'User',
-                'field'    => 'user.name',
+                'title' => 'User',
+                'field' => 'user.name',
                 'sortable' => true,
             ],
             [
-                'title'     => 'Actions',
-                'field'     => 'title',
-                'tdComp'    => 'DatatableActions',
+                'title' => 'Actions',
+                'field' => 'title',
+                'tdComp' => 'DatatableActions',
                 'isActions' => true,
-                'sortable'  => true,
+                'sortable' => true,
             ],
         ];
     }
@@ -125,15 +127,16 @@ class SalesInvoiceListResourceCollection extends ResourceCollection
             $taxTotal += $item->tax_total;
             $grandTotal += $item->grand_total;
         }
+
         return [
-            'sub_total'             => $subTotal,
-            'sub_total_text'        => $currencySign . number_format($subTotal, 2),
-            'commission_total'      => $commissionTotal,
-            'commission_total_text' => $currencySign . number_format($commissionTotal, 2),
-            'tax_total'             => $taxTotal,
-            'tax_total_text'        => $currencySign . number_format($taxTotal, 2),
-            'grand_total'           => $grandTotal,
-            'grand_total_text'      => $currencySign . number_format($grandTotal, 2),
+            'sub_total' => $subTotal,
+            'sub_total_text' => $currencySign.number_format($subTotal, 2),
+            'commission_total' => $commissionTotal,
+            'commission_total_text' => $currencySign.number_format($commissionTotal, 2),
+            'tax_total' => $taxTotal,
+            'tax_total_text' => $currencySign.number_format($taxTotal, 2),
+            'grand_total' => $grandTotal,
+            'grand_total_text' => $currencySign.number_format($grandTotal, 2),
         ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -19,7 +20,6 @@
 namespace App\Http\Requests;
 
 use App\Models\SalesOrder;
-use App\Services\OrderUtilityService;
 use App\Services\UtilityService;
 use App\Traits\CustomFormRequest;
 use Gate;
@@ -48,72 +48,72 @@ class StoreSalesOrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'company_id'              => [
+            'company_id' => [
                 'integer',
                 'exists:companies,id',
                 'required',
             ],
-            'so_number'               => [
+            'so_number' => [
                 'string',
                 'required',
             ],
-            'quotation_no'            => [
+            'quotation_no' => [
                 'string',
                 'nullable',
             ],
-            'reference_no'            => [
+            'reference_no' => [
                 'string',
                 'nullable',
             ],
-            'warehouse_id'            => [
+            'warehouse_id' => [
                 'integer',
                 'exists:warehouses,id',
                 'required',
             ],
-            'type'                    => [
+            'type' => [
                 'required',
-                'in:' . implode(',', Arr::pluck(SalesOrder::TYPE_SELECT, 'value')),
+                'in:'.implode(',', Arr::pluck(SalesOrder::TYPE_SELECT, 'value')),
             ],
-            'date'                    => [
-                'date_format:' . config('project.date_format'),
+            'date' => [
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
             'estimated_shipment_date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'nullable',
             ],
-            'buyer_id'                => [
+            'buyer_id' => [
                 'integer',
                 'exists:buyers,id',
                 /* 'required', */
                 'nullable',
             ],
-            'payment_term_id'         => [
+            'payment_term_id' => [
                 'integer',
                 'exists:payment_terms,id',
                 'nullable',
             ],
-            'remarks'                 => [
+            'remarks' => [
                 'string',
                 'nullable',
             ],
-            'sub_total'               => [
+            'sub_total' => [
                 'numeric',
                 'required',
             ],
-            'tax_total'               => [
+            'tax_total' => [
                 'numeric',
                 'nullable',
             ],
-            'tax_rate'                => [
+            'tax_rate' => [
                 'numeric',
                 'required',
             ],
-            'grand_total'             => [
+            'grand_total' => [
                 'numeric',
                 'required',
             ],
-            'user_id'                 => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'required',
@@ -125,9 +125,9 @@ class StoreSalesOrderRequest extends FormRequest
     {
         $field = 'so_number';
         $config = [
-            'table'  => 'sales_orders',
-            'field'  => $field,
-            'prefix' => 'SO-'
+            'table' => 'sales_orders',
+            'field' => $field,
+            'prefix' => 'SO-',
         ];
         $code = UtilityService::generateCode($config);
         $this->merge([$field => $code]);
@@ -137,13 +137,12 @@ class StoreSalesOrderRequest extends FormRequest
     public function messages()
     {
         return [
-            'so_number.required'       => 'SO Number is required',
-            'date.required'            => 'Date is required',
-            'buyer_id.required'        => 'Importer is required',
+            'so_number.required' => 'SO Number is required',
+            'date.required' => 'Date is required',
+            'buyer_id.required' => 'Importer is required',
             'payment_term_id.required' => 'Payment Term is required',
-            'sub_total.required'       => 'Sub Total is required',
-            'grand_total.required'     => 'Grand Total is required',
+            'sub_total.required' => 'Sub Total is required',
+            'grand_total.required' => 'Grand Total is required',
         ];
     }
-
 }

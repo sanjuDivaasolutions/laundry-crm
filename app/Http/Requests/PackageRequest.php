@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -30,13 +31,13 @@ class PackageRequest extends FormRequest
     private string $requestType;
 
     private array $idObjects = [
-        'sales_invoice'
+        'sales_invoice',
     ];
 
     private array $valueObjects = [];
 
     private array $stringArrays = [
-        'items'
+        'items',
     ];
 
     public function __construct()
@@ -63,7 +64,7 @@ class PackageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sales_order_id'   => [
+            'sales_order_id' => [
                 'integer',
                 'exists:sales_orders,id',
                 'nullable',
@@ -73,28 +74,28 @@ class PackageRequest extends FormRequest
                 'exists:sales_invoices,id',
                 'nullable',
             ],
-            'code'             => [
+            'code' => [
                 'string',
                 'required',
             ],
-            'reference_no'     => [
+            'reference_no' => [
                 'string',
                 'nullable',
             ],
-            'date'             => [
-                'date_format:' . config('project.date_format'),
+            'date' => [
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
-            'remarks'          => [
+            'remarks' => [
                 'string',
                 'nullable',
             ],
-            'user_id'          => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'required',
             ],
-            'packing_type_id'  => [
+            'packing_type_id' => [
                 'integer',
                 'exists:packing_types,id',
                 'nullable',
@@ -106,9 +107,9 @@ class PackageRequest extends FormRequest
     {
         $field = 'code';
         $config = [
-            'table'  => 'packages',
-            'field'  => $field,
-            'prefix' => 'PKG-'
+            'table' => 'packages',
+            'field' => $field,
+            'prefix' => 'PKG-',
         ];
         $code = UtilityService::generateCode($config);
         $this->set($field, $code);
@@ -127,5 +128,4 @@ class PackageRequest extends FormRequest
         }
         $this->set('items', $items);
     }
-
 }

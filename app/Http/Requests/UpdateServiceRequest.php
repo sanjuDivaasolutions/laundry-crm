@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -51,71 +52,71 @@ class UpdateServiceRequest extends FormRequest
         $this->set('has_inventory', 0);
         $this->set('unit_01_id', 1);
         $this->set('unit_02_id', 1);
-        $this->setIfNull('sku', 'SER-' . time());
+        $this->setIfNull('sku', 'SER-'.time());
     }
 
     public function rules()
     {
         return [
-            'code'          => [
+            'code' => [
                 'string',
                 'required',
-                'unique:products,code,' . request()->route('product')->id,
+                'unique:products,code,'.request()->route('product')->id,
             ],
-            'name'          => [
+            'name' => [
                 'string',
                 'required',
             ],
-            'type'          => [
+            'type' => [
                 'string',
                 'required',
-                'in:' . implode(',', collect(Product::TYPE_SELECT)->pluck('value')->toArray()),
+                'in:'.implode(',', collect(Product::TYPE_SELECT)->pluck('value')->toArray()),
             ],
             'has_inventory' => [
                 'integer',
             ],
-            'sku'           => [
+            'sku' => [
                 'string',
                 'required',
-                'unique:products,sku,' . request()->route('product')->id,
+                'unique:products,sku,'.request()->route('product')->id,
             ],
-            'company_id'    => [
+            'company_id' => [
                 'integer',
                 'exists:companies,id',
                 'required',
             ],
-            'category_id'   => [
+            'category_id' => [
                 'integer',
                 'exists:categories,id',
                 'nullable',
             ],
-            'description'   => [
+            'description' => [
                 'string',
                 'nullable',
             ],
-            'supplier_id'   => [
+            'supplier_id' => [
                 'integer',
                 'exists:suppliers,id',
                 'nullable',
             ],
-            'active'        => [
+            'active' => [
                 'boolean',
             ],
-            'user_id'       => [
+            'user_id' => [
                 'integer',
                 'exists:users,id',
                 'required',
             ],
-            'manufacturer'  => [
+            'manufacturer' => [
                 'string',
                 'nullable',
             ],
-            'unit_01_id'    => [
+            'unit_01_id' => [
                 'integer',
                 'exists:units,id',
                 'required',
             ],
-            'unit_02_id'    => [
+            'unit_02_id' => [
                 'integer',
                 'exists:units,id',
                 'required',

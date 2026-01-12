@@ -2,9 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Company;
-use Illuminate\Auth\Access\Response;
+use App\Models\User;
 
 class CompanyPolicy
 {
@@ -23,8 +22,8 @@ class CompanyPolicy
     {
         // Users can view their own company
         if ($user->company_id) {
-            return $user->company_id === $company->id || 
-                   $user->hasPermission('manage-companies') || 
+            return $user->company_id === $company->id ||
+                   $user->hasPermission('manage-companies') ||
                    $user->isAdmin();
         }
 
@@ -46,8 +45,8 @@ class CompanyPolicy
     {
         // Users can update their own company
         if ($user->company_id) {
-            return $user->company_id === $company->id || 
-                   $user->hasPermission('manage-companies') || 
+            return $user->company_id === $company->id ||
+                   $user->hasPermission('manage-companies') ||
                    $user->isAdmin();
         }
 
@@ -61,8 +60,8 @@ class CompanyPolicy
     {
         // Users can delete their own company
         if ($user->company_id) {
-            return $user->company_id === $company->id || 
-                   $user->hasPermission('manage-companies') || 
+            return $user->company_id === $company->id ||
+                   $user->hasPermission('manage-companies') ||
                    $user->isAdmin();
         }
 
@@ -76,8 +75,8 @@ class CompanyPolicy
     {
         // Users can view reports for their own company
         if ($user->company_id) {
-            return $user->company_id === $company->id || 
-                   $user->hasPermission('view-reports') || 
+            return $user->company_id === $company->id ||
+                   $user->hasPermission('view-reports') ||
                    $user->isAdmin();
         }
 

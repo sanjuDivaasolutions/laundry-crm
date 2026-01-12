@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2024 Divaa Solutions. All rights reserved.
@@ -18,16 +19,18 @@
 
 namespace App\Modules\Dashboard;
 
-use App\Models\PettyCashExpense;
 use App\Models\SalesInvoice;
-use App\Models\Transaction;
 
 class AdminTopBuyerModule
 {
     public string $module = 'AdminTopBuyerModule';
+
     public string $title = 'Top 5 Buyers';
+
     public string $component = 'BasicTableComponent';
+
     public int $columns = 4;
+
     public array $filters = [];
 
     public function __construct($params = [])
@@ -42,14 +45,14 @@ class AdminTopBuyerModule
     public function get(): array
     {
         return [
-            'title'        => $this->title,
-            'component'    => $this->component,
-            'module'       => $this->module,
-            'query'        => $this->getQuery(),
+            'title' => $this->title,
+            'component' => $this->component,
+            'module' => $this->module,
+            'query' => $this->getQuery(),
             'defaultQuery' => $this->getQuery(),
-            'filters'      => $this->getFilters(),
-            'data'         => $this->getData(),
-            'columns'      => $this->columns,
+            'filters' => $this->getFilters(),
+            'data' => $this->getData(),
+            'columns' => $this->columns,
         ];
     }
 
@@ -70,8 +73,8 @@ class AdminTopBuyerModule
         $data = [];
         foreach ($topFiveBuyers as $buyer) {
             $data[] = [
-                'name'   => $buyer->buyer->name,
-                'amount' => $currencySign . number_format($buyer->converted_sub_total, 2),
+                'name' => $buyer->buyer->name,
+                'amount' => $currencySign.number_format($buyer->converted_sub_total, 2),
             ];
         }
 
@@ -119,9 +122,9 @@ class AdminTopBuyerModule
                 'value' => 'name',
             ],
             [
-                'label'   => 'Amount',
-                'value'   => 'amount',
-                'class'   => 'text-end',
+                'label' => 'Amount',
+                'value' => 'amount',
+                'class' => 'text-end',
                 'thClass' => '',
                 'tdClass' => 'text-primary fw-bold',
             ],

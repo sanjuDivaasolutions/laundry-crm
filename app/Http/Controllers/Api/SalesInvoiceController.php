@@ -21,8 +21,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SalesInvoiceResource;
-use App\Models\SalesInvoice;
 use App\Models\Buyer;
+use App\Models\SalesInvoice;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -33,7 +33,6 @@ class SalesInvoiceController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param Request $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request)
@@ -72,9 +71,9 @@ class SalesInvoiceController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('invoice_number', 'like', '%' . $search . '%')
-                  ->orWhere('reference_no', 'like', '%' . $search . '%')
-                  ->orWhere('remark', 'like', '%' . $search . '%');
+                $q->where('invoice_number', 'like', '%'.$search.'%')
+                    ->orWhere('reference_no', 'like', '%'.$search.'%')
+                    ->orWhere('remark', 'like', '%'.$search.'%');
             });
         }
 
@@ -91,7 +90,6 @@ class SalesInvoiceController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
      * @return SalesInvoiceResource
      */
     public function store(Request $request)
@@ -177,7 +175,6 @@ class SalesInvoiceController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param SalesInvoice $salesInvoice
      * @return SalesInvoiceResource
      */
     public function show(SalesInvoice $salesInvoice)
@@ -195,21 +192,19 @@ class SalesInvoiceController extends Controller
             'items.product.unit_01',
             'items.product.unit_02',
             'taxes',
-            'payments'
+            'payments',
         ]));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param SalesInvoice $salesInvoice
      * @return SalesInvoiceResource
      */
     public function update(Request $request, SalesInvoice $salesInvoice)
     {
         $validated = $request->validate([
-            'invoice_number' => 'sometimes|required|string|max:255|unique:sales_invoices,invoice_number,' . $salesInvoice->id,
+            'invoice_number' => 'sometimes|required|string|max:255|unique:sales_invoices,invoice_number,'.$salesInvoice->id,
             'date' => 'sometimes|required|date',
             'due_date' => 'nullable|date|after_or_equal:date',
             'buyer_id' => 'sometimes|required|exists:buyers,id',
@@ -274,7 +269,7 @@ class SalesInvoiceController extends Controller
             // Update items if provided
             if (isset($validated['items'])) {
                 $salesInvoice->items()->delete();
-                
+
                 foreach ($validated['items'] as $item) {
                     $salesInvoice->items()->create([
                         'product_id' => $item['product_id'],
@@ -295,7 +290,6 @@ class SalesInvoiceController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param SalesInvoice $salesInvoice
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(SalesInvoice $salesInvoice)
@@ -373,14 +367,14 @@ class SalesInvoiceController extends Controller
         $prefix = 'SI';
         $year = date('Y');
         $month = date('m');
-        
+
         $latest = SalesInvoice::whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->orderBy('id', 'desc')
             ->first();
 
         $sequence = $latest ? intval(substr($latest->invoice_number, -4)) + 1 : 1;
-        $invoiceNumber = "{$prefix}-{$year}{$month}-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        $invoiceNumber = "{$prefix}-{$year}{$month}-".str_pad($sequence, 4, '0', STR_PAD_LEFT);
 
         return response()->json(['invoice_number' => $invoiceNumber]);
     }

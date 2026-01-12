@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\PurchaseReceive;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 
 class StorePurchaseReceiveRequest extends FormRequest
 {
@@ -22,7 +20,7 @@ class StorePurchaseReceiveRequest extends FormRequest
                 'required',
             ],
             'date' => [
-                'date_format:' . config('project.date_format'),
+                'date_format:'.config('project.date_format'),
                 'required',
             ],
             'remarks' => [

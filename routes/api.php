@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
@@ -37,24 +38,26 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::get('locales/messages', 'LocalesController@messages')->name('locales.messages');
 
     Route::post('login', 'Auth\LoginController');
-    
+
     // Password Reset Routes
     Route::post('forgot_password', 'UsersApiController@passwordResetRequest')->name('password.email');
     Route::post('reset_password', 'Auth\ResetPasswordController@reset')->name('password.update');
 
-    //Storage:link
+    // Storage:link
     Route::get('storage-link', function () {
         \Illuminate\Support\Facades\Artisan::call('storage:link');
+
         return response()->json(['message' => 'Storage link created successfully.']);
     });
 
-    //Optimize
+    // Optimize
     Route::get('optimize', function () {
         Artisan::call('optimize:clear');
+
         return response()->json(['message' => 'Optimize cleared successfully.']);
     });
 
-    //Reinstall Permissions
+    // Reinstall Permissions
     Route::get('reinstall-permissions', function () {
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('permission_role')->truncate();
@@ -69,12 +72,14 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
 
     Route::get('update-language-terms', function () {
         // Assuming LanguageService is kept or specific parts moved
-        // LanguageService::updateLanguageData(); 
+        // LanguageService::updateLanguageData();
         return response()->json(['message' => 'Language terms updated successfully.']);
     });
 
     // Test route
-    Route::get('test', function() { return response()->json(['message' => 'test works']); });
+    Route::get('test', function () {
+        return response()->json(['message' => 'test works']);
+    });
 });
 
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Admin', 'middleware' => ['jwt.admin.verify']], function () {
@@ -129,7 +134,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     // Company Settings
     Route::resource('companies', 'CompanyApiController');
     Route::get('companies-csv', 'CompanyApiController@getCsv');
-    
+
     // Messages (Internal)
     Route::resource('messages', 'MessageApiController');
     Route::get('messages-csv', 'MessageApiController@getCsv');
