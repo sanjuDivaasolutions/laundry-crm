@@ -94,8 +94,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::get('bulk-options/{types}', 'SearchApiController@bulkOptions')->name('bulk-options');
     Route::get('keys', 'SearchApiController@keys')->withoutMiddleware(['jwt.admin.verify'])->name('keys');
 
-    // Dashboard (Generic)
-    Route::get('dashboard-data', 'DashboardApiController@fetchData')->name('dashboard-data');
+
 
     // Import (Generic)
     Route::post('import/{type}/{id?}', 'ImportApiController@import')->name('import');

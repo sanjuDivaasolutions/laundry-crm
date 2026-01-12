@@ -20,7 +20,6 @@
 namespace App\Services;
 
 use App\Models\Company;
-use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
