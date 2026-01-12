@@ -20,6 +20,7 @@
 namespace App\Models;
 
 use App\Support\HasAdvancedFilter;
+use App\Traits\BelongsToTenant;
 use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,7 +31,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Company extends Model implements HasMedia
 {
-    use HasAdvancedFilter, HasFactory, InteractsWithMedia, Searchable;
+    use BelongsToTenant, HasAdvancedFilter, HasFactory, InteractsWithMedia, Searchable;
 
     protected $appends = [
         'image',
@@ -43,7 +44,7 @@ class Company extends Model implements HasMedia
         'address_2',
         'active',
         'user_id',
-        'user_id',
+        'tenant_id',
     ];
 
     protected $orderable = [

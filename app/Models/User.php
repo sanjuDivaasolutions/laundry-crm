@@ -22,6 +22,7 @@ namespace App\Models;
 use App\Notifications\ResetPasswordNotification;
 use App\Support\HasAdvancedFilter;
 use App\Traits\Searchable;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -30,7 +31,7 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasAdvancedFilter, HasFactory, Notifiable, Searchable;
+    use BelongsToTenant, HasAdvancedFilter, HasFactory, Notifiable, Searchable;
 
     /**
      * The table associated with the model.
@@ -48,6 +49,7 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'active',
         'language_id',
+        'tenant_id',
     ];
 
     protected $orderable = [

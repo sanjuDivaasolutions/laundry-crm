@@ -12,12 +12,25 @@ class TenantsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        Tenant::create([
-            'id' => 1,
-            'name' => 'Default Tenant',
-            'domain' => 'default',
-            'active' => true,
-            'settings' => ['locale' => 'en'],
-        ]);
+        $tenants = [
+            [
+                'id' => 1,
+                'name' => 'Default Tenant',
+                'domain' => 'localhost', // Default for local dev
+                'active' => true,
+                'settings' => ['locale' => 'en'],
+            ],
+            [
+                'id' => 2,
+                'name' => 'Demo Tenant',
+                'domain' => 'demo.localhost',
+                'active' => true,
+                'settings' => ['locale' => 'en'],
+            ]
+        ];
+
+        foreach ($tenants as $tenant) {
+            Tenant::updateOrCreate(['id' => $tenant['id']], $tenant);
+        }
     }
 }

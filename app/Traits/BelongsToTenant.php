@@ -1,28 +1,33 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Traits;
 
+use App\Services\TenantService;
 use App\Models\Tenant;
-use App\Scopes\TenantScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Auth;
 
 trait BelongsToTenant
 {
     /**
      * Boot the trait.
      */
-    protected static function bootBelongsToTenant(): void
+    public static function bootBelongsToTenant(): void
     {
-        static::addGlobalScope(new TenantScope);
+        static::addGlobalScope('tenant', function (Builder $builder) {
+            $tenantService = app(TenantService::class);
+            
+            // Only apply scope if a tenant is identified
+            if ($tenantId = $tenantService->getId()) {
+                $builder->where($builder->getModel()->getTable() . '.tenant_id', $tenantId);
+            }
+        });
 
         static::creating(function (Model $model) {
-            // Auto-assign tenant_id if not set and user is logged in
-            if (! $model->getAttribute('tenant_id') && Auth::check()) {
-                $model->setAttribute('tenant_id', Auth::user()->tenant_id);
+            $tenantService = app(TenantService::class);
+            
+            if (! $model->getAttribute('tenant_id') && $tenantId = $tenantService->getId()) {
+                $model->setAttribute('tenant_id', $tenantId);
             }
         });
     }
@@ -30,7 +35,7 @@ trait BelongsToTenant
     /**
      * Get the tenant that owns the model.
      */
-    public function tenant(): BelongsTo
+    public function tenant()
     {
         return $this->belongsTo(Tenant::class);
     }

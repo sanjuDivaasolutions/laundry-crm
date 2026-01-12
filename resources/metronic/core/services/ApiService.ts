@@ -36,6 +36,13 @@ class ApiService {
         ] = `Bearer ${JwtService.getToken()}`;
         ApiService.vueInstance.axios.defaults.headers.common["Accept"] =
             "application/json";
+
+        // Tenant Header
+        // Prefer window object (injected by blades) or Env, fallback to default
+        const tenantId = (window as any).TENANT_ID || "1";
+        if (tenantId) {
+            ApiService.vueInstance.axios.defaults.headers.common["X-Tenant-ID"] = tenantId;
+        }
     }
 
     /**

@@ -3,12 +3,17 @@
 namespace App\Http\Middleware;
 
 use App\Models\Tenant;
+use App\Services\TenantService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class IdentifyTenant
 {
+    public function __construct(
+        protected TenantService $tenantService
+    ) {}
+
     /**
      * Handle an incoming request.
      *
@@ -16,37 +21,30 @@ class IdentifyTenant
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $tenant = $this->identifyTenant($request);
+        $tenant = $this->resolveTenant($request);
 
         if ($tenant) {
-            // Store tenant in request for downstream usage
-            $request->merge(['tenant_id' => $tenant->id]);
-            $request->attributes->set('tenant', $tenant);
+            $this->tenantService->setTenant($tenant);
         }
 
         return $next($request);
     }
 
-    /**
-     * Identify tenant from request (subdomain or header)
-     */
-    protected function identifyTenant(Request $request): ?Tenant
+    protected function resolveTenant(Request $request): ?Tenant
     {
-        // 1. Check for X-Tenant-ID header (for API clients)
-        if ($request->hasHeader('X-Tenant-ID')) {
-            return Tenant::find($request->header('X-Tenant-ID'));
+        // 1. Try Header (X-Tenant-ID)
+        if ($tenantId = $request->header('X-Tenant-ID')) {
+            return Tenant::find($tenantId);
         }
 
-        // 2. Check for subdomain (e.g., tenant1.app.com)
+        // 2. Try Domain/Subdomain
         $host = $request->getHost();
-        $subdomain = explode('.', $host)[0] ?? null;
-
-        if ($subdomain && $subdomain !== 'www') {
-            return Tenant::where('domain', $subdomain)
-                ->where('active', true)
-                ->first();
+        if ($tenant = Tenant::where('domain', $host)->first()) {
+            return $tenant;
         }
 
+        // 3. Fallback (optional: could check query param or authenticated user's tenant)
+        
         return null;
     }
 }

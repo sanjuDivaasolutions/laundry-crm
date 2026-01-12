@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->api(append: [
+            \App\Http\Middleware\IdentifyTenant::class,
             \App\Http\Middleware\AdminAuthGates::class,
         ]);
 

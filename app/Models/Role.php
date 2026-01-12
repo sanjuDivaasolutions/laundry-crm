@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\HasAdvancedFilter;
+use App\Traits\BelongsToTenant;
 use App\Traits\Searchable;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Role extends Model
 {
+    use BelongsToTenant;
     use HasAdvancedFilter;
     use HasFactory;
     use Searchable;
@@ -31,6 +33,7 @@ class Role extends Model
 
     protected $fillable = [
         'title',
+        'tenant_id',
         'created_at',
         'updated_at',
         'deleted_at',
