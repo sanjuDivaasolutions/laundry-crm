@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'jwt.admin.verify' => \App\Http\Middleware\JwtAdminMiddleware::class,
             'jwt.auth' => \PHPOpenSourceSaver\JWTAuth\Middleware\GetUserFromToken::class,
             'jwt.refresh' => \PHPOpenSourceSaver\JWTAuth\Middleware\RefreshToken::class,
+            'tenant' => \App\Http\Middleware\IdentifyTenant::class,
+            'quota' => \App\Http\Middleware\EnforceTenantQuota::class,
         ]);
 
         $middleware->api(append: [

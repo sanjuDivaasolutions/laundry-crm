@@ -19,7 +19,8 @@
       "Bash(php check_terms.php:*)",
       "Bash(php update_all_german_translations.php:*)",
       "Bash(php:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(xargs ls:*)"
     ],
     "deny": [],
     "ask": []

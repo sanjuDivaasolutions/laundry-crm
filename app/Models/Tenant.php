@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Traits\HasEntitlements;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Laravel\Cashier\Billable;
 
 class Tenant extends Model
 {
-    use Billable;
+    use Billable, HasEntitlements, HasFactory;
 
     protected $fillable = [
         'name',
@@ -35,6 +38,35 @@ class Tenant extends Model
     public function companies()
     {
         return $this->hasMany(\App\Models\Company::class);
+    }
+
+    /**
+     * Check if the tenant has already used their trial.
+     */
+    public function hasUsedTrial(): bool
+    {
+        // If they have trial_ends_at set, they've used trial
+        if ($this->trial_ends_at !== null) {
+            return true;
+        }
+
+        // Check if they've ever had a subscription
+        return $this->subscriptions()->exists();
+    }
+
+    /**
+     * Get the current plan code from active subscription.
+     */
+    public function getCurrentPlanCode(): ?string
+    {
+        $subscription = $this->subscription('default');
+
+        if (!$subscription || !$subscription->active()) {
+            return null;
+        }
+
+        // Get from subscription metadata or items
+        return $subscription->stripe_price;
     }
 
     /**

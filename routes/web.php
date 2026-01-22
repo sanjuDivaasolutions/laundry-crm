@@ -12,13 +12,16 @@
  *  *  Unauthorized copying of this file, via any medium is strictly prohibited.
  *  *  Proprietary and confidential.
  *  *
- *  *  Last modified: 17/10/24, 2:31 pm
+ *  *  Last modified: 17/10/24, 2:31 pm
  *  *  Written by Chintan Bagdawala, 2024.
  *
  */
 
-use App\Models\Contract;
-use App\Services\StripeService;
+use App\Http\Controllers\Webhooks\StripeWebhookController;
+use App\Models\Plan;
+use App\Models\Tenant;
+use App\Services\Billing\StripeService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,36 +40,108 @@ Route::get('/admin', function () {
 });
 
 Route::get('/', function () {
-    // return view('welcome');
     return redirect('/admin');
 });
 
-Route::get('/subscription-checkout/{contract}', function (Contract $contract) {
-    if (! StripeService::isValidContract($contract)) {
-        return redirect()->route('contract-invalid');
+/*
+|--------------------------------------------------------------------------
+| Pricing & Checkout Routes
+|--------------------------------------------------------------------------
+*/
+
+// Public pricing page
+Route::get('/pricing', function () {
+    $plans = Plan::active()->ordered()->with(['features', 'quotas'])->get();
+    return view('front-end.pricing', compact('plans'));
+})->name('pricing');
+
+// Checkout success - provision plan for tenant
+Route::get('/checkout/success', function (Request $request) {
+    $sessionId = $request->query('session_id');
+
+    if (!$sessionId) {
+        return redirect('/pricing')->with('error', 'Invalid checkout session');
     }
 
-    return StripeService::createContractSubscription($contract);
-})->name('subscription-checkout');
+    try {
+        $stripe = new \Stripe\StripeClient(config('cashier.secret'));
+        $session = $stripe->checkout->sessions->retrieve($sessionId, [
+            'expand' => ['subscription'],
+        ]);
 
-Route::get('/contract-success', function () {
-    return view('front-end.contract-success');
-})->name('contract-success');
+        $tenantId = $session->metadata->tenant_id ?? null;
+        $planCode = $session->subscription?->metadata?->plan_code ?? null;
 
-Route::get('/contract-cancel', function () {
-    $message = 'Failed! Your subscription could not be activated.';
+        if ($tenantId && $planCode) {
+            $tenant = Tenant::find($tenantId);
+            $plan = Plan::where('code', $planCode)->first();
 
-    return view('front-end.contract-failed', compact('message'));
-})->name('contract-cancel');
+            if ($tenant && $plan) {
+                $plan->provisionForTenant($tenant);
+            }
+        }
 
-Route::get('/contract-invalid', function () {
-    $message = 'Failed! Your subscription is not stripe managed.';
+        return view('front-end.checkout-success', [
+            'subscription_id' => $session->subscription?->id,
+        ]);
+    } catch (\Exception $e) {
+        logger()->error('Checkout success error', ['error' => $e->getMessage()]);
+        return redirect('/pricing')->with('error', 'Failed to verify checkout');
+    }
+})->name('checkout.success');
 
-    return view('front-end.contract-failed', compact('message'));
-})->name('contract-invalid');
+// Checkout cancel
+Route::get('/checkout/cancel', function () {
+    return view('front-end.checkout-cancel');
+})->name('checkout.cancel');
+
+/*
+|--------------------------------------------------------------------------
+| Billing Portal
+|--------------------------------------------------------------------------
+*/
+
+// Redirect to Stripe Billing Portal
+Route::get('/billing', function (Request $request) {
+    $tenant = app(\App\Services\TenantService::class)->getTenant();
+
+    if (!$tenant || !$tenant->hasStripeId()) {
+        return redirect('/pricing')->with('error', 'No billing account found');
+    }
+
+    $stripeService = app(StripeService::class);
+    $session = $stripeService->createBillingPortalSession($tenant, url('/admin'));
+
+    return redirect($session->url);
+})->middleware(['jwt.admin.verify', 'identify.tenant'])->name('billing');
+
+/*
+|--------------------------------------------------------------------------
+| Newsletter
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/newsletter-subscribe/{company}', 'App\Http\Controllers\Web\SubscribeController@index')->name('newsletter-subscribe');
+
+/*
+|--------------------------------------------------------------------------
+| Password Reset
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/reset-password', function () {
     return view('admin');
 })->name('password.reset');
+
+/*
+|--------------------------------------------------------------------------
+| Stripe Webhooks
+|--------------------------------------------------------------------------
+|
+| Stripe webhook endpoint with custom idempotency and audit logging.
+| Uses CSRF exemption as Stripe cannot send CSRF tokens.
+|
+*/
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
+    ->name('stripe.webhook')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);

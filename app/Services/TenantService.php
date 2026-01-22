@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Tenant;
-use Illuminate\Support\Facades\Log;
 
 class TenantService
 {
@@ -17,8 +18,8 @@ class TenantService
         $this->tenant = $tenant;
         
         if ($tenant) {
-             // Share tenant context with logs
-             Log::shareContext(['tenant_id' => $tenant->id]);
+            // Share tenant context with logs
+            logger()->shareContext(['tenant_id' => $tenant->id]);
         }
     }
 

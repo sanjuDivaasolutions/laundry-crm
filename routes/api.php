@@ -72,7 +72,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
 
     Route::get('update-language-terms', function () {
         // Assuming LanguageService is kept or specific parts moved
-        // LanguageService::updateLanguageData();
+        \App\Services\LanguageService::updateLanguageData();
         return response()->json(['message' => 'Language terms updated successfully.']);
     });
 
@@ -80,6 +80,61 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::get('test', function () {
         return response()->json(['message' => 'test works']);
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Public SaaS Routes (No Auth)
+|--------------------------------------------------------------------------
+*/
+Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
+    // Plans - public listing for pricing page
+    Route::get('plans', [\App\Http\Controllers\Api\PlanController::class, 'index'])->name('plans.index');
+    Route::get('plans/compare', [\App\Http\Controllers\Api\PlanController::class, 'compare'])->name('plans.compare');
+    Route::get('plans/{code}', [\App\Http\Controllers\Api\PlanController::class, 'show'])->name('plans.show');
+
+    // Signup - create new tenant
+    Route::post('signup', [\App\Http\Controllers\Api\SignupController::class, 'register'])->name('signup');
+
+    // Checkout callbacks (no auth - called from Stripe redirect)
+    Route::get('checkout/success', [\App\Http\Controllers\Api\CheckoutController::class, 'handleSuccess'])->name('checkout.success');
+    Route::get('checkout/cancel', [\App\Http\Controllers\Api\CheckoutController::class, 'handleCancel'])->name('checkout.cancel');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated SaaS Routes
+|--------------------------------------------------------------------------
+*/
+Route::group(['prefix' => 'v1', 'as' => 'api.', 'middleware' => ['jwt.admin.verify', 'identify.tenant']], function () {
+    // Checkout - create subscription
+    Route::post('checkout', [\App\Http\Controllers\Api\CheckoutController::class, 'createSession'])->name('checkout.create');
+
+    // Subscription management
+    Route::get('subscription', [\App\Http\Controllers\Api\SubscriptionController::class, 'show'])->name('subscription.show');
+    Route::post('subscription/change-plan', [\App\Http\Controllers\Api\SubscriptionController::class, 'changePlan'])->name('subscription.change-plan');
+    Route::post('subscription/cancel', [\App\Http\Controllers\Api\SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::post('subscription/resume', [\App\Http\Controllers\Api\SubscriptionController::class, 'resume'])->name('subscription.resume');
+
+    // Billing
+    Route::get('billing', [\App\Http\Controllers\Api\BillingController::class, 'index'])->name('billing.index');
+    Route::get('billing/portal', [\App\Http\Controllers\Api\BillingController::class, 'portal'])->name('billing.portal');
+    Route::get('billing/invoices', [\App\Http\Controllers\Api\BillingController::class, 'invoices'])->name('billing.invoices');
+    Route::get('billing/upcoming', [\App\Http\Controllers\Api\BillingController::class, 'upcomingInvoice'])->name('billing.upcoming');
+    Route::post('billing/payment-method', [\App\Http\Controllers\Api\BillingController::class, 'updatePaymentMethod'])->name('billing.payment-method');
+    Route::post('billing/setup-intent', [\App\Http\Controllers\Api\BillingController::class, 'createSetupIntent'])->name('billing.setup-intent');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Plan Management Routes
+|--------------------------------------------------------------------------
+*/
+Route::group(['prefix' => 'v1/admin', 'as' => 'api.admin.', 'middleware' => ['jwt.admin.verify']], function () {
+    Route::get('plans', [\App\Http\Controllers\Api\PlanController::class, 'adminIndex'])->name('plans.index');
+    Route::post('plans', [\App\Http\Controllers\Api\PlanController::class, 'store'])->name('plans.store');
+    Route::put('plans/{id}', [\App\Http\Controllers\Api\PlanController::class, 'update'])->name('plans.update');
+    Route::delete('plans/{id}', [\App\Http\Controllers\Api\PlanController::class, 'destroy'])->name('plans.destroy');
 });
 
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Admin', 'middleware' => ['jwt.admin.verify']], function () {

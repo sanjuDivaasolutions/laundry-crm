@@ -16,7 +16,6 @@ class LoginController extends Controller
         ]);
         $credentials = $request->only('email', 'password');
         $credentials['active'] = 1;
-
         $token = auth('admin')->attempt($credentials);
         if (! $token) {
             return errorResponse('Invalid Email or Password', 401);

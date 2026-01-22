@@ -23,7 +23,17 @@ class LocalesController extends Controller
         $languageId = $user->language_id ?: 1;
         $language = Language::query()->find($languageId);
         $locale = $language->locale ?: config('system.defaults.language.locale', 'en');*/
-        $locale = $request->get('locale', app()->getLocale());
+        if ($request->has('locale')) {
+            $locale = $request->get('locale');
+        } else {
+            $user = adminAuth()->user();
+            if ($user && $user->language) {
+                $locale = $user->language->locale;
+            } else {
+                $locale = app()->getLocale();
+            }
+        }
+        
         $translationData = Translation::query()
             ->whereHas('language', function ($query) use ($locale) {
                 $query->where('locale', $locale);
