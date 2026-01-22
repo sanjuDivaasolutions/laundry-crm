@@ -9,6 +9,7 @@ class CityFactory extends Factory
 {
     protected $model = City::class;
 
+    
     public function definition(): array
     {
         return [
