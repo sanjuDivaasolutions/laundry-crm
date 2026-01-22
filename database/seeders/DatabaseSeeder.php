@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
             UsersTableSeeder::class,
             CurrenciesTableSeeder::class,
             RoleUserTableSeeder::class,
+            ProcessingStatusSeeder::class,
+            OrderStatusSeeder::class,
+            CategorySeeder::class,
         ]);
     }
 }
