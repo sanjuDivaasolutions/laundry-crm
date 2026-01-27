@@ -20,7 +20,9 @@
       "Bash(php update_all_german_translations.php:*)",
       "Bash(php:*)",
       "Bash(ls:*)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "Bash(echo:*)",
+      "Bash(vendor/bin/pint:*)"
     ],
     "deny": [],
     "ask": []

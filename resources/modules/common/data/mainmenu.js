@@ -20,6 +20,34 @@ const mainMenuPages = [
     },
     {
         topMenu: false,
+        heading: "Master Data",
+        route: "/master",
+        gate: "item_access",
+        pages: [
+            {
+                sectionTitle: "Catalog",
+                route: "/catalog",
+                icon: "feather:box",
+                gate: "item_access",
+                sub: [
+                    {
+                        heading: "Items",
+                        route: "/items",
+                        gate: "item_access",
+                        icon: "feather:package",
+                    },
+                    {
+                        heading: "Categories",
+                        route: "/categories",
+                        gate: "category_access",
+                        icon: "feather:tag",
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        topMenu: false,
         heading: "general.fields.configuration",
         route: "/configuration",
         gate: "module_menu_access",

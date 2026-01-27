@@ -25,7 +25,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Cashier\Cashier;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -84,11 +83,25 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasPermission('manage-companies');
         });
 
-        // Admin gates
+        // Admin gates - return true for admin, null to continue checking
         Gate::before(function (User $user, string $ability) {
             if ($user->isAdmin()) {
                 return true;
             }
+
+            // Return null to continue to the gate check
+            return null;
+        });
+
+        // Fallback gate for dynamic permission checking
+        Gate::after(function (User $user, string $ability, ?bool $result) {
+            // If a gate already returned a result, use that
+            if ($result !== null) {
+                return $result;
+            }
+
+            // Otherwise, check if the user has the permission through their roles
+            return $user->hasPermission($ability);
         });
     }
 }

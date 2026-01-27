@@ -20,9 +20,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Currency;
+use App\Models\Item;
 use App\Models\Role;
 use App\Models\State;
 use App\Models\User;
@@ -52,6 +54,7 @@ class SearchApiController extends Controller
         $result = $this->getOptionData($camelType);
         if ($result === false) {
             \Log::error("SearchApiController Options: Invalid search type '$type' (Camel: '$camelType')");
+
             return errorResponse('Invalid search type');
         }
 
@@ -67,6 +70,7 @@ class SearchApiController extends Controller
             $result = $this->getOptionData($camelType);
             if ($result === false) {
                 \Log::error("SearchApiController Bulk: Invalid search type '$type' (Camel: '$camelType')");
+
                 return errorResponse('Invalid search type');
             }
             $options[$type] = $result;
@@ -158,6 +162,25 @@ class SearchApiController extends Controller
                     'labelValue' => 'name',
                 ];
 
+            case 'items':
+                return [
+                    'class' => Item::class,
+                    'field' => 'name',
+                    'idValue' => 'id',
+                    'labelValue' => 'name',
+                    'additional' => ['code', 'price'],
+                    'scopes' => ['active'],
+                ];
+
+            case 'categories':
+                return [
+                    'class' => Category::class,
+                    'field' => 'name',
+                    'idValue' => 'id',
+                    'labelValue' => 'name',
+                    'scopes' => ['active'],
+                ];
+
             default:
                 return null;
 
@@ -172,10 +195,25 @@ class SearchApiController extends Controller
         ];
     }
 
-    public function units() { return []; }
-    public function paymentTerms() { return []; }
-    public function warehouses() { return []; }
-    public function features() { return []; }
+    public function units()
+    {
+        return [];
+    }
+
+    public function paymentTerms()
+    {
+        return [];
+    }
+
+    public function warehouses()
+    {
+        return [];
+    }
+
+    public function features()
+    {
+        return [];
+    }
 
     public function currencies()
     {
@@ -205,6 +243,16 @@ class SearchApiController extends Controller
     public function roles()
     {
         return Role::get(['id', 'title']);
+    }
+
+    public function items()
+    {
+        return Item::active()->ordered()->get(['id', 'name', 'code', 'price']);
+    }
+
+    public function categories()
+    {
+        return Category::active()->ordered()->get(['id', 'name']);
     }
 
     private function getOptionData($type)

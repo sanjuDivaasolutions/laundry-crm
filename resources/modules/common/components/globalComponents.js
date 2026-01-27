@@ -37,6 +37,10 @@ import DatatableLedgerLink from "@/components/magic-datatable/components/Datatab
 import DatatableActions from "@/components/magic-datatable/components/DatatableActions.vue";
 import DatatableJournalItemList from "@/components/magic-datatable/components/DatatableJournalItemList.vue";
 import DatatableHtml from "@/components/magic-datatable/components/DatatableHtml.vue";
+import DatatableBoolean from "@/components/magic-datatable/components/DatatableBoolean.vue";
+import DatatableCurrency from "@/components/magic-datatable/components/DatatableCurrency.vue";
+import DatatableYesNo from "@/components/magic-datatable/components/DatatableYesNo.vue";
+import DatatableCheckUncheckDash from "@/components/magic-datatable/components/DatatableCheckUncheckDash.vue";
 import BarcodeScanner from "@common@/components/BarcodeScanner.vue";
 import BarcodeQuickAdd from "@common@/components/BarcodeQuickAdd.vue";
 
@@ -82,6 +86,10 @@ export default function registerFormGlobalComponents(app) {
     app.component("DatatableJournalItemList", DatatableJournalItemList);
     app.component("DatatableActions", DatatableActions);
     app.component("DatatableHtml", DatatableHtml);
+    app.component("DatatableBoolean", DatatableBoolean);
+    app.component("DatatableCurrency", DatatableCurrency);
+    app.component("DatatableYesNo", DatatableYesNo);
+    app.component("DatatableCheckUncheckDash", DatatableCheckUncheckDash);
     app.component("BarcodeScanner", BarcodeScanner);
     app.component("BarcodeQuickAdd", BarcodeQuickAdd);
 

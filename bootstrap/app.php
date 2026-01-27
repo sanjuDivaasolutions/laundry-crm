@@ -17,7 +17,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'jwt.auth' => \PHPOpenSourceSaver\JWTAuth\Middleware\GetUserFromToken::class,
             'jwt.refresh' => \PHPOpenSourceSaver\JWTAuth\Middleware\RefreshToken::class,
             'tenant' => \App\Http\Middleware\IdentifyTenant::class,
+            'identify.tenant' => \App\Http\Middleware\IdentifyTenant::class,
             'quota' => \App\Http\Middleware\EnforceTenantQuota::class,
+        ]);
+
+        $middleware->priority([
+            \App\Http\Middleware\IdentifyTenant::class,
+            \App\Http\Middleware\JwtAdminMiddleware::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
 
         $middleware->api(append: [

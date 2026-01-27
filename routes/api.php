@@ -73,6 +73,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::get('update-language-terms', function () {
         // Assuming LanguageService is kept or specific parts moved
         \App\Services\LanguageService::updateLanguageData();
+
         return response()->json(['message' => 'Language terms updated successfully.']);
     });
 
@@ -153,8 +154,6 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::get('bulk-options/{types}', 'SearchApiController@bulkOptions')->name('bulk-options');
     Route::get('keys', 'SearchApiController@keys')->withoutMiddleware(['jwt.admin.verify'])->name('keys');
 
-
-
     // Import (Generic)
     Route::post('import/{type}/{id?}', 'ImportApiController@import')->name('import');
 
@@ -196,4 +195,12 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     // Messages (Internal)
     Route::resource('messages', 'MessageApiController');
     Route::get('messages-csv', 'MessageApiController@getCsv');
+
+    // Items (Master catalog)
+    Route::resource('items', 'ItemApiController');
+    Route::get('items-csv', 'ItemApiController@getCsv');
+
+    // Categories
+    Route::resource('categories', 'CategoryApiController');
+    Route::get('categories-csv', 'CategoryApiController@getCsv');
 });

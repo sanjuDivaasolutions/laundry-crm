@@ -50,6 +50,8 @@ class PermissionDataService
 
         $projectModules = [
             ['module' => 'company', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
+            ['module' => 'item', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
+            ['module' => 'category', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
         ];
 
         $simpleCustom = [];
@@ -57,19 +59,25 @@ class PermissionDataService
         $data = [];
         foreach ($simple as $s) {
             $g = $groups->where('name', $s['group'])->first();
-            if ($g) $data[] = ['permission' => $s['module'], 'group_id' => $g->id];
+            if ($g) {
+                $data[] = ['permission' => $s['module'], 'group_id' => $g->id];
+            }
         }
         foreach ($defaultModules as $m) {
             foreach ($m['actions'] as $a) {
                 $g = $groups->where('name', $m['group'])->first();
-                if ($g) $data[] = ['permission' => $m['module'].'_'.$a, 'group_id' => $g->id];
+                if ($g) {
+                    $data[] = ['permission' => $m['module'].'_'.$a, 'group_id' => $g->id];
+                }
             }
         }
 
         foreach ($projectModules as $m) {
             foreach ($m['actions'] as $a) {
                 $g = $groups->where('name', $m['group'])->first();
-                if ($g) $data[] = ['permission' => $m['module'].'_'.$a, 'group_id' => $g->id];
+                if ($g) {
+                    $data[] = ['permission' => $m['module'].'_'.$a, 'group_id' => $g->id];
+                }
             }
         }
 

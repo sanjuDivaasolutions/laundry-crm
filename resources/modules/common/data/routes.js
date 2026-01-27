@@ -134,6 +134,24 @@ const systemRoutes = [
                     breadcrumbs: ["Companies"],
                 },
             },
+            {
+                path: "items",
+                name: "items.index",
+                component: () => import("@modules@/items/Index.vue"),
+                meta: {
+                    pageTitle: "Items",
+                    breadcrumbs: ["Items"],
+                },
+            },
+            {
+                path: "categories",
+                name: "categories.index",
+                component: () => import("@modules@/categories/Index.vue"),
+                meta: {
+                    pageTitle: "Categories",
+                    breadcrumbs: ["Categories"],
+                },
+            },
         ],
     },
 ];

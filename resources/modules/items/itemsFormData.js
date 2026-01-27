@@ -1,0 +1,141 @@
+import { module } from "./itemsModule";
+
+const defaultEntry = () => {
+    return {
+        id: null,
+        name: null,
+        code: null,
+        category_id: null,
+        description: null,
+        price: 0,
+        display_order: 0,
+        is_active: true,
+    };
+};
+
+const formFields = [
+    {
+        name: "name",
+        label: "Item Name",
+        field: "name",
+        placeholder: "Enter item name (e.g., Shirt, Pants)",
+        type: "text",
+        required: true,
+        column: "6",
+    },
+
+    {
+        name: "category_id",
+        label: "Category",
+        field: "category_id",
+        placeholder: "Select category",
+        type: "select-single",
+        endpoint: "categories",
+        idValue: "id",
+        labelValue: "name",
+        required: false,
+        column: "6",
+        object: false,
+    },
+    {
+        name: "price",
+        label: "Price",
+        field: "price",
+        placeholder: "Enter price",
+        type: "decimal",
+        required: true,
+        column: "6",
+    },
+    {
+        name: "display_order",
+        label: "Display Order",
+        field: "display_order",
+        placeholder: "Enter display order",
+        type: "number",
+        required: false,
+        column: "6",
+    },
+    {
+        name: "is_active",
+        label: "Active",
+        field: "is_active",
+        type: "switch",
+        required: false,
+        column: "6",
+    },
+    {
+        name: "description",
+        label: "Description",
+        field: "description",
+        placeholder: "Enter description (optional)",
+        type: "textarea",
+        required: false,
+        column: "12",
+        rows: 3,
+    },
+];
+
+const showFields = [
+    {
+        field: "id",
+        label: "ID",
+    },
+    {
+        field: "name",
+        label: "Name",
+    },
+    {
+        field: "code",
+        label: "Code",
+    },
+    {
+        field: "category.name",
+        label: "Category",
+    },
+    {
+        field: "price",
+        label: "Price",
+    },
+    {
+        field: "display_order",
+        label: "Display Order",
+    },
+    {
+        field: "is_active",
+        label: "Status",
+    },
+    {
+        field: "description",
+        label: "Description",
+    },
+];
+
+const modals = {
+    form: {
+        id: `${module.slug}-form-modal`,
+        createTitle: `Create ${module.singular}`,
+        editTitle: `Edit ${module.singular}`,
+        size: "modal-lg",
+        centered: false,
+        route: module.id,
+    },
+    show: {
+        id: `${module.slug}-show-modal`,
+        showTitle: `${module.singular} Details`,
+        size: "modal-lg",
+        route: module.id,
+    },
+};
+
+const defaultFormDataState = {
+    route: module.id,
+    module: module,
+    entry: defaultEntry(),
+    formFields: formFields,
+    showFields: showFields,
+    modals: modals,
+};
+
+export default defaultFormDataState;
+
+export { defaultEntry };

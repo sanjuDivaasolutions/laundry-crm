@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Exceptions\TenantResolutionException;
 use App\Models\Tenant;
+use App\Models\User;
 use App\Services\TenantService;
 use Closure;
 use Illuminate\Http\Request;
@@ -128,7 +129,10 @@ class IdentifyTenant
             }
 
             // Load and return the user's tenant
-            return Tenant::find($user->tenant_id);
+            // Use withoutGlobalScope to bypass the tenant scope while we are identifying the tenant
+            $user = User::withoutGlobalScope('tenant')->find($user->id);
+
+            return $user ? Tenant::find($user->tenant_id) : null;
         } catch (\Exception $e) {
             // Auth not yet verified - this is fine, will fall through
             return null;
@@ -284,6 +288,11 @@ class IdentifyTenant
         if ($baseDomain && str_ends_with($host, ".{$baseDomain}")) {
             $subdomain = str_replace(".{$baseDomain}", '', $host);
             return Tenant::where('domain', $subdomain)->first();
+        }
+
+        // 5. LOCALHOST FALLBACK (for development)
+        if ($host === 'localhost' || $host === '127.0.0.1') {
+            return Tenant::first(); // Fallback to first tenant for local dev
         }
 
         return null;
