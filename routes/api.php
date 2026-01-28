@@ -12,7 +12,7 @@
  *  *  Unauthorized copying of this file, via any medium is strictly prohibited.
  *  *  Proprietary and confidential.
  *  *
- *  *  Last modified: 11/02/25, 6:36 pm
+ *  *  Last modified: 11/02/25, 6:36 pm
  *  *  Written by Chintan Bagdawala, 2025.
  *
  */
@@ -30,6 +30,8 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
+| NOTE: Tenant-related routes are in routes/tenant_api.php
+|
 */
 
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Admin', 'middleware' => []], function () {
@@ -37,7 +39,8 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::get('locales/languages', 'LocalesController@languages')->name('locales.languages');
     Route::get('locales/messages', 'LocalesController@messages')->name('locales.messages');
 
-    Route::post('login', 'Auth\LoginController');
+    // Login with tenant context resolution (identify.tenant middleware sets tenant from subdomain)
+    Route::post('login', 'Auth\LoginController')->middleware('identify.tenant');
 
     // Password Reset Routes
     Route::post('forgot_password', 'UsersApiController@passwordResetRequest')->name('password.email');
@@ -85,49 +88,6 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
 
 /*
 |--------------------------------------------------------------------------
-| Public SaaS Routes (No Auth)
-|--------------------------------------------------------------------------
-*/
-Route::group(['prefix' => 'v1', 'as' => 'api.'], function () {
-    // Plans - public listing for pricing page
-    Route::get('plans', [\App\Http\Controllers\Api\PlanController::class, 'index'])->name('plans.index');
-    Route::get('plans/compare', [\App\Http\Controllers\Api\PlanController::class, 'compare'])->name('plans.compare');
-    Route::get('plans/{code}', [\App\Http\Controllers\Api\PlanController::class, 'show'])->name('plans.show');
-
-    // Signup - create new tenant
-    Route::post('signup', [\App\Http\Controllers\Api\SignupController::class, 'register'])->name('signup');
-
-    // Checkout callbacks (no auth - called from Stripe redirect)
-    Route::get('checkout/success', [\App\Http\Controllers\Api\CheckoutController::class, 'handleSuccess'])->name('checkout.success');
-    Route::get('checkout/cancel', [\App\Http\Controllers\Api\CheckoutController::class, 'handleCancel'])->name('checkout.cancel');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Authenticated SaaS Routes
-|--------------------------------------------------------------------------
-*/
-Route::group(['prefix' => 'v1', 'as' => 'api.', 'middleware' => ['jwt.admin.verify', 'identify.tenant']], function () {
-    // Checkout - create subscription
-    Route::post('checkout', [\App\Http\Controllers\Api\CheckoutController::class, 'createSession'])->name('checkout.create');
-
-    // Subscription management
-    Route::get('subscription', [\App\Http\Controllers\Api\SubscriptionController::class, 'show'])->name('subscription.show');
-    Route::post('subscription/change-plan', [\App\Http\Controllers\Api\SubscriptionController::class, 'changePlan'])->name('subscription.change-plan');
-    Route::post('subscription/cancel', [\App\Http\Controllers\Api\SubscriptionController::class, 'cancel'])->name('subscription.cancel');
-    Route::post('subscription/resume', [\App\Http\Controllers\Api\SubscriptionController::class, 'resume'])->name('subscription.resume');
-
-    // Billing
-    Route::get('billing', [\App\Http\Controllers\Api\BillingController::class, 'index'])->name('billing.index');
-    Route::get('billing/portal', [\App\Http\Controllers\Api\BillingController::class, 'portal'])->name('billing.portal');
-    Route::get('billing/invoices', [\App\Http\Controllers\Api\BillingController::class, 'invoices'])->name('billing.invoices');
-    Route::get('billing/upcoming', [\App\Http\Controllers\Api\BillingController::class, 'upcomingInvoice'])->name('billing.upcoming');
-    Route::post('billing/payment-method', [\App\Http\Controllers\Api\BillingController::class, 'updatePaymentMethod'])->name('billing.payment-method');
-    Route::post('billing/setup-intent', [\App\Http\Controllers\Api\BillingController::class, 'createSetupIntent'])->name('billing.setup-intent');
-});
-
-/*
-|--------------------------------------------------------------------------
 | Admin Plan Management Routes
 |--------------------------------------------------------------------------
 */
@@ -138,6 +98,11 @@ Route::group(['prefix' => 'v1/admin', 'as' => 'api.admin.', 'middleware' => ['jw
     Route::delete('plans/{id}', [\App\Http\Controllers\Api\PlanController::class, 'destroy'])->name('plans.destroy');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Authenticated Application Routes
+|--------------------------------------------------------------------------
+*/
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Admin', 'middleware' => ['jwt.admin.verify']], function () {
     Route::get('verify', 'Auth\VerifyController');
     Route::get('abilities', 'Auth\AbilitiesController@index');

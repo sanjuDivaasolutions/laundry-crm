@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentStatusEnum;
+use App\Enums\ProcessingStatusEnum;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderStatus;
@@ -17,10 +19,10 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         $tenantId = Tenant::factory();
-        
+
         return [
             'tenant_id' => $tenantId,
-            'order_number' => 'ORD-' . $this->faker->unique()->numberBetween(10000, 99999),
+            'order_number' => 'ORD-'.$this->faker->unique()->numberBetween(10000, 99999),
             'customer_id' => Customer::factory()->state(['tenant_id' => $tenantId]),
             'order_date' => now(),
             'promised_date' => now()->addDays(2),
@@ -31,10 +33,14 @@ class OrderFactory extends Factory
             'paid_amount' => 0,
             'balance_amount' => 0,
             'payment_status' => PaymentStatusEnum::Unpaid,
-            'processing_status_id' => 1, // 'received'
-            'order_status_id' => 1, // 'open'
-            'created_by_employee_id' => 1, // Placeholder
+            'processing_status_id' => ProcessingStatus::where('status_name', ProcessingStatusEnum::Pending->value)->first()?->id ?? 1,
+            'order_status_id' => OrderStatus::where('status_name', OrderStatusEnum::Open->value)->first()?->id ?? 1,
+            'created_by_employee_id' => 1,
             'urgent' => false,
+            'hanger_number' => null,
+            'tax_rate' => 10.00,
+            'tax_amount' => 0,
+            'discount_type' => 'fixed',
         ];
     }
 }

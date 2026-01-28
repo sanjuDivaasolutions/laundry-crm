@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentStatusEnum;
+use App\Enums\ProcessingStatusEnum;
 use App\Support\HasAdvancedFilter;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,6 +38,10 @@ class Order extends Model
         'picked_up_at',
         'notes',
         'urgent',
+        'hanger_number',
+        'tax_rate',
+        'tax_amount',
+        'discount_type',
         'created_by_employee_id',
         'closed_at',
     ];
@@ -82,6 +88,8 @@ class Order extends Model
         'total_amount' => 'decimal:2',
         'paid_amount' => 'decimal:2',
         'balance_amount' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
         'urgent' => 'boolean',
         'payment_status' => PaymentStatusEnum::class,
     ];
@@ -126,5 +134,23 @@ class Order extends Model
         return Attribute::make(
             get: fn () => $this->balance_amount <= 0 && $this->payment_status === PaymentStatusEnum::Paid,
         );
+    }
+
+    public function isReadyForPickup(): bool
+    {
+        return $this->processingStatus?->status_name === ProcessingStatusEnum::Ready->value;
+    }
+
+    public function markAsPickedUp(): void
+    {
+        $deliveredStatus = ProcessingStatus::where('status_name', ProcessingStatusEnum::Delivered->value)->first();
+        $closedStatus = OrderStatus::where('status_name', OrderStatusEnum::Closed->value)->first();
+
+        $this->update([
+            'processing_status_id' => $deliveredStatus?->id,
+            'order_status_id' => $closedStatus?->id,
+            'picked_up_at' => now(),
+            'closed_at' => now(),
+        ]);
     }
 }

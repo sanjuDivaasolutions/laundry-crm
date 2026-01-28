@@ -153,9 +153,20 @@ return [
     | in your application. This will determine which domains the cookie is
     | available to in your application. A sensible default has been set.
     |
+    | SECURITY NOTE FOR MULTI-TENANT:
+    | For proper tenant session isolation, this should be left as null/empty.
+    | Setting this to a wildcard domain (e.g., '.example.com') would allow
+    | session cookies to be shared across all tenant subdomains, which is
+    | a security vulnerability.
+    |
+    | With null domain:
+    | - tenant1.example.com has its own session
+    | - tenant2.example.com has its own session
+    | - Sessions cannot be hijacked across tenants
+    |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => env('SESSION_DOMAIN', null),
 
     /*
     |--------------------------------------------------------------------------

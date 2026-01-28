@@ -22,7 +22,10 @@
       "Bash(ls:*)",
       "Bash(xargs ls:*)",
       "Bash(echo:*)",
-      "Bash(vendor/bin/pint:*)"
+      "Bash(vendor/bin/pint:*)",
+      "Bash(del \"E:\\\\2026\\\\L\\\\laundry-crm\\\\test_tenant.php\")",
+      "Bash(curl:*)",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []

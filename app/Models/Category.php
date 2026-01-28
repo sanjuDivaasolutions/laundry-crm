@@ -3,16 +3,19 @@
 namespace App\Models;
 
 use App\Support\HasAdvancedFilter;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    use HasAdvancedFilter;
+    use BelongsToTenant, HasAdvancedFilter, HasFactory;
 
     protected $fillable = [
+        'tenant_id',
         'name',
         'display_order',
         'is_active',

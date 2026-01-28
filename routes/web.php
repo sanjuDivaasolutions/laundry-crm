@@ -120,8 +120,8 @@ Route::get('/billing', function (Request $request) {
 | Newsletter
 |--------------------------------------------------------------------------
 */
-
-Route::get('/newsletter-subscribe/{company}', 'App\Http\Controllers\Web\SubscribeController@index')->name('newsletter-subscribe');
+// TODO: Create SubscribeController if newsletter feature is needed
+// Route::get('/newsletter-subscribe/{company}', 'App\Http\Controllers\Web\SubscribeController@index')->name('newsletter-subscribe');
 
 /*
 |--------------------------------------------------------------------------

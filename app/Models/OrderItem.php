@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Category;
-use App\Models\Order;
 use App\Support\HasAdvancedFilter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,12 +14,17 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'category_id',
+        'item_id',
+        'service_id',
         'item_name',
         'service_name',
         'quantity',
         'unit_price',
         'total_price',
         'barcode',
+        'color',
+        'brand',
+        'defect_notes',
         'notes',
     ];
 
@@ -64,5 +67,15 @@ class OrderItem extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
+    }
+
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
     }
 }

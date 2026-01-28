@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Category;
+use App\Rules\BelongsToSameTenant;
 use App\Services\UtilityService;
 use App\Traits\CustomFormRequest;
 use Gate;
@@ -26,7 +28,7 @@ class StoreItemRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:100'],
             'code' => ['required', 'string', 'max:50', 'unique:items,code'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'category_id' => ['nullable', 'integer', new BelongsToSameTenant(Category::class)],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
             'display_order' => ['nullable', 'integer', 'min:0'],

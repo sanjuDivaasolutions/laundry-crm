@@ -152,6 +152,17 @@ const systemRoutes = [
                     breadcrumbs: ["Categories"],
                 },
             },
+            // Admin Tenant Management (Super Admin only)
+            {
+                path: "admin/tenants",
+                name: "admin.tenants.index",
+                component: () => import("@modules@/tenants/Index.vue"),
+                meta: {
+                    pageTitle: "Tenant Management",
+                    breadcrumbs: ["Admin", "Tenants"],
+                    permission: "manage-tenants",
+                },
+            },
         ],
     },
 ];

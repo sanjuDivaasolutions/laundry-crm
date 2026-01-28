@@ -48,6 +48,24 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
+                path: "/register",
+                name: "tenant-register",
+                component: () =>
+                    import("@/views/auth/TenantSignUp.vue"),
+                meta: {
+                    pageTitle: "Create Your Workspace",
+                },
+            },
+            {
+                path: "/verify-email",
+                name: "verify-email",
+                component: () =>
+                    import("@/views/auth/VerifyEmail.vue"),
+                meta: {
+                    pageTitle: "Verify Email",
+                },
+            },
+            {
                 path: "/password-reset",
                 name: "password-reset",
                 component: () =>

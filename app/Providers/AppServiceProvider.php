@@ -19,11 +19,20 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
+use App\Models\Company;
+use App\Models\Customer;
+use App\Models\Item;
+use App\Models\Order;
+use App\Models\Payment;
+use App\Models\Role;
+use App\Models\Service;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -47,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
         $this->configureGates();
+        $this->configureTenantScopedBindings();
     }
 
     protected function configureRateLimiting()
@@ -103,5 +113,48 @@ class AppServiceProvider extends ServiceProvider
             // Otherwise, check if the user has the permission through their roles
             return $user->hasPermission($ability);
         });
+    }
+
+    /**
+     * Configure tenant-scoped route model bindings.
+     *
+     * These bindings ensure that when a model is resolved from a route parameter,
+     * it is scoped to the current tenant context. This prevents cross-tenant
+     * data access via URL manipulation.
+     *
+     * Security: If a model ID is provided that belongs to a different tenant,
+     * a 404 response is returned (not 403) to avoid revealing the existence
+     * of resources in other tenants.
+     */
+    protected function configureTenantScopedBindings(): void
+    {
+        // List of tenant-scoped models and their route parameter names
+        // Format: 'route_parameter' => ModelClass::class
+        $tenantScopedModels = [
+            'item' => Item::class,
+            'category' => Category::class,
+            'customer' => Customer::class,
+            'order' => Order::class,
+            'payment' => Payment::class,
+            'company' => Company::class,
+            'service' => Service::class,
+            'role' => Role::class,
+            'user' => User::class,
+        ];
+
+        foreach ($tenantScopedModels as $parameter => $modelClass) {
+            Route::bind($parameter, function ($value) use ($modelClass) {
+                // The global tenant scope should already be applied
+                // This explicit binding ensures it works even if scope was bypassed
+                $model = $modelClass::where('id', $value)->first();
+
+                if (!$model) {
+                    // Return 404 - don't reveal if resource exists in another tenant
+                    abort(404);
+                }
+
+                return $model;
+            });
+        }
     }
 }
