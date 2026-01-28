@@ -25,7 +25,8 @@
       "Bash(vendor/bin/pint:*)",
       "Bash(del \"E:\\\\2026\\\\L\\\\laundry-crm\\\\test_tenant.php\")",
       "Bash(curl:*)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "WebFetch(domain:stitch-status-pro.lovable.app)"
     ],
     "deny": [],
     "ask": []

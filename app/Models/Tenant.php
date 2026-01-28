@@ -664,8 +664,10 @@ class Tenant extends Model
     {
         $baseDomain = config('tenancy.base_domain', 'localhost');
         $scheme = app()->environment('production') ? 'https' : 'http';
+        $port = parse_url(config('app.url'), PHP_URL_PORT);
+        $portSuffix = $port ? ":{$port}" : '';
 
-        return "{$scheme}://{$this->domain}.{$baseDomain}";
+        return "{$scheme}://{$this->domain}.{$baseDomain}{$portSuffix}";
     }
 
     // =========================================================================

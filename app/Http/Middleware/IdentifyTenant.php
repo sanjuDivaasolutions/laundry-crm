@@ -283,7 +283,7 @@ class IdentifyTenant
         }
 
         // Try subdomain extraction (e.g., tenant.example.com)
-        $baseDomain = config('app.base_domain');
+        $baseDomain = config('tenancy.base_domain');
 
         if ($baseDomain && str_ends_with($host, ".{$baseDomain}")) {
             $subdomain = str_replace(".{$baseDomain}", '', $host);

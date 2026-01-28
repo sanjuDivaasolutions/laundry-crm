@@ -88,6 +88,24 @@
 
       <!--begin::Input group-->
       <div class="fv-row mb-7">
+        <label class="form-label fw-bold text-dark fs-6">Company Name</label>
+        <Field
+          class="form-control form-control-lg form-control-solid"
+          type="text"
+          placeholder="Your Company Name"
+          name="company_name"
+          autocomplete="off"
+        />
+        <div class="fv-plugins-message-container">
+          <div class="fv-help-block">
+            <ErrorMessage name="company_name" />
+          </div>
+        </div>
+      </div>
+      <!--end::Input group-->
+
+      <!--begin::Input group-->
+      <div class="fv-row mb-7">
         <label class="form-label fw-bold text-dark fs-6">Email</label>
         <Field
           class="form-control form-control-lg form-control-solid"
@@ -243,6 +261,7 @@ export default defineComponent({
     const registration = Yup.object().shape({
       first_name: Yup.string().required().label("Name"),
       last_name: Yup.string().required().label("Surname"),
+      company_name: Yup.string().required().label("Company Name"),
       email: Yup.string().min(4).required().email().label("Email"),
       password: Yup.string().required().label("Password"),
       password_confirmation: Yup.string()

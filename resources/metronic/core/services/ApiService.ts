@@ -22,9 +22,29 @@ class ApiService {
     public static init(app: App<Element>) {
         ApiService.vueInstance = app;
         ApiService.vueInstance.use(VueAxios, axios);
-        ApiService.vueInstance.axios.defaults.baseURL =
-            // @ts-ignore
-            import.meta.env.VITE_APP_API_URL;
+
+        // Dynamic API URL handling for multi-tenancy
+        const envApiUrl = import.meta.env.VITE_APP_API_URL as string;
+
+        try {
+            // If the API URL is absolute, we want to preserve the port/proto but use current hostname
+            // This ensures http://leeza.localhost:8000 calls http://leeza.localhost:8000/api/v1
+            // instead of http://localhost:8000/api/v1
+            if (envApiUrl.startsWith('http')) {
+                const url = new URL(envApiUrl);
+                // Only replace if we are not on localhost/127.0.0.1 explicitly, 
+                // or if we are on a subdomain (different hostname than config)
+                if (window.location.hostname !== url.hostname) {
+                    url.hostname = window.location.hostname;
+                }
+                ApiService.vueInstance.axios.defaults.baseURL = url.toString();
+            } else {
+                ApiService.vueInstance.axios.defaults.baseURL = envApiUrl;
+            }
+        } catch (e) {
+            // Fallback for relative URLs or errors
+            ApiService.vueInstance.axios.defaults.baseURL = envApiUrl;
+        }
     }
 
     /**

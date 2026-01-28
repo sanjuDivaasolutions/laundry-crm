@@ -88,6 +88,21 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
 
 /*
 |--------------------------------------------------------------------------
+| Tenant Registration Routes (Public)
+|--------------------------------------------------------------------------
+*/
+Route::group(['prefix' => 'v1/register', 'as' => 'api.register.'], function () {
+    Route::get('check-subdomain', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'checkSubdomain'])->name('check-subdomain');
+    Route::get('suggest-subdomain', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'suggestSubdomain'])->name('suggest-subdomain');
+    Route::get('timezones', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'getTimezones'])->name('timezones');
+    Route::get('currencies', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'getCurrencies'])->name('currencies');
+    Route::post('/', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'register'])->name('register');
+    Route::get('verify-email/{id}/{hash}', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'verifyEmail'])->name('verify-email');
+    Route::post('resend-verification', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'resendVerification'])->name('resend-verification');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Admin Plan Management Routes
 |--------------------------------------------------------------------------
 */

@@ -47,30 +47,28 @@ class TenantEmailVerificationNotification extends Notification implements Should
     protected function verificationUrl(object $notifiable): string
     {
         $tenant = $notifiable->tenant;
-        $baseDomain = config('tenancy.base_domain', 'localhost');
-
-        // Create signed URL for verification
-        $temporarySignedUrl = URL::temporarySignedRoute(
-            'api.register.verify-email',
-            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
-            [
-                'id' => $notifiable->getKey(),
-                'hash' => sha1($notifiable->getEmailForVerification()),
-            ]
-        );
-
-        // If tenant has subdomain, adjust the URL
-        if ($tenant && $tenant->domain) {
-            $tenantUrl = 'https://' . $tenant->domain . '.' . $baseDomain;
-            // Replace base URL with tenant URL
-            $temporarySignedUrl = preg_replace(
-                '/^https?:\/\/[^\/]+/',
-                $tenantUrl,
-                $temporarySignedUrl
-            );
+        
+        // Force the URL generation to use the tenant's domain
+        // This ensures the signature matches the domain where it will be verified
+        if ($tenant) {
+            URL::forceRootUrl($tenant->getUrl());
         }
 
-        return $temporarySignedUrl;
+        try {
+            return URL::temporarySignedRoute(
+                'api.register.verify-email',
+                Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+                [
+                    'id' => $notifiable->getKey(),
+                    'hash' => sha1($notifiable->getEmailForVerification()),
+                ]
+            );
+        } finally {
+            // Always reset to avoid side effects
+            if ($tenant) {
+                URL::forceRootUrl(null);
+            }
+        }
     }
 
     /**
