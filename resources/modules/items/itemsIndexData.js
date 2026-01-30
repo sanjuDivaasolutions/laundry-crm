@@ -10,16 +10,12 @@ const defaultIndexState = {
         singular: module.singular,
         plural: module.plural,
         showType: "modal",
-        formType: "modal",
-        formClickAction: `init-${module.slug}-form-modal`,
+        formType: "link",
         permission_prefix: `${module.snakeSlug}_`,
         query: { sort: "display_order", order: "asc", limit: 50, s: "" },
         saveState: true,
         tableRowClick: {
             enabled: false,
-            type: "modal",
-            action: `init-${module.slug}-show-modal`,
-            actionPayloadField: "id",
         },
         import: {
             enabled: false,
@@ -31,10 +27,9 @@ const defaultIndexState = {
         hasActionButtons: true,
         actionButtons: [
             {
-                type: "event",
+                type: "link",
                 label: `Create ${module.singular}`,
-                action: `init-${module.slug}-form-modal`,
-                actionPayload: { id: null },
+                action: { name: `${module.id}.create` },
             },
         ],
     },

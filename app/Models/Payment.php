@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\PaymentMethodEnum;
-use App\Models\Order;
 use App\Support\HasAdvancedFilter;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Payment extends Model
 {
     use BelongsToTenant, HasAdvancedFilter, HasFactory;
+
+    public $timestamps = false;
 
     protected $fillable = [
         'tenant_id',

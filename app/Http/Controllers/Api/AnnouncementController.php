@@ -29,14 +29,8 @@ class AnnouncementController extends Controller
         $tenant = $this->tenantService->getTenant();
         $user = $request->user();
 
-        if (!$tenant || !$user) {
-            return response()->json(['announcements' => []]);
-        }
-
-        $announcements = Announcement::getForTenantUser($tenant, $user);
-
-        return response()->json([
-            'announcements' => $announcements->map(fn($a) => [
+        return $this->success([
+            'announcements' => $announcements->map(fn ($a) => [
                 'id' => $a->id,
                 'title' => $a->title,
                 'content' => $a->content,
@@ -59,12 +53,12 @@ class AnnouncementController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
-            return response()->json(['success' => false], 401);
+        if (! $user) {
+            return $this->error('Unauthenticated.', 401);
         }
 
         $announcement->dismissFor($user);
 
-        return response()->json(['success' => true]);
+        return $this->success(null, 'Announcement dismissed.');
     }
 }

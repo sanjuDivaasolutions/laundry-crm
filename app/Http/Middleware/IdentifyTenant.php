@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Exceptions\TenantResolutionException;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Services\TenantService;
@@ -52,7 +51,7 @@ class IdentifyTenant
         $tenant = $this->resolveTenant($request);
 
         if ($tenant) {
-            if (!$tenant->active) {
+            if (! $tenant->active) {
                 return $this->tenantInactiveResponse($tenant);
             }
 
@@ -82,24 +81,28 @@ class IdentifyTenant
         // This CANNOT be overridden by any header
         if ($tenant = $this->resolveFromAuthenticatedUser($request)) {
             $request->attributes->set('tenant_resolution_method', 'authenticated_user');
+
             return $tenant;
         }
 
         // 2. Super-admin impersonation (only if authenticated AND has permission)
         if ($tenant = $this->resolveFromImpersonation($request)) {
             $request->attributes->set('tenant_resolution_method', 'super_admin_impersonation');
+
             return $tenant;
         }
 
         // 3. Internal service-to-service communication (requires signed header)
         if ($tenant = $this->resolveFromInternalService($request)) {
             $request->attributes->set('tenant_resolution_method', 'internal_service');
+
             return $tenant;
         }
 
         // 4. Domain matching (for public/unauthenticated routes)
         if ($tenant = $this->resolveFromDomain($request)) {
             $request->attributes->set('tenant_resolution_method', 'domain');
+
             return $tenant;
         }
 
@@ -115,16 +118,17 @@ class IdentifyTenant
         try {
             $user = adminAuth()->user();
 
-            if (!$user) {
+            if (! $user) {
                 return null;
             }
 
             // User MUST have a tenant_id
-            if (!$user->tenant_id) {
+            if (! $user->tenant_id) {
                 logger()->warning('Authenticated user without tenant_id', [
                     'user_id' => $user->id,
                     'email' => $user->email,
                 ]);
+
                 return null;
             }
 
@@ -151,28 +155,30 @@ class IdentifyTenant
     {
         $impersonateTenantId = $request->header(self::IMPERSONATE_HEADER);
 
-        if (!$impersonateTenantId) {
+        if (! $impersonateTenantId) {
             return null;
         }
 
         try {
             $user = adminAuth()->user();
 
-            if (!$user) {
+            if (! $user) {
                 logger()->warning('Impersonation attempt without authentication', [
                     'target_tenant_id' => $impersonateTenantId,
                     'ip' => $request->ip(),
                 ]);
+
                 return null;
             }
 
             // Check for super-admin impersonation permission
-            if (!$user->hasPermission('impersonate_tenant') && !$this->isSystemAdmin($user)) {
+            if (! $user->hasPermission('impersonate_tenant') && ! $this->isSystemAdmin($user)) {
                 logger()->warning('Unauthorized impersonation attempt', [
                     'user_id' => $user->id,
                     'target_tenant_id' => $impersonateTenantId,
                     'ip' => $request->ip(),
                 ]);
+
                 return null;
             }
 
@@ -206,17 +212,18 @@ class IdentifyTenant
         $tenantId = $request->header(self::TENANT_HEADER);
         $signature = $request->header(self::SIGNATURE_HEADER);
 
-        if (!$tenantId || !$signature) {
+        if (! $tenantId || ! $signature) {
             return null;
         }
 
         // Verify the signature
-        if (!$this->verifyInternalServiceSignature($tenantId, $signature)) {
+        if (! $this->verifyInternalServiceSignature($tenantId, $signature)) {
             logger()->warning('Invalid internal service signature', [
                 'tenant_id' => $tenantId,
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);
+
             return null;
         }
 
@@ -233,7 +240,7 @@ class IdentifyTenant
     {
         $secret = config('services.internal.secret');
 
-        if (!$secret) {
+        if (! $secret) {
             // Internal service communication not configured
             return false;
         }
@@ -257,6 +264,7 @@ class IdentifyTenant
                 'timestamp' => $timestamp,
                 'current_time' => $currentTime,
             ]);
+
             return false;
         }
 
@@ -287,6 +295,7 @@ class IdentifyTenant
 
         if ($baseDomain && str_ends_with($host, ".{$baseDomain}")) {
             $subdomain = str_replace(".{$baseDomain}", '', $host);
+
             return Tenant::where('domain', $subdomain)->first();
         }
 
@@ -304,6 +313,7 @@ class IdentifyTenant
     protected function isSystemAdmin($user): bool
     {
         $systemAdminIds = config('system.auth.admin_user_id', []);
+
         return in_array($user->id, $systemAdminIds);
     }
 

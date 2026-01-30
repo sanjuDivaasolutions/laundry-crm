@@ -26,6 +26,7 @@ use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Item;
 use App\Models\Role;
+use App\Models\Service;
 use App\Models\State;
 use App\Models\User;
 use App\Services\ModelCacheService;
@@ -181,6 +182,16 @@ class SearchApiController extends Controller
                     'scopes' => ['active'],
                 ];
 
+            case 'services':
+                return [
+                    'class' => Service::class,
+                    'field' => 'name',
+                    'idValue' => 'id',
+                    'labelValue' => 'name',
+                    'additional' => ['code'],
+                    'scopes' => ['active'],
+                ];
+
             default:
                 return null;
 
@@ -253,6 +264,11 @@ class SearchApiController extends Controller
     public function categories()
     {
         return Category::active()->ordered()->get(['id', 'name']);
+    }
+
+    public function services()
+    {
+        return Service::active()->ordered()->get(['id', 'name', 'code']);
     }
 
     private function getOptionData($type)

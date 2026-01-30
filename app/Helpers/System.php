@@ -10,8 +10,8 @@ use Illuminate\Support\Carbon;
 }
 if (! function_exists('pfMoneyRound')) {
     function pfMoneyRound($value) {
-        $curr_code = config('project.default_currency_code','INR');
-        $locale = config('project.default_locale','en_IN');
+        $curr_code = config('project.default_currency', 'USD');
+        $locale = config('project.default_locale', 'en-US');
         $fmt = new NumberFormatter($locale, NumberFormatter::CURRENCY);
         return numfmt_format_currency($fmt, $value, $curr_code);
     }

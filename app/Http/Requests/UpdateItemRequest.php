@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Category;
-use App\Rules\BelongsToSameTenant;
 use App\Traits\CustomFormRequest;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,11 +20,15 @@ class UpdateItemRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:100'],
             'code' => ['nullable', 'string', 'max:50'],
-            'category_id' => ['nullable', 'integer', new BelongsToSameTenant(Category::class)],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
             'display_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['boolean'],
+            // Service prices validation
+            'service_prices' => ['nullable', 'array'],
+            'service_prices.*.service_id' => ['required_with:service_prices', 'integer', 'exists:services,id'],
+            'service_prices.*.price' => ['nullable', 'numeric', 'min:0'],
+            'service_prices.*.is_active' => ['nullable', 'boolean'],
         ];
     }
 
@@ -34,7 +36,9 @@ class UpdateItemRequest extends FormRequest
     {
         return [
             'name.required' => 'Item name is required.',
-            'price.required' => 'Price is required.',
+            'price.required' => 'Default price is required.',
+            'service_prices.*.service_id.exists' => 'Invalid service selected.',
+            'service_prices.*.price.numeric' => 'Service price must be a number.',
         ];
     }
 }

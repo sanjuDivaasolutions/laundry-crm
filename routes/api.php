@@ -176,11 +176,32 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::resource('messages', 'MessageApiController');
     Route::get('messages-csv', 'MessageApiController@getCsv');
 
+    // Customers
+    Route::resource('customers', 'CustomerApiController');
+    Route::get('customers-csv', 'CustomerApiController@getCsv');
+
+    // Orders
+    Route::resource('orders', 'OrderApiController');
+    Route::get('orders-csv', 'OrderApiController@getCsv');
+
     // Items (Master catalog)
     Route::resource('items', 'ItemApiController');
     Route::get('items-csv', 'ItemApiController@getCsv');
 
-    // Categories
-    Route::resource('categories', 'CategoryApiController');
-    Route::get('categories-csv', 'CategoryApiController@getCsv');
+    // Services
+    Route::resource('services', 'ServiceApiController');
+    Route::get('services-csv', 'ServiceApiController@getCsv');
+
+    // POS Board
+    Route::prefix('pos')->name('pos.')->group(function () {
+        Route::get('board', 'OrderBoardApiController@getBoardData')->name('board');
+        Route::get('statistics', 'OrderBoardApiController@getStatistics')->name('statistics');
+        Route::get('items', 'OrderBoardApiController@getItems')->name('items');
+        Route::get('customers/search', 'OrderBoardApiController@searchCustomers')->name('customers.search');
+        Route::post('orders', 'OrderBoardApiController@store')->name('orders.store');
+        Route::get('orders/{order}', 'OrderBoardApiController@show')->name('orders.show');
+        Route::put('orders/{order}/status', 'OrderBoardApiController@updateStatus')->name('orders.status');
+        Route::post('orders/{order}/pay', 'OrderBoardApiController@processPayment')->name('orders.pay');
+        Route::delete('orders/{order}', 'OrderBoardApiController@destroy')->name('orders.destroy');
+    });
 });

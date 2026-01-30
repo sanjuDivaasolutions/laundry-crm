@@ -28,6 +28,10 @@ class DatabaseSeeder extends Seeder
             ProcessingStatusSeeder::class,
             OrderStatusSeeder::class,
             CategorySeeder::class,
+            ServiceSeeder::class,
+            ItemSeeder::class,
+            CustomerSeeder::class,
+            OrderSeeder::class,
         ]);
     }
 }

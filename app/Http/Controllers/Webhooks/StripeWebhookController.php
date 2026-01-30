@@ -11,7 +11,6 @@ use App\Models\StripeWebhookLog;
 use App\Models\Tenant;
 use App\Notifications\PaymentFailedNotification;
 use App\Notifications\SubscriptionEndingNotification;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Stripe\Event;
@@ -74,7 +73,8 @@ class StripeWebhookController extends Controller
                 'error' => $e->getMessage(),
                 'ip' => $request->ip(),
             ]);
-            return $this->errorResponse('Invalid signature', 400);
+
+            return $this->error('Invalid signature', 400);
         }
 
         // 2. Check idempotency - has this event been processed?
@@ -85,7 +85,8 @@ class StripeWebhookController extends Controller
                 'event_id' => $event->id,
                 'event_type' => $event->type,
             ]);
-            return $this->successResponse('Already processed');
+
+            return $this->success(null, 'Already processed');
         }
 
         if ($webhookLog->isProcessing()) {
@@ -93,7 +94,8 @@ class StripeWebhookController extends Controller
             logger()->debug('Stripe webhook currently being processed', [
                 'event_id' => $event->id,
             ]);
-            return $this->successResponse('Processing in progress');
+
+            return $this->success(null, 'Processing in progress');
         }
 
         // 3. Process the webhook
@@ -121,7 +123,7 @@ class StripeWebhookController extends Controller
                 ]);
             }
 
-            return $this->successResponse('Webhook processed');
+            return $this->success(null, 'Webhook processed');
         } catch (\Exception $e) {
             $webhookLog->markAsFailed($e->getMessage());
 
@@ -133,7 +135,7 @@ class StripeWebhookController extends Controller
             ]);
 
             // Return 500 so Stripe retries
-            return $this->errorResponse('Processing failed', 500);
+            return $this->error('Processing failed', 500);
         }
     }
 
@@ -144,7 +146,7 @@ class StripeWebhookController extends Controller
     {
         $secret = config('cashier.webhook.secret');
 
-        if (!$secret) {
+        if (! $secret) {
             throw new \RuntimeException('Stripe webhook secret not configured');
         }
 
@@ -195,7 +197,7 @@ class StripeWebhookController extends Controller
     {
         $customerId = $this->extractCustomerId($event);
 
-        if (!$customerId) {
+        if (! $customerId) {
             return null;
         }
 
@@ -281,7 +283,7 @@ class StripeWebhookController extends Controller
      */
     protected function getHandlerMethod(string $eventType): string
     {
-        return 'handle' . str_replace(' ', '', ucwords(str_replace(['.', '_'], ' ', $eventType)));
+        return 'handle'.str_replace(' ', '', ucwords(str_replace(['.', '_'], ' ', $eventType)));
     }
 
     /**
@@ -304,26 +306,25 @@ class StripeWebhookController extends Controller
     {
         $tenant = $log->tenant;
 
-        if (!$tenant) {
-            logger()->warning('Subscription created for unknown tenant', [
-                'stripe_customer_id' => $subscription->customer,
-            ]);
-            return ['warning' => 'tenant_not_found'];
+        if ($tenant) {
+            // Clear trial since they subscribed
+            if ($tenant->trial_ends_at && $tenant->trial_ends_at->isFuture()) {
+                logger()->info('Tenant converted from trial to paid', ['tenant_id' => $tenant->id]);
+            }
+
+            // Ensure tenant is active
+            if (! $tenant->active) {
+                $tenant->reactivate();
+            }
+
+            // Reset quotas for new subscription period
+            $this->resetTenantQuotas($tenant);
         }
 
-        // Reset quotas for new subscription period
-        $this->resetTenantQuotas($tenant);
-
-        logger()->info('Tenant subscription created', [
-            'tenant_id' => $tenant->id,
+        return [
+            'tenant_id' => $tenant?->id,
             'subscription_id' => $subscription->id,
             'status' => $subscription->status,
-        ]);
-
-        return [
-            'tenant_id' => $tenant->id,
-            'subscription_status' => $subscription->status,
-            'quotas_reset' => true,
         ];
     }
 
@@ -334,20 +335,23 @@ class StripeWebhookController extends Controller
     {
         $tenant = $log->tenant;
 
-        if (!$tenant) {
+        if (! $tenant) {
             return ['warning' => 'tenant_not_found'];
+        }
+
+        // Handle cancellation scheduled
+        if ($subscription->cancel_at_period_end) {
+            $currentPeriodEnd = $subscription->current_period_end;
+            if ($currentPeriodEnd) {
+                $endsAt = \Carbon\Carbon::createFromTimestamp($currentPeriodEnd);
+                $this->notifyTenantAdmins($tenant, new SubscriptionEndingNotification($endsAt));
+            }
         }
 
         // Check for billing period renewal (quota reset trigger)
         if ($this->isNewBillingPeriod($subscription, $tenant)) {
             $this->resetTenantQuotas($tenant);
         }
-
-        logger()->info('Tenant subscription updated', [
-            'tenant_id' => $tenant->id,
-            'subscription_id' => $subscription->id,
-            'status' => $subscription->status,
-        ]);
 
         return [
             'tenant_id' => $tenant->id,
@@ -362,13 +366,19 @@ class StripeWebhookController extends Controller
     {
         $tenant = $log->tenant;
 
-        if (!$tenant) {
+        if (! $tenant) {
             return ['warning' => 'tenant_not_found'];
         }
 
-        logger()->info('Tenant subscription canceled', [
+        logger()->warning('Tenant subscription deleted', [
             'tenant_id' => $tenant->id,
             'subscription_id' => $subscription->id,
+        ]);
+
+        // Start grace period
+        $graceDays = config('tenancy.grace_period.days', 7);
+        $tenant->update([
+            'grace_period_ends_at' => now()->addDays($graceDays),
         ]);
 
         // Send cancellation notification
@@ -387,7 +397,6 @@ class StripeWebhookController extends Controller
         return [
             'tenant_id' => $tenant->id,
             'subscription_canceled' => true,
-            'notification_sent' => $owner !== null,
         ];
     }
 
@@ -398,8 +407,20 @@ class StripeWebhookController extends Controller
     {
         $tenant = $log->tenant;
 
-        if (!$tenant) {
+        if (! $tenant) {
             return ['warning' => 'tenant_not_found'];
+        }
+
+        // Clear grace period if payment succeeded
+        if ($tenant->grace_period_ends_at) {
+            $tenant->update(['grace_period_ends_at' => null]);
+            logger()->info('Tenant grace period cleared', ['tenant_id' => $tenant->id]);
+        }
+
+        // Reactivate if suspended due to payment
+        if (! $tenant->active && $tenant->suspension_reason === 'payment_failed') {
+            $tenant->reactivate();
+            logger()->info('Tenant reactivated after clear payment', ['tenant_id' => $tenant->id]);
         }
 
         // Check if this is a subscription renewal
@@ -407,16 +428,9 @@ class StripeWebhookController extends Controller
             $this->resetTenantQuotas($tenant);
         }
 
-        logger()->info('Tenant payment succeeded', [
-            'tenant_id' => $tenant->id,
-            'invoice_id' => $invoice->id,
-            'amount' => $invoice->amount_paid,
-        ]);
-
         return [
             'tenant_id' => $tenant->id,
             'invoice_id' => $invoice->id,
-            'amount_paid' => $invoice->amount_paid,
         ];
     }
 
@@ -427,15 +441,19 @@ class StripeWebhookController extends Controller
     {
         $tenant = $log->tenant;
 
-        if (!$tenant) {
+        if (! $tenant) {
             return ['warning' => 'tenant_not_found'];
         }
 
-        logger()->warning('Tenant payment failed', [
-            'tenant_id' => $tenant->id,
-            'invoice_id' => $invoice->id,
-            'attempt_count' => $invoice->attempt_count,
-        ]);
+        $attemptCount = $invoice->attempt_count ?? 1;
+        $graceDays = config('tenancy.grace_period.days', 7);
+
+        // Set grace period on first failure
+        if ($attemptCount === 1 && ! $tenant->grace_period_ends_at) {
+            $tenant->update([
+                'grace_period_ends_at' => now()->addDays($graceDays),
+            ]);
+        }
 
         // Send dunning notification to tenant owner
         $owner = $tenant->users()->first();
@@ -443,17 +461,66 @@ class StripeWebhookController extends Controller
             $owner->notify(new PaymentFailedNotification(
                 invoiceId: $invoice->id,
                 amountDue: $invoice->amount_due ?? 0,
-                attemptCount: $invoice->attempt_count ?? 1,
+                attemptCount: $attemptCount,
                 failureReason: $invoice->last_payment_error?->message ?? null
             ));
+        }
+
+        // Suspend if past grace period
+        if ($tenant->grace_period_ends_at?->isPast() && $tenant->active) {
+            $tenant->suspend('payment_failed');
+            logger()->warning('Tenant suspended due to payment failure', ['tenant_id' => $tenant->id]);
         }
 
         return [
             'tenant_id' => $tenant->id,
             'invoice_id' => $invoice->id,
             'payment_failed' => true,
-            'notification_sent' => $owner !== null,
         ];
+    }
+
+    /**
+     * Handle checkout session completed event.
+     */
+    protected function handleCheckoutSessionCompleted($session, StripeWebhookLog $log): array
+    {
+        $stripeCustomerId = $session->customer;
+        $metadata = $session->metadata;
+
+        // If this is a new tenant signup, link the customer
+        if (isset($metadata->tenant_id)) {
+            $tenant = Tenant::find($metadata->tenant_id);
+            if ($tenant && ! $tenant->stripe_id) {
+                $tenant->update(['stripe_id' => $stripeCustomerId]);
+                logger()->info('Tenant linked to Stripe customer', ['tenant_id' => $tenant->id]);
+            }
+        }
+
+        return ['status' => 'processed'];
+    }
+
+    /**
+     * Notify all admin users of a tenant.
+     */
+    protected function notifyTenantAdmins(Tenant $tenant, $notification): void
+    {
+        $admins = $tenant->users()
+            ->whereHas('roles', function ($query) {
+                $query->where('name', 'admin');
+            })
+            ->get();
+
+        foreach ($admins as $admin) {
+            try {
+                $admin->notify($notification);
+            } catch (\Exception $e) {
+                logger()->error('Failed to notify tenant admin', [
+                    'tenant_id' => $tenant->id,
+                    'user_id' => $admin->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     /**
@@ -467,7 +534,7 @@ class StripeWebhookController extends Controller
             ->where('stripe_id', $subscription->id)
             ->first();
 
-        if (!$localSubscription) {
+        if (! $localSubscription) {
             return false;
         }
 
@@ -491,21 +558,5 @@ class StripeWebhookController extends Controller
             ]);
 
         logger()->info('Tenant quotas reset', ['tenant_id' => $tenant->id]);
-    }
-
-    /**
-     * Return success response.
-     */
-    protected function successResponse(string $message = 'OK'): JsonResponse
-    {
-        return response()->json(['message' => $message], 200);
-    }
-
-    /**
-     * Return error response.
-     */
-    protected function errorResponse(string $message, int $status = 400): JsonResponse
-    {
-        return response()->json(['error' => $message], $status);
     }
 }

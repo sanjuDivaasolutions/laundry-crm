@@ -9,11 +9,13 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
+        $tenantId = 1; // Default tenant
+
         $categories = [
-            ['name' => 'Wash & Fold', 'display_order' => 1, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Dry Cleaning', 'display_order' => 2, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Ironing', 'display_order' => 3, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Alterations', 'display_order' => 4, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['tenant_id' => $tenantId, 'name' => 'Wash & Fold', 'display_order' => 1, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['tenant_id' => $tenantId, 'name' => 'Dry Cleaning', 'display_order' => 2, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['tenant_id' => $tenantId, 'name' => 'Ironing', 'display_order' => 3, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['tenant_id' => $tenantId, 'name' => 'Alterations', 'display_order' => 4, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
         ];
 
         DB::table('categories')->insert($categories);

@@ -32,24 +32,26 @@ class LoginController extends Controller
                 ->where('tenant_id', $currentTenant->id)
                 ->first();
 
-            if (!$user) {
+            if (! $user) {
                 // Don't reveal whether user exists in another tenant
                 logger()->warning('Login attempt for user not in tenant', [
                     'email' => $request->input('email'),
                     'tenant_id' => $currentTenant->id,
                     'ip' => $request->ip(),
                 ]);
-                return errorResponse('Invalid Email or Password', 401);
+
+                return $this->error('Invalid Email or Password', 401);
             }
 
             // Check if user is active
-            if (!$user->active) {
+            if (! $user->active) {
                 logger()->warning('Login attempt for inactive user', [
                     'user_id' => $user->id,
                     'tenant_id' => $currentTenant->id,
                     'ip' => $request->ip(),
                 ]);
-                return errorResponse('Your account has been deactivated. Please contact support.', 401);
+
+                return $this->error('Your account has been deactivated. Please contact support.', 401);
             }
         }
 
@@ -64,18 +66,19 @@ class LoginController extends Controller
 
         $token = auth('admin')->attempt($credentials);
 
-        if (!$token) {
+        if (! $token) {
             logger()->info('Failed login attempt', [
                 'email' => $request->input('email'),
                 'tenant_id' => $currentTenant?->id,
                 'ip' => $request->ip(),
             ]);
-            return errorResponse('Invalid Email or Password', 401);
+
+            return $this->error('Invalid Email or Password', 401);
         }
 
         // Set tenant context from authenticated user for subsequent middleware
         $user = auth('admin')->user();
-        if ($user && $user->tenant_id && !$currentTenant) {
+        if ($user && $user->tenant_id && ! $currentTenant) {
             $tenant = \App\Models\Tenant::find($user->tenant_id);
             if ($tenant) {
                 $this->tenantService->setTenant($tenant);
@@ -88,6 +91,6 @@ class LoginController extends Controller
             'ip' => $request->ip(),
         ]);
 
-        return okResponse(AuthService::getUserResponse());
+        return $this->success(AuthService::getUserResponse());
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Support\HasAdvancedFilter;
 use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,16 +17,57 @@ class Service extends Model
     protected $fillable = [
         'tenant_id',
         'name',
+        'code',
         'description',
+        'display_order',
         'is_active',
     ];
 
+    protected $orderable = [
+        'id',
+        'name',
+        'code',
+        'display_order',
+        'is_active',
+        'created_at',
+    ];
+
+    protected $filterable = [
+        'id',
+        'name',
+        'code',
+        'is_active',
+    ];
+
+    protected $searchable = [
+        'id',
+        'name',
+        'code',
+        'description',
+    ];
+
     protected $casts = [
+        'display_order' => 'integer',
         'is_active' => 'boolean',
     ];
 
     public function servicePrices(): HasMany
     {
         return $this->hasMany(ServicePrice::class);
+    }
+
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
+    }
+
+    public function scopeOrdered(Builder $query): void
+    {
+        $query->orderBy('display_order')->orderBy('name');
     }
 }

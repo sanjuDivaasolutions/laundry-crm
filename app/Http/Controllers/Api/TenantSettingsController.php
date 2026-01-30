@@ -28,13 +28,13 @@ class TenantSettingsController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json(['error' => 'No tenant context'], 403);
+        if (! $tenant) {
+            return $this->error('No tenant context', 403);
         }
 
         $settings = TenantSetting::getAllForTenant($tenant->id);
 
-        return response()->json(['settings' => $settings]);
+        return $this->success(['settings' => $settings]);
     }
 
     /**
@@ -44,8 +44,8 @@ class TenantSettingsController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json(['error' => 'No tenant context'], 403);
+        if (! $tenant) {
+            return $this->error('No tenant context', 403);
         }
 
         $validated = $request->validate([
@@ -66,10 +66,7 @@ class TenantSettingsController extends Controller
             );
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Settings updated successfully.',
-        ]);
+        return $this->success(null, 'Settings updated successfully.');
     }
 
     /**
@@ -79,11 +76,11 @@ class TenantSettingsController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json(['error' => 'No tenant context'], 403);
+        if (! $tenant) {
+            return $this->error('No tenant context', 403);
         }
 
-        return response()->json([
+        return $this->success([
             'profile' => [
                 'id' => $tenant->id,
                 'name' => $tenant->name,
@@ -104,8 +101,8 @@ class TenantSettingsController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json(['error' => 'No tenant context'], 403);
+        if (! $tenant) {
+            return $this->error('No tenant context', 403);
         }
 
         $validated = $request->validate([
@@ -116,11 +113,9 @@ class TenantSettingsController extends Controller
 
         $tenant->update($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Profile updated successfully.',
+        return $this->success([
             'profile' => $tenant->fresh(),
-        ]);
+        ], 'Profile updated successfully.');
     }
 
     /**
@@ -130,8 +125,8 @@ class TenantSettingsController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json(['error' => 'No tenant context'], 403);
+        if (! $tenant) {
+            return $this->error('No tenant context', 403);
         }
 
         $request->validate([
@@ -142,9 +137,8 @@ class TenantSettingsController extends Controller
 
         $tenant->update(['logo_path' => $path]);
 
-        return response()->json([
-            'success' => true,
-            'logo_url' => asset('storage/' . $path),
-        ]);
+        return $this->success([
+            'logo_url' => asset('storage/'.$path),
+        ], 'Logo uploaded successfully.');
     }
 }

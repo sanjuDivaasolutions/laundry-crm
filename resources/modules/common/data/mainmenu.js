@@ -20,6 +20,40 @@ const mainMenuPages = [
     },
     {
         topMenu: false,
+        heading: "Operations",
+        route: "/operations",
+        gate: "customer_access",
+        pages: [
+            {
+                heading: "POS",
+                route: "/pos",
+                gate: "order_access",
+                icon: "feather:monitor",
+            },
+            {
+                sectionTitle: "Sales",
+                route: "/sales",
+                icon: "feather:shopping-bag",
+                gate: "order_access",
+                sub: [
+                    {
+                        heading: "customer.title",
+                        route: "/customers",
+                        gate: "customer_access",
+                        icon: "feather:users",
+                    },
+                    {
+                        heading: "order.title",
+                        route: "/orders",
+                        gate: "order_access",
+                        icon: "feather:shopping-cart",
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        topMenu: false,
         heading: "Master Data",
         route: "/master",
         gate: "item_access",
@@ -37,10 +71,10 @@ const mainMenuPages = [
                         icon: "feather:package",
                     },
                     {
-                        heading: "Categories",
-                        route: "/categories",
-                        gate: "category_access",
-                        icon: "feather:tag",
+                        heading: "Services",
+                        route: "/services",
+                        gate: "service_access",
+                        icon: "feather:settings",
                     },
                 ],
             },

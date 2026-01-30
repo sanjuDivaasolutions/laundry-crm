@@ -144,7 +144,7 @@
                                             data-kt-countup-value="4500"
                                             data-kt-countup-prefix="$"
                                         >
-                                            ₹ 45,79,869
+                                            {{ formatCurrency(4579869) }}
                                         </div>
                                     </div>
 

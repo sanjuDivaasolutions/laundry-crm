@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 | Stripe Webhooks (No Auth, No CSRF)
 |--------------------------------------------------------------------------
 */
-Route::post('stripe/webhook', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])
+Route::post('stripe/webhook', [\App\Http\Controllers\Webhooks\StripeWebhookController::class, 'handleWebhook'])
     ->name('cashier.webhook');
 
 /*

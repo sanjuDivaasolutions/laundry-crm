@@ -1,0 +1,131 @@
+<template>
+    <div class="card mb-5 mb-xl-10">
+        <div class="card-body pt-9 pb-0">
+            <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
+                <div class="me-7 mb-4">
+                    <div
+                        class="symbol symbol-100px symbol-lg-160px symbol-fixed position-relative"
+                    >
+                        <span class="symbol-label bg-light-primary text-primary fs-1 fw-bold">
+                            {{ entry.name ? entry.name.charAt(0) : 'C' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex-grow-1">
+                    <div
+                        class="d-flex justify-content-between align-items-start flex-wrap mb-2"
+                    >
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center mb-2">
+                                <a
+                                    href="javascript:void(0);"
+                                    class="text-gray-800 text-hover-primary fs-2 fw-bold me-1"
+                                    >{{ entry.name }}</a
+                                >
+                            </div>
+
+                            <div
+                                class="d-flex flex-wrap fw-semobold fs-6 mb-4 pe-2"
+                            >
+                                <a
+                                    href="#"
+                                    class="d-flex align-items-center text-gray-400 text-hover-primary me-5 mb-2"
+                                >
+                                    {{ entry.phone }}
+                                </a>
+                                <a
+                                    href="#"
+                                    class="d-flex align-items-center text-gray-400 text-hover-primary me-5 mb-2"
+                                >
+                                    {{ entry.customer_code }}
+                                </a>
+                            </div>
+                        </div>
+                        <div class="d-flex my-4">
+                            <RouterLink
+                                title="Back to Customers"
+                                :to="{ name: 'customers.index' }"
+                                class="btn btn-sm btn-primary me-3"
+                                ><FormIcon icon="feather:arrow-left"
+                            /></RouterLink>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex overflow-auto h-55px">
+                <ul
+                    class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold flex-nowrap"
+                >
+                    <li class="nav-item">
+                        <router-link
+                            :to="{
+                                name: 'customers.show',
+                                params: { id: id, tab: 'overview' },
+                            }"
+                            @click.prevent="switchTab('overview')"
+                            class="nav-link text-active-primary me-6"
+                            :class="tab === 'overview' ? 'active' : ''"
+                        >
+                            Overview
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link
+                            :to="{
+                                name: 'customers.show',
+                                params: { id: id, tab: 'orders' },
+                            }"
+                            @click.prevent="switchTab('orders')"
+                            class="nav-link text-active-primary me-6"
+                            :class="tab === 'orders' ? 'active' : ''"
+                        >
+                            Orders
+                        </router-link>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <Overview
+        v-if="tab === 'overview'"
+        :id="id"
+        :entry="entry"
+        :fields="showFields"
+    />
+    <OrdersHistory
+        v-if="tab === 'orders'"
+        :orders="entry.recent_orders || []"
+    />
+</template>
+
+<script setup>
+import { useModuleFormStore } from "@modules@/customers/customersFormStore";
+import Overview from "./ShowComponents/Overview.vue";
+import OrdersHistory from "./ShowComponents/OrdersHistory.vue";
+import { computed, onBeforeMount, ref } from "vue";
+import { useRoute } from "vue-router";
+import FormIcon from "@common@/components/form/FormIcon.vue";
+
+const route = useRoute();
+
+const moduleFormStore = useModuleFormStore();
+const entry = computed(() => moduleFormStore.entry);
+const showFields = computed(() => moduleFormStore.showFields);
+
+const tab = ref("overview");
+const id = ref(null);
+
+const switchTab = (tabName) => {
+    tab.value = tabName;
+};
+
+onBeforeMount(() => {
+    id.value = route.params.id;
+    moduleFormStore.loadShowData(id.value);
+    const qsTab = route.params.tab;
+    if (qsTab) {
+        tab.value = qsTab;
+    }
+});
+</script>

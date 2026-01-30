@@ -8,4 +8,6 @@ return [
     'moment_datetime_format' => 'DD/MM/YYYY HH:mm:ss',
     'moment_time_format' => 'HH:mm:ss',
     'datepicker_date_format' => 'dd/MM/yyyy',
+    'default_currency' => 'USD',
+    'default_locale' => 'en-US',
 ];

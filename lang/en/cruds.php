@@ -170,4 +170,32 @@ return [
         'title' => 'Masters',
         'title_singular' => 'Master',
     ],
+    'media' => [
+        'title' => 'Media',
+        'title_singular' => 'Media',
+    ],
+    'customer' => [
+        'title' => 'Customers',
+        'title_singular' => 'Customer',
+        'fields' => [
+            'id' => 'ID',
+            'name' => 'Name',
+            'phone' => 'Phone',
+            'address' => 'Address',
+            'customer_code' => 'Code',
+        ],
+    ],
+    'order' => [
+        'title' => 'Orders',
+        'title_singular' => 'Order',
+        'fields' => [
+            'id' => 'ID',
+            'order_number' => 'Order #',
+            'order_date' => 'Order Date',
+            'promised_date' => 'Promised Date',
+            'total_amount' => 'Total',
+            'payment_status' => 'Payment Status',
+            'order_status' => 'Order Status',
+        ],
+    ],
 ];

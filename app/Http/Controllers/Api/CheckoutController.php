@@ -39,10 +39,7 @@ class CheckoutController extends Controller
         $tenant = $this->tenantService->getTenant();
 
         if (!$tenant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tenant context found.',
-            ], 400);
+            return $this->error('No tenant context found.', 400);
         }
 
         $plan = Plan::where('code', $validated['plan_code'])
@@ -50,22 +47,15 @@ class CheckoutController extends Controller
             ->first();
 
         if (!$plan) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Plan not found or inactive.',
-            ], 404);
+            return $this->error('Plan not found or inactive.', 404);
         }
 
         // Check if tenant already has an active subscription
         $existingSubscription = $tenant->subscription('default');
         if ($existingSubscription && $existingSubscription->active()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tenant already has an active subscription. Use plan change instead.',
-                'data' => [
-                    'current_status' => $this->stripeService->getSubscriptionStatus($tenant),
-                ],
-            ], 400);
+            return $this->error('Tenant already has an active subscription. Use plan change instead.', 400, [
+                'current_status' => $this->stripeService->getSubscriptionStatus($tenant),
+            ]);
         }
 
         try {
@@ -77,12 +67,9 @@ class CheckoutController extends Controller
                 $validated['cancel_url'] ?? null
             );
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'checkout_url' => $session->url,
-                    'session_id' => $session->id,
-                ],
+            return $this->success([
+                'checkout_url' => $session->url,
+                'session_id' => $session->id,
             ]);
 
         } catch (\Exception $e) {
@@ -92,11 +79,7 @@ class CheckoutController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create checkout session.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
+            return $this->error('Failed to create checkout session.', 500, config('app.debug') ? $e->getMessage() : null);
         }
     }
 
@@ -110,10 +93,7 @@ class CheckoutController extends Controller
         $sessionId = $request->query('session_id');
 
         if (!$sessionId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Missing session ID.',
-            ], 400);
+            return $this->error('Missing session ID.', 400);
         }
 
         try {
@@ -126,10 +106,7 @@ class CheckoutController extends Controller
             $planCode = $session->subscription?->metadata?->plan_code ?? null;
 
             if (!$tenantId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid checkout session.',
-                ], 400);
+                return $this->error('Invalid checkout session.', 400);
             }
 
             $tenant = Tenant::find($tenantId);
@@ -140,15 +117,11 @@ class CheckoutController extends Controller
                 $plan->provisionForTenant($tenant);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Subscription activated successfully.',
-                'data' => [
-                    'subscription_id' => $session->subscription?->id,
-                    'plan_code' => $planCode,
-                    'status' => $session->subscription?->status,
-                ],
-            ]);
+            return $this->success([
+                'subscription_id' => $session->subscription?->id,
+                'plan_code' => $planCode,
+                'status' => $session->subscription?->status,
+            ], 'Subscription activated successfully.');
 
         } catch (\Exception $e) {
             logger()->error('Checkout success handling failed', [
@@ -156,10 +129,7 @@ class CheckoutController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to verify checkout.',
-            ], 500);
+            return $this->error('Failed to verify checkout.', 500);
         }
     }
 
@@ -170,9 +140,6 @@ class CheckoutController extends Controller
      */
     public function handleCancel(Request $request): JsonResponse
     {
-        return response()->json([
-            'success' => true,
-            'message' => 'Checkout canceled.',
-        ]);
+        return $this->success(null, 'Checkout canceled.');
     }
 }

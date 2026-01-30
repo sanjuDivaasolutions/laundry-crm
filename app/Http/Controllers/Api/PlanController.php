@@ -48,17 +48,11 @@ class PlanController extends Controller
             ->with(['features', 'quotas'])
             ->first();
 
-        if (!$plan) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Plan not found.',
-            ], 404);
+        if (! $plan) {
+            return $this->error('Plan not found.', 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $plan->toApiArray(),
-        ]);
+        return $this->success($plan->toApiArray());
     }
 
     /**
@@ -74,13 +68,11 @@ class PlanController extends Controller
             ->get();
 
         // Get all unique feature codes across plans
-        $allFeatures = $plans->flatMap(fn ($plan) =>
-            $plan->features->pluck('feature_code')
+        $allFeatures = $plans->flatMap(fn ($plan) => $plan->features->pluck('feature_code')
         )->unique()->sort()->values();
 
         // Get all unique quota codes
-        $allQuotas = $plans->flatMap(fn ($plan) =>
-            $plan->quotas->pluck('quota_code')
+        $allQuotas = $plans->flatMap(fn ($plan) => $plan->quotas->pluck('quota_code')
         )->unique()->sort()->values();
 
         // Build comparison matrix
@@ -106,10 +98,7 @@ class PlanController extends Controller
             ]),
         ];
 
-        return response()->json([
-            'success' => true,
-            'data' => $comparison,
-        ]);
+        return $this->success($comparison);
     }
 
     /**
@@ -177,7 +166,7 @@ class PlanController extends Controller
         ]);
 
         // Create features
-        if (!empty($validated['features'])) {
+        if (! empty($validated['features'])) {
             foreach ($validated['features'] as $feature) {
                 $plan->features()->create([
                     'feature_code' => $feature['feature_code'],
@@ -188,7 +177,7 @@ class PlanController extends Controller
         }
 
         // Create quotas
-        if (!empty($validated['quotas'])) {
+        if (! empty($validated['quotas'])) {
             foreach ($validated['quotas'] as $quota) {
                 $plan->quotas()->create([
                     'quota_code' => $quota['quota_code'],
@@ -198,11 +187,7 @@ class PlanController extends Controller
             }
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Plan created successfully.',
-            'data' => $plan->load(['features', 'quotas']),
-        ], 201);
+        return $this->success($plan->load(['features', 'quotas']), 'Plan created successfully.', 201);
     }
 
     /**
@@ -231,11 +216,7 @@ class PlanController extends Controller
 
         $plan->update($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Plan updated successfully.',
-            'data' => $plan->fresh()->load(['features', 'quotas']),
-        ]);
+        return $this->success($plan->fresh()->load(['features', 'quotas']), 'Plan updated successfully.');
     }
 
     /**
@@ -252,9 +233,6 @@ class PlanController extends Controller
 
         $plan->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Plan deleted successfully.',
-        ]);
+        return $this->success(null, 'Plan deleted successfully.');
     }
 }

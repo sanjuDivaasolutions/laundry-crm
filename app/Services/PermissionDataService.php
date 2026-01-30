@@ -51,7 +51,9 @@ class PermissionDataService
         $projectModules = [
             ['module' => 'company', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
             ['module' => 'item', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
-            ['module' => 'category', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
+            ['module' => 'service', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
+            ['module' => 'customer', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
+            ['module' => 'order', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
         ];
 
         $simpleCustom = [];

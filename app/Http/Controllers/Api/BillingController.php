@@ -36,12 +36,7 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tenant context found.',
-            ], 400);
-        }
+        return $this->error('No tenant context found.', 400);
 
         $subscriptionStatus = $this->stripeService->getSubscriptionStatus($tenant);
         $upcomingInvoice = $this->stripeService->getUpcomingInvoice($tenant);
@@ -59,15 +54,12 @@ class BillingController extends Controller
             ];
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'subscription' => $subscriptionStatus,
-                'payment_method' => $paymentMethod,
-                'upcoming_invoice' => $upcomingInvoice,
-                'recent_invoices' => $recentInvoices,
-                'quotas' => $tenant->getQuotaSummary(),
-            ],
+        return $this->success([
+            'subscription' => $subscriptionStatus,
+            'payment_method' => $paymentMethod,
+            'upcoming_invoice' => $upcomingInvoice,
+            'recent_invoices' => $recentInvoices,
+            'quotas' => $tenant->getQuotaSummary(),
         ]);
     }
 
@@ -80,18 +72,10 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tenant context found.',
-            ], 400);
-        }
+        return $this->error('No tenant context found.', 400);
 
-        if (!$tenant->hasStripeId()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No billing account found. Please subscribe to a plan first.',
-            ], 400);
+        if (! $tenant->hasStripeId()) {
+            return $this->error('No billing account found. Please subscribe to a plan first.', 400);
         }
 
         try {
@@ -101,13 +85,9 @@ class BillingController extends Controller
                 $returnUrl
             );
 
-            // If this is an API request, return the URL
             if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'data' => [
-                        'portal_url' => $session->url,
-                    ],
+                return $this->success([
+                    'portal_url' => $session->url,
                 ]);
             }
 
@@ -120,10 +100,7 @@ class BillingController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create billing portal session.',
-            ], 500);
+            return $this->error('Failed to create billing portal session.', 500);
         }
     }
 
@@ -136,20 +113,12 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tenant context found.',
-            ], 400);
-        }
+        return $this->error('No tenant context found.', 400);
 
         $limit = min((int) $request->query('limit', 20), 100);
         $invoices = $this->stripeService->getInvoices($tenant, $limit);
 
-        return response()->json([
-            'success' => true,
-            'data' => $invoices,
-        ]);
+        return $this->success($invoices);
     }
 
     /**
@@ -161,27 +130,15 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tenant context found.',
-            ], 400);
-        }
+        return $this->error('No tenant context found.', 400);
 
         $upcoming = $this->stripeService->getUpcomingInvoice($tenant);
 
-        if (!$upcoming) {
-            return response()->json([
-                'success' => true,
-                'data' => null,
-                'message' => 'No upcoming invoice.',
-            ]);
+        if (! $upcoming) {
+            return $this->success(null, 'No upcoming invoice.');
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $upcoming,
-        ]);
+        return $this->success($upcoming);
     }
 
     /**
@@ -197,18 +154,10 @@ class BillingController extends Controller
 
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tenant context found.',
-            ], 400);
-        }
+        return $this->error('No tenant context found.', 400);
 
-        if (!$tenant->hasStripeId()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No billing account found.',
-            ], 400);
+        if (! $tenant->hasStripeId()) {
+            return $this->error('No billing account found.', 400);
         }
 
         try {
@@ -219,22 +168,16 @@ class BillingController extends Controller
 
             if ($success) {
                 $pm = $tenant->defaultPaymentMethod();
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Payment method updated successfully.',
-                    'data' => [
-                        'brand' => $pm->card->brand ?? null,
-                        'last4' => $pm->card->last4 ?? null,
-                        'exp_month' => $pm->card->exp_month ?? null,
-                        'exp_year' => $pm->card->exp_year ?? null,
-                    ],
-                ]);
+
+                return $this->success([
+                    'brand' => $pm->card->brand ?? null,
+                    'last4' => $pm->card->last4 ?? null,
+                    'exp_month' => $pm->card->exp_month ?? null,
+                    'exp_year' => $pm->card->exp_year ?? null,
+                ], 'Payment method updated successfully.');
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update payment method.',
-            ], 500);
+            return $this->error('Failed to update payment method.', 500);
 
         } catch (\Exception $e) {
             logger()->error('Payment method update failed', [
@@ -242,11 +185,7 @@ class BillingController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update payment method.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
+            return $this->error('Failed to update payment method.', 500, config('app.debug') ? $e->getMessage() : null);
         }
     }
 
@@ -259,14 +198,9 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tenant context found.',
-            ], 400);
-        }
+        return $this->error('No tenant context found.', 400);
 
-        if (!$tenant->hasStripeId()) {
+        if (! $tenant->hasStripeId()) {
             // Create customer first
             $this->stripeService->createCustomer($tenant);
         }
@@ -274,11 +208,8 @@ class BillingController extends Controller
         try {
             $intent = $tenant->createSetupIntent();
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'client_secret' => $intent->client_secret,
-                ],
+            return $this->success([
+                'client_secret' => $intent->client_secret,
             ]);
 
         } catch (\Exception $e) {
@@ -287,10 +218,7 @@ class BillingController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create setup intent.',
-            ], 500);
+            return $this->error('Failed to create setup intent.', 500);
         }
     }
 }

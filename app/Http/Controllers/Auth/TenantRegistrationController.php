@@ -48,35 +48,29 @@ class TenantRegistrationController extends Controller
         // Check reserved list
         $reserved = config('tenancy.reserved_domains', []);
         if (in_array($subdomain, $reserved, true)) {
-            return response()->json([
+            return $this->error('This subdomain is reserved.', 400, [
                 'available' => false,
-                'message' => 'This subdomain is reserved.',
                 'suggestion' => ValidSubdomain::generateUnique($subdomain),
             ]);
         }
 
         // Check if taken
         if (Tenant::where('domain', $subdomain)->exists()) {
-            return response()->json([
+            return $this->error('This subdomain is already taken.', 400, [
                 'available' => false,
-                'message' => 'This subdomain is already taken.',
                 'suggestion' => ValidSubdomain::generateUnique($subdomain),
             ]);
         }
 
         // Check format
-        if (!preg_match('/^[a-z0-9][a-z0-9-]*[a-z0-9]$/', $subdomain) && strlen($subdomain) > 2) {
-            return response()->json([
+        if (! preg_match('/^[a-z0-9][a-z0-9-]*[a-z0-9]$/', $subdomain) && strlen($subdomain) > 2) {
+            return $this->error('Invalid format. Use only lowercase letters, numbers, and hyphens.', 400, [
                 'available' => false,
-                'message' => 'Invalid format. Use only lowercase letters, numbers, and hyphens.',
                 'suggestion' => ValidSubdomain::suggest($subdomain),
             ]);
         }
 
-        return response()->json([
-            'available' => true,
-            'message' => 'Subdomain is available!',
-        ]);
+        return $this->success(['available' => true], 'Subdomain is available!');
     }
 
     /**
@@ -97,9 +91,7 @@ class TenantRegistrationController extends Controller
             $suggestion = ValidSubdomain::generateUnique($suggestion);
         }
 
-        return response()->json([
-            'suggestion' => $suggestion,
-        ]);
+        return $this->success(['suggestion' => $suggestion]);
     }
 
     /**
@@ -111,7 +103,7 @@ class TenantRegistrationController extends Controller
     {
         $validated = $request->validate([
             'company_name' => ['required', 'string', 'max:100'],
-            'subdomain' => ['required', 'string', new ValidSubdomain()],
+            'subdomain' => ['required', 'string', new ValidSubdomain],
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'name' => ['nullable', 'string', 'max:100'],
@@ -137,7 +129,7 @@ class TenantRegistrationController extends Controller
                 ]);
 
                 // 2. Create admin user (directly insert to bypass tenant scope)
-                $user = new User();
+                $user = new User;
                 $user->tenant_id = $tenant->id;
                 $user->name = $validated['name'] ?? 'Admin';
                 $user->email = $validated['email'];
@@ -151,7 +143,7 @@ class TenantRegistrationController extends Controller
                 }
 
                 // 4. Create default company for tenant
-                $company = new Company();
+                $company = new Company;
                 $company->tenant_id = $tenant->id;
                 $company->name = $validated['company_name'];
                 $company->code = 'MAIN';
@@ -164,12 +156,12 @@ class TenantRegistrationController extends Controller
                 TenantSetting::seedDefaults($tenant->id);
 
                 // 6. Store additional settings
-                if (!empty($validated['phone'])) {
+                if (! empty($validated['phone'])) {
                     TenantSetting::setValue($tenant->id, 'company_phone', $validated['phone'], 'string', 'general');
                 }
 
                 // 7. Send verification email
-                $user->notify(new TenantEmailVerificationNotification());
+                $user->notify(new TenantEmailVerificationNotification);
 
                 // 8. Send welcome notification (queued)
                 $user->notify(new TenantWelcomeNotification($tenant));
@@ -191,26 +183,22 @@ class TenantRegistrationController extends Controller
             $tenant = $result['tenant'];
             $user = $result['user'];
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Registration successful! Please check your email to verify your account.',
-                'data' => [
-                    'tenant' => [
-                        'id' => $tenant->id,
-                        'name' => $tenant->name,
-                        'subdomain' => $tenant->domain,
-                        'url' => $tenant->getUrl(),
-                        'trial_ends_at' => $tenant->trial_ends_at->toIso8601String(),
-                        'trial_days_remaining' => $tenant->trialDaysRemaining(),
-                    ],
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'email_verified' => $user->hasVerifiedEmail(),
-                    ],
+            return $this->success([
+                'tenant' => [
+                    'id' => $tenant->id,
+                    'name' => $tenant->name,
+                    'subdomain' => $tenant->domain,
+                    'url' => $tenant->getUrl(),
+                    'trial_ends_at' => $tenant->trial_ends_at->toIso8601String(),
+                    'trial_days_remaining' => $tenant->trialDaysRemaining(),
                 ],
-            ], 201);
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'email_verified' => $user->hasVerifiedEmail(),
+                ],
+            ], 'Registration successful! Please check your email to verify your account.', 201);
 
         } catch (\Exception $e) {
             logger()->error('Tenant registration failed', [
@@ -247,9 +235,7 @@ class TenantRegistrationController extends Controller
             ->sortKeys()
             ->toArray();
 
-        return response()->json([
-            'timezones' => $timezones,
-        ]);
+        return $this->success($timezones);
     }
 
     /**
@@ -282,9 +268,7 @@ class TenantRegistrationController extends Controller
             'NPR' => 'Nepalese Rupee (रू)',
         ];
 
-        return response()->json([
-            'currencies' => $currencies,
-        ]);
+        return $this->success($currencies);
     }
 
     /**
@@ -297,28 +281,20 @@ class TenantRegistrationController extends Controller
         // Find user across all tenants
         $user = User::withoutGlobalScope('tenant')->find($id);
 
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found.',
-            ], 404);
+        if (! $user) {
+            return $this->error('User not found.', 404);
         }
 
         // Verify hash
-        if (!hash_equals(sha1($user->email), $hash)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid verification link.',
-            ], 400);
+        if (! hash_equals(sha1($user->email), $hash)) {
+            return $this->error('Invalid verification link.', 400);
         }
 
         // Check if already verified
         if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Email already verified.',
+            return $this->success([
                 'redirect_url' => $user->tenant->getUrl(),
-            ]);
+            ], 'Email already verified.');
         }
 
         // Mark as verified
@@ -329,11 +305,9 @@ class TenantRegistrationController extends Controller
             'tenant_id' => $user->tenant_id,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Email verified successfully!',
+        return $this->success([
             'redirect_url' => $user->tenant->getUrl(),
-        ]);
+        ], 'Email verified successfully!');
     }
 
     /**
@@ -352,36 +326,24 @@ class TenantRegistrationController extends Controller
             ->where('email', $request->email)
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             // Don't reveal if email exists
-            return response()->json([
-                'success' => true,
-                'message' => 'If this email is registered, a verification link has been sent.',
-            ]);
+            return $this->success(null, 'If this email is registered, a verification link has been sent.');
         }
 
         if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Email is already verified.',
-            ]);
+            return $this->success(null, 'Email is already verified.');
         }
 
         // Rate limit: only allow resend every 60 seconds
         $cacheKey = "email_verification_sent:{$user->id}";
         if (cache()->has($cacheKey)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Please wait before requesting another verification email.',
-            ], 429);
+            return $this->error('Please wait before requesting another verification email.', 429);
         }
 
         $user->sendEmailVerificationNotification();
         cache()->put($cacheKey, true, 60);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Verification email sent.',
-        ]);
+        return $this->success(null, 'Verification email sent.');
     }
 }

@@ -41,8 +41,6 @@ import DatatableBoolean from "@/components/magic-datatable/components/DatatableB
 import DatatableCurrency from "@/components/magic-datatable/components/DatatableCurrency.vue";
 import DatatableYesNo from "@/components/magic-datatable/components/DatatableYesNo.vue";
 import DatatableCheckUncheckDash from "@/components/magic-datatable/components/DatatableCheckUncheckDash.vue";
-import BarcodeScanner from "@common@/components/BarcodeScanner.vue";
-import BarcodeQuickAdd from "@common@/components/BarcodeQuickAdd.vue";
 
 import { Ckeditor } from "@ckeditor/ckeditor5-vue";
 
@@ -90,8 +88,6 @@ export default function registerFormGlobalComponents(app) {
     app.component("DatatableCurrency", DatatableCurrency);
     app.component("DatatableYesNo", DatatableYesNo);
     app.component("DatatableCheckUncheckDash", DatatableCheckUncheckDash);
-    app.component("BarcodeScanner", BarcodeScanner);
-    app.component("BarcodeQuickAdd", BarcodeQuickAdd);
 
     app.component("ckeditor", Ckeditor.component);
 }

@@ -17,13 +17,13 @@ trait ApiResponse
     {
         if ($data instanceof JsonResource) {
             return $data->additional([
-                'status' => true,
+                'success' => true,
                 'message' => $message,
             ])->response()->setStatusCode($code);
         }
 
         return response()->json([
-            'status' => true,
+            'success' => true,
             'message' => $message,
             'data' => $data,
         ], $code);
@@ -35,7 +35,7 @@ trait ApiResponse
     protected function error(string $message, int $code = Response::HTTP_BAD_REQUEST, mixed $errors = null): JsonResponse
     {
         return response()->json([
-            'status' => false,
+            'success' => false,
             'message' => $message,
             'errors' => $errors,
         ], $code);

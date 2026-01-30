@@ -9,4 +9,5 @@ enum ProcessingStatusEnum: string
     case Drying = 'Drying';
     case Ready = 'Ready Area';
     case Delivered = 'Delivered';
+    case Cancelled = 'Cancelled';
 }

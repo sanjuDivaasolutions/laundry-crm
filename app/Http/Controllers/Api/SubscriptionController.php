@@ -36,7 +36,7 @@ class SubscriptionController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
+        if (! $tenant) {
             return response()->json([
                 'success' => false,
                 'message' => 'No tenant context found.',
@@ -60,13 +60,10 @@ class SubscriptionController extends Controller
             }
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'subscription' => $status,
-                'plan' => $planInfo,
-                'quotas' => $tenant->getQuotaSummary(),
-            ],
+        return $this->success([
+            'subscription' => $status,
+            'plan' => $planInfo,
+            'quotas' => $tenant->getQuotaSummary(),
         ]);
     }
 
@@ -85,7 +82,7 @@ class SubscriptionController extends Controller
 
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
+        if (! $tenant) {
             return response()->json([
                 'success' => false,
                 'message' => 'No tenant context found.',
@@ -94,22 +91,16 @@ class SubscriptionController extends Controller
 
         $subscription = $tenant->subscription('default');
 
-        if (!$subscription || !$subscription->active()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No active subscription to change.',
-            ], 400);
+        if (! $subscription || ! $subscription->active()) {
+            return $this->error('No active subscription to change.', 400);
         }
 
         $plan = Plan::where('code', $validated['plan_code'])
             ->where('is_active', true)
             ->first();
 
-        if (!$plan) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Plan not found or inactive.',
-            ], 404);
+        if (! $plan) {
+            return $this->error('Plan not found or inactive.', 404);
         }
 
         try {
@@ -120,14 +111,10 @@ class SubscriptionController extends Controller
                 $validated['prorate'] ?? true
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Plan changed successfully.',
-                'data' => [
-                    'new_plan' => $plan->toApiArray(),
-                    'subscription' => $this->stripeService->getSubscriptionStatus($tenant),
-                ],
-            ]);
+            return $this->success([
+                'new_plan' => $plan->toApiArray(),
+                'subscription' => $this->stripeService->getSubscriptionStatus($tenant),
+            ], 'Plan changed successfully.');
 
         } catch (\Exception $e) {
             logger()->error('Plan change failed', [
@@ -136,11 +123,7 @@ class SubscriptionController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to change plan.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
+            return $this->error('Failed to change plan.', 500, config('app.debug') ? $e->getMessage() : null);
         }
     }
 
@@ -158,7 +141,7 @@ class SubscriptionController extends Controller
 
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
+        if (! $tenant) {
             return response()->json([
                 'success' => false,
                 'message' => 'No tenant context found.',
@@ -167,18 +150,15 @@ class SubscriptionController extends Controller
 
         $subscription = $tenant->subscription('default');
 
-        if (!$subscription) {
+        if (! $subscription) {
             return response()->json([
                 'success' => false,
                 'message' => 'No subscription found.',
             ], 400);
         }
 
-        if ($subscription->canceled() && !$subscription->onGracePeriod()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Subscription is already canceled.',
-            ], 400);
+        if ($subscription->canceled() && ! $subscription->onGracePeriod()) {
+            return $this->error('Subscription is already canceled.', 400);
         }
 
         try {
@@ -187,7 +167,7 @@ class SubscriptionController extends Controller
             $this->stripeService->cancelSubscription($tenant, $immediately);
 
             // Log cancellation reason if provided
-            if (!empty($validated['reason'])) {
+            if (! empty($validated['reason'])) {
                 logger()->info('Subscription canceled with reason', [
                     'tenant_id' => $tenant->id,
                     'reason' => $validated['reason'],
@@ -199,13 +179,9 @@ class SubscriptionController extends Controller
                 ? 'Subscription canceled immediately.'
                 : 'Subscription will be canceled at the end of the billing period.';
 
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'data' => [
-                    'subscription' => $this->stripeService->getSubscriptionStatus($tenant),
-                ],
-            ]);
+            return $this->success([
+                'subscription' => $this->stripeService->getSubscriptionStatus($tenant),
+            ], $message);
 
         } catch (\Exception $e) {
             logger()->error('Subscription cancellation failed', [
@@ -213,11 +189,7 @@ class SubscriptionController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to cancel subscription.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
+            return $this->error('Failed to cancel subscription.', 500, config('app.debug') ? $e->getMessage() : null);
         }
     }
 
@@ -230,7 +202,7 @@ class SubscriptionController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        if (!$tenant) {
+        if (! $tenant) {
             return response()->json([
                 'success' => false,
                 'message' => 'No tenant context found.',
@@ -239,30 +211,20 @@ class SubscriptionController extends Controller
 
         $subscription = $tenant->subscription('default');
 
-        if (!$subscription) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No subscription found.',
-            ], 400);
+        if (! $subscription) {
+            return $this->error('No subscription found.', 400);
         }
 
-        if (!$subscription->onGracePeriod()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Subscription cannot be resumed. Grace period has ended or subscription was not canceled.',
-            ], 400);
+        if (! $subscription->onGracePeriod()) {
+            return $this->error('Subscription cannot be resumed. Grace period has ended or subscription was not canceled.', 400);
         }
 
         try {
             $this->stripeService->resumeSubscription($tenant);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Subscription resumed successfully.',
-                'data' => [
-                    'subscription' => $this->stripeService->getSubscriptionStatus($tenant),
-                ],
-            ]);
+            return $this->success([
+                'subscription' => $this->stripeService->getSubscriptionStatus($tenant),
+            ], 'Subscription resumed successfully.');
 
         } catch (\Exception $e) {
             logger()->error('Subscription resume failed', [
@@ -270,10 +232,7 @@ class SubscriptionController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to resume subscription.',
-            ], 500);
+            return $this->error('Failed to resume subscription.', 500);
         }
     }
 }

@@ -144,12 +144,93 @@ const systemRoutes = [
                 },
             },
             {
-                path: "categories",
-                name: "categories.index",
-                component: () => import("@modules@/categories/Index.vue"),
+                path: "items/create",
+                name: "items.create",
+                component: () => import("@modules@/items/Create.vue"),
                 meta: {
-                    pageTitle: "Categories",
-                    breadcrumbs: ["Categories"],
+                    pageTitle: "Create Item",
+                    breadcrumbs: [
+                        { label: "Items", route: "items.index" },
+                        "Create",
+                    ],
+                },
+            },
+            {
+                path: "items/edit/:id",
+                name: "items.edit",
+                component: () => import("@modules@/items/Edit.vue"),
+                meta: {
+                    pageTitle: "Edit Item",
+                    breadcrumbs: [
+                        { label: "Items", route: "items.index" },
+                        "Edit",
+                    ],
+                },
+            },
+            {
+                path: "items/show/:id",
+                name: "items.show",
+                redirect: to => ({ name: "items.edit", params: { id: to.params.id } }),
+            },
+            {
+                path: "services",
+                name: "services.index",
+                component: () => import("@modules@/services/Index.vue"),
+                meta: {
+                    pageTitle: "Services",
+                    breadcrumbs: ["Services"],
+                },
+            },
+            {
+                path: "customers",
+                name: "customers.index",
+                component: () => import("@modules@/customers/Index.vue"),
+                meta: {
+                    pageTitle: "customer.title",
+                    breadcrumbs: ["customer.title"],
+                },
+            },
+            {
+                path: "customers/show/:id/:tab?",
+                name: "customers.show",
+                component: () => import("@modules@/customers/Show.vue"),
+                meta: {
+                    pageTitle: "customer.title",
+                    breadcrumbs: [
+                        { label: "customer.title", route: "customers.index" },
+                        "general.fields.details",
+                    ],
+                },
+            },
+            {
+                path: "orders",
+                name: "orders.index",
+                component: () => import("@modules@/orders/Index.vue"),
+                meta: {
+                    pageTitle: "order.title",
+                    breadcrumbs: ["order.title"],
+                },
+            },
+            {
+                path: "orders/show/:id/:tab?",
+                name: "orders.show",
+                component: () => import("@modules@/orders/Show.vue"),
+                meta: {
+                    pageTitle: "order.title",
+                    breadcrumbs: [
+                        { label: "order.title", route: "orders.index" },
+                        "general.fields.details",
+                    ],
+                },
+            },
+            // POS Board
+            {
+                path: "pos",
+                name: "pos.board",
+                component: () => import("@modules@/pos-board/Index.vue"),
+                meta: {
+                    pageTitle: "POS Board",
+                    breadcrumbs: ["POS"],
                 },
             },
             // Admin Tenant Management (Super Admin only)

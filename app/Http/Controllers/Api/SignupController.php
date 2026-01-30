@@ -85,7 +85,7 @@ class SignupController extends Controller
 
             // 4. If plan selected, create checkout session
             $checkoutUrl = null;
-            if (!empty($validated['plan_code'])) {
+            if (! empty($validated['plan_code'])) {
                 $plan = Plan::where('code', $validated['plan_code'])
                     ->where('is_active', true)
                     ->first();
@@ -104,25 +104,21 @@ class SignupController extends Controller
             // Generate auth token for the new user
             $token = auth()->login($user);
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                    ],
-                    'tenant' => [
-                        'id' => $tenant->id,
-                        'name' => $tenant->name,
-                    ],
-                    'token' => $token,
-                    'checkout_url' => $checkoutUrl,
+            return $this->success([
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
                 ],
-                'message' => $checkoutUrl
-                    ? 'Account created. Complete payment to activate subscription.'
-                    : 'Account created successfully.',
-            ], 201);
+                'tenant' => [
+                    'id' => $tenant->id,
+                    'name' => $tenant->name,
+                ],
+                'token' => $token,
+                'checkout_url' => $checkoutUrl,
+            ], $checkoutUrl
+                ? 'Account created. Complete payment to activate subscription.'
+                : 'Account created successfully.', 201);
 
         } catch (\Exception $e) {
             logger()->error('Signup failed', [
@@ -130,11 +126,7 @@ class SignupController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Registration failed. Please try again.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
+            return $this->error('Registration failed. Please try again.', 500, config('app.debug') ? $e->getMessage() : null);
         }
     }
 
@@ -158,11 +150,8 @@ class SignupController extends Controller
             $tenantId = $session->metadata->tenant_id ?? null;
             $planCode = $session->subscription->metadata->plan_code ?? null;
 
-            if (!$tenantId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid checkout session.',
-                ], 400);
+            if (! $tenantId) {
+                return $this->error('Invalid checkout session.', 400);
             }
 
             $tenant = Tenant::find($tenantId);
@@ -178,15 +167,11 @@ class SignupController extends Controller
                 ]);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Subscription activated successfully.',
-                'data' => [
-                    'tenant_id' => $tenantId,
-                    'plan_code' => $planCode,
-                    'subscription_id' => $session->subscription->id ?? null,
-                ],
-            ]);
+            return $this->success([
+                'tenant_id' => $tenantId,
+                'plan_code' => $planCode,
+                'subscription_id' => $session->subscription->id ?? null,
+            ], 'Subscription activated successfully.');
 
         } catch (\Exception $e) {
             logger()->error('Checkout success handling failed', [
@@ -194,10 +179,7 @@ class SignupController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to activate subscription.',
-            ], 500);
+            return $this->error('Failed to activate subscription.', 500);
         }
     }
 
@@ -214,9 +196,6 @@ class SignupController extends Controller
             ->get()
             ->map(fn ($plan) => $plan->toApiArray());
 
-        return response()->json([
-            'success' => true,
-            'data' => $plans,
-        ]);
+        return $this->success($plans);
     }
 }

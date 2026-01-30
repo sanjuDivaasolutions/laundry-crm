@@ -17,7 +17,6 @@ class Item extends Model
 
     protected $fillable = [
         'tenant_id',
-        'category_id',
         'name',
         'code',
         'description',
@@ -38,7 +37,6 @@ class Item extends Model
 
     protected $filterable = [
         'id',
-        'category_id',
         'name',
         'code',
         'price',
@@ -57,14 +55,6 @@ class Item extends Model
         'display_order' => 'integer',
         'is_active' => 'boolean',
     ];
-
-    /**
-     * Primary category for this item.
-     */
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
 
     /**
      * Order items using this item.

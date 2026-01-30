@@ -5,7 +5,6 @@ const defaultEntry = () => {
         id: null,
         name: null,
         code: null,
-        category_id: null,
         description: null,
         price: 0,
         display_order: 0,
@@ -22,20 +21,6 @@ const formFields = [
         type: "text",
         required: true,
         column: "6",
-    },
-
-    {
-        name: "category_id",
-        label: "Category",
-        field: "category_id",
-        placeholder: "Select category",
-        type: "select-single",
-        endpoint: "categories",
-        idValue: "id",
-        labelValue: "name",
-        required: false,
-        column: "6",
-        object: false,
     },
     {
         name: "price",
@@ -87,10 +72,6 @@ const showFields = [
     {
         field: "code",
         label: "Code",
-    },
-    {
-        field: "category.name",
-        label: "Category",
     },
     {
         field: "price",

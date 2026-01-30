@@ -18,7 +18,7 @@
             >
                 <template v-for="(item, i) in MainMenuConfig" :key="i">
                     <div
-                        v-if="item.heading && $can(item.route)"
+                        v-if="item.heading && $can(item.gate || item.route)"
                         class="menu-item pt-5"
                     >
                         <div class="menu-content">
