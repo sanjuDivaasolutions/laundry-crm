@@ -257,7 +257,7 @@
                 </div>
             </div>
 
-            <!-- Pending Column - Orange -->
+            <!-- Pending Column - Orange (Status ID: 2) -->
             <div class="card card-flush border-top-0" style="flex: 1; min-width: 200px;">
                 <div class="card-header py-3 rounded-top" style="background-color: #f59e0b;">
                     <h3 class="card-title fs-6 fw-bold text-white">
@@ -268,57 +268,10 @@
                         Pending
                     </h3>
                     <div class="card-toolbar">
-                        <span class="badge badge-circle badge-light fw-bold">{{ filteredOrdersByStatus(1).length }}</span>
-                    </div>
-                </div>
-                <div class="card-body py-3 bg-light-warning" style="overflow-y: auto; max-height: calc(100vh - 280px);">
-                    <div
-                        v-for="order in filteredOrdersByStatus(1)"
-                        :key="order.id"
-                        class="card card-flush shadow-sm mb-3 cursor-pointer"
-                        @click="openOrderModal(order.id)"
-                    >
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="fs-7 fw-bold text-gray-900">#{{ order.order_number }}</span>
-                                <span class="badge badge-light-info fs-8">{{ order.service_name }}</span>
-                            </div>
-                            <h4 class="fs-7 fw-semibold text-gray-800 mb-1">{{ order.customer_name }}</h4>
-                            <p class="text-muted fs-8 mb-2">{{ order.item_summary }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fs-6 fw-bold text-primary">{{ formatCurrency(order.total_amount) }}</span>
-                                <button
-                                    class="btn btn-sm text-white"
-                                    style="background-color: #f59e0b;"
-                                    @click.stop="moveToStatus(order.id, 2)"
-                                >
-                                    Start Washing
-                                    <i class="bi bi-arrow-right ms-1"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-if="filteredOrdersByStatus(1).length === 0" class="text-center text-muted py-5 fs-7">
-                        No pending orders
-                    </div>
-                </div>
-            </div>
-
-            <!-- Washing Column - Blue -->
-            <div class="card card-flush border-top-0" style="flex: 1; min-width: 200px;">
-                <div class="card-header py-3 rounded-top" style="background-color: #3b82f6;">
-                    <h3 class="card-title fs-6 fw-bold text-white">
-                        <i class="ki-duotone ki-drop fs-4 text-white me-2">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                        </i>
-                        Washing
-                    </h3>
-                    <div class="card-toolbar">
                         <span class="badge badge-circle badge-light fw-bold">{{ filteredOrdersByStatus(2).length }}</span>
                     </div>
                 </div>
-                <div class="card-body py-3 bg-light-info" style="overflow-y: auto; max-height: calc(100vh - 280px);">
+                <div class="card-body py-3 bg-light-warning" style="overflow-y: auto; max-height: calc(100vh - 280px);">
                     <div
                         v-for="order in filteredOrdersByStatus(2)"
                         :key="order.id"
@@ -335,36 +288,37 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fs-6 fw-bold text-primary">{{ formatCurrency(order.total_amount) }}</span>
                                 <button
-                                    class="btn btn-sm btn-info"
+                                    class="btn btn-sm text-white"
+                                    style="background-color: #f59e0b;"
                                     @click.stop="moveToStatus(order.id, 3)"
                                 >
-                                    Move to Drying
+                                    Start Washing
                                     <i class="bi bi-arrow-right ms-1"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div v-if="filteredOrdersByStatus(2).length === 0" class="text-center text-muted py-5 fs-7">
-                        No orders in washing
+                        No pending orders
                     </div>
                 </div>
             </div>
 
-            <!-- Drying Column - Purple -->
+            <!-- Washing Column - Blue (Status ID: 3) -->
             <div class="card card-flush border-top-0" style="flex: 1; min-width: 200px;">
-                <div class="card-header py-3 rounded-top" style="background-color: #8b5cf6;">
+                <div class="card-header py-3 rounded-top" style="background-color: #3b82f6;">
                     <h3 class="card-title fs-6 fw-bold text-white">
-                        <i class="ki-duotone ki-cloud fs-4 text-white me-2">
+                        <i class="ki-duotone ki-drop fs-4 text-white me-2">
                             <span class="path1"></span>
                             <span class="path2"></span>
                         </i>
-                        Drying
+                        Washing
                     </h3>
                     <div class="card-toolbar">
                         <span class="badge badge-circle badge-light fw-bold">{{ filteredOrdersByStatus(3).length }}</span>
                     </div>
                 </div>
-                <div class="card-body py-3" style="background-color: #f3e8ff; overflow-y: auto; max-height: calc(100vh - 280px);">
+                <div class="card-body py-3 bg-light-info" style="overflow-y: auto; max-height: calc(100vh - 280px);">
                     <div
                         v-for="order in filteredOrdersByStatus(3)"
                         :key="order.id"
@@ -381,9 +335,55 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fs-6 fw-bold text-primary">{{ formatCurrency(order.total_amount) }}</span>
                                 <button
+                                    class="btn btn-sm btn-info"
+                                    @click.stop="moveToStatus(order.id, 4)"
+                                >
+                                    Move to Drying
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="filteredOrdersByStatus(3).length === 0" class="text-center text-muted py-5 fs-7">
+                        No orders in washing
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drying Column - Purple (Status ID: 4) -->
+            <div class="card card-flush border-top-0" style="flex: 1; min-width: 200px;">
+                <div class="card-header py-3 rounded-top" style="background-color: #8b5cf6;">
+                    <h3 class="card-title fs-6 fw-bold text-white">
+                        <i class="ki-duotone ki-cloud fs-4 text-white me-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        Drying
+                    </h3>
+                    <div class="card-toolbar">
+                        <span class="badge badge-circle badge-light fw-bold">{{ filteredOrdersByStatus(4).length }}</span>
+                    </div>
+                </div>
+                <div class="card-body py-3" style="background-color: #f3e8ff; overflow-y: auto; max-height: calc(100vh - 280px);">
+                    <div
+                        v-for="order in filteredOrdersByStatus(4)"
+                        :key="order.id"
+                        class="card card-flush shadow-sm mb-3 cursor-pointer"
+                        @click="openOrderModal(order.id)"
+                    >
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="fs-7 fw-bold text-gray-900">#{{ order.order_number }}</span>
+                                <span class="badge badge-light-info fs-8">{{ order.service_name }}</span>
+                            </div>
+                            <h4 class="fs-7 fw-semibold text-gray-800 mb-1">{{ order.customer_name }}</h4>
+                            <p class="text-muted fs-8 mb-2">{{ order.item_summary }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fs-6 fw-bold text-primary">{{ formatCurrency(order.total_amount) }}</span>
+                                <button
                                     class="btn btn-sm text-white"
                                     style="background-color: #8b5cf6;"
-                                    @click.stop="moveToStatus(order.id, 4)"
+                                    @click.stop="moveToStatus(order.id, 5)"
                                 >
                                     Mark as Ready
                                     <i class="bi bi-arrow-right ms-1"></i>
@@ -391,13 +391,13 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="filteredOrdersByStatus(3).length === 0" class="text-center text-muted py-5 fs-7">
+                    <div v-if="filteredOrdersByStatus(4).length === 0" class="text-center text-muted py-5 fs-7">
                         No orders in drying
                     </div>
                 </div>
             </div>
 
-            <!-- Pickup & Pay Column - Combined Ready + Payment -->
+            <!-- Pickup & Pay Column - Combined Ready + Payment (Status ID: 5) -->
             <div class="card card-flush border-top-0" style="flex: 1.2; min-width: 280px;">
                 <div class="card-header py-3 rounded-top" style="background-color: #22c55e;">
                     <h3 class="card-title fs-6 fw-bold text-white">
@@ -408,13 +408,13 @@
                         Pickup & Pay
                     </h3>
                     <div class="card-toolbar">
-                        <span class="badge badge-circle badge-light fw-bold">{{ filteredOrdersByStatus(4).length }}</span>
+                        <span class="badge badge-circle badge-light fw-bold">{{ filteredOrdersByStatus(5).length }}</span>
                     </div>
                 </div>
                 <div class="card-body py-3 bg-light-success" style="overflow-y: auto; max-height: calc(100vh - 280px);">
                     <!-- Order Cards -->
                     <div
-                        v-for="order in filteredOrdersByStatus(4)"
+                        v-for="order in filteredOrdersByStatus(5)"
                         :key="order.id"
                         class="card card-flush shadow-sm mb-3"
                     >
@@ -506,7 +506,7 @@
                         </div>
                     </div>
 
-                    <div v-if="filteredOrdersByStatus(4).length === 0" class="text-center text-muted py-5 fs-7">
+                    <div v-if="filteredOrdersByStatus(5).length === 0" class="text-center text-muted py-5 fs-7">
                         No orders ready for pickup
                     </div>
                 </div>
@@ -653,28 +653,29 @@
                             </button>
 
                             <div class="d-flex gap-3 flex-grow-1 justify-content-end">
+                                <!-- Status IDs: 2=Pending, 3=Washing, 4=Drying, 5=Ready, 6=Delivered -->
                                 <button
-                                    v-if="modalOrderDetail.processing_status_id === 1"
+                                    v-if="modalOrderDetail.processing_status_id === 2"
                                     type="button"
                                     class="btn btn-primary fs-7 fw-bold"
-                                    @click="moveAndCloseModal(modalOrderDetail.id, 2)"
+                                    @click="moveAndCloseModal(modalOrderDetail.id, 3)"
                                 >
                                     Move to Washing <i class="ki-duotone ki-arrow-right fs-4 ms-1"><span class="path1"></span><span class="path2"></span></i>
                                 </button>
                                  <button
-                                    v-else-if="modalOrderDetail.processing_status_id === 2"
+                                    v-else-if="modalOrderDetail.processing_status_id === 3"
                                     type="button"
                                     class="btn btn-info fs-7 fw-bold"
-                                    @click="moveAndCloseModal(modalOrderDetail.id, 3)"
+                                    @click="moveAndCloseModal(modalOrderDetail.id, 4)"
                                 >
                                     Move to Drying <i class="ki-duotone ki-arrow-right fs-4 ms-1"><span class="path1"></span><span class="path2"></span></i>
                                 </button>
                                 <button
-                                    v-else-if="modalOrderDetail.processing_status_id === 3"
+                                    v-else-if="modalOrderDetail.processing_status_id === 4"
                                     type="button"
                                     class="btn btn-success fs-7 fw-bold"
                                     style="background-color: #8b5cf6;"
-                                    @click="moveAndCloseModal(modalOrderDetail.id, 4)"
+                                    @click="moveAndCloseModal(modalOrderDetail.id, 5)"
                                 >
                                     Mark as Ready <i class="ki-duotone ki-arrow-right fs-4 ms-1"><span class="path1"></span><span class="path2"></span></i>
                                 </button>

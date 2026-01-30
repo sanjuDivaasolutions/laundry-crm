@@ -423,7 +423,6 @@ class OrderSeeder extends Seeder
 
             OrderItem::create([
                 'order_id' => $order->id,
-                'category_id' => $item->category_id,
                 'item_id' => $item->id,
                 'service_id' => $service->id,
                 'item_name' => $item->name,

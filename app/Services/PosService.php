@@ -42,10 +42,10 @@ class PosService
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Get processing statuses for columns (exclude Delivered for main board)
+        // Get processing statuses for columns (exclude Delivered and Cancelled for main board)
         $statuses = ProcessingStatus::active()
             ->ordered()
-            ->where('id', '!=', 5) // Exclude Delivered
+            ->whereNotIn('id', [1, 6]) // Exclude Cancelled (1) and Delivered (6)
             ->get();
 
         // Group orders by status
@@ -80,12 +80,13 @@ class PosService
         $todayRevenue = Payment::whereDate('payment_date', $today)
             ->sum('amount');
 
+        // ProcessingStatus IDs: 2=Pending, 3=Washing, 4=Drying, 5=Ready, 6=Delivered
         return [
-            'pending' => $counts[1] ?? 0,
-            'washing' => $counts[2] ?? 0,
-            'drying' => $counts[3] ?? 0,
-            'ready' => $counts[4] ?? 0,
-            'completed' => $counts[5] ?? 0,
+            'pending' => $counts[2] ?? 0,
+            'washing' => $counts[3] ?? 0,
+            'drying' => $counts[4] ?? 0,
+            'ready' => $counts[5] ?? 0,
+            'completed' => $counts[6] ?? 0,
             'today_revenue' => (float) $todayRevenue,
         ];
     }
@@ -105,7 +106,6 @@ class PosService
                     'name' => $item->name,
                     'code' => $item->code,
                     'price' => $item->price,
-                    'category_id' => $item->category_id,
                     'service_prices' => $item->servicePrices->map(fn ($sp) => [
                         'service_id' => $sp->service_id,
                         'service_name' => $sp->service?->name,
@@ -149,7 +149,7 @@ class PosService
                 'paid_amount' => 0,
                 'balance_amount' => $totals['total_amount'],
                 'payment_status' => PaymentStatusEnum::Unpaid,
-                'processing_status_id' => 1, // Pending
+                'processing_status_id' => 2, // Pending
                 'order_status_id' => 1, // Open
                 'urgent' => $data['urgent'] ?? false,
                 'notes' => $data['notes'] ?? null,
@@ -174,7 +174,6 @@ class PosService
                     'order_id' => $order->id,
                     'item_id' => $item->id,
                     'service_id' => $data['service_id'],
-                    'category_id' => $item->category_id,
                     'item_name' => $item->name,
                     'service_name' => $service->name,
                     'quantity' => $quantity,
@@ -189,7 +188,7 @@ class PosService
                 'order_id' => $order->id,
                 'status_type' => OrderStatusTypeEnum::Processing,
                 'old_status_id' => null,
-                'new_status_id' => 1,
+                'new_status_id' => 2, // Pending
                 'changed_by_employee_id' => auth()->id(),
                 'remarks' => 'Order created',
                 'changed_at' => now(),
@@ -210,8 +209,8 @@ class PosService
             'processing_status_id' => $newStatusId,
         ]);
 
-        // If moving to Ready, set actual_ready_date
-        if ($newStatusId === 4) {
+        // If moving to Ready (ID 5), set actual_ready_date
+        if ($newStatusId === 5) {
             $order->update(['actual_ready_date' => now()]);
         }
 
@@ -271,7 +270,7 @@ class PosService
 
             // If fully paid, mark as delivered
             if ($paymentStatus === PaymentStatusEnum::Paid) {
-                $this->updateOrderStatus($order, 5); // Delivered
+                $this->updateOrderStatus($order, 6); // Delivered
                 $order->update([
                     'picked_up_at' => now(),
                     'closed_at' => now(),

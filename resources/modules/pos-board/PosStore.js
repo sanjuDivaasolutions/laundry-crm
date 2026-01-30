@@ -106,9 +106,9 @@ export const usePosStore = defineStore("pos", () => {
                 paymentData
             );
             if (response.data.success) {
-                // Remove from board if delivered (status 5)
+                // Remove from board if delivered (status 6)
                 const order = response.data.data.order;
-                if (order.processing_status_id === 5) {
+                if (order.processing_status_id === 6) {
                     orders.value = orders.value.filter((o) => o.id !== orderId);
                 } else {
                     const index = orders.value.findIndex((o) => o.id === orderId);

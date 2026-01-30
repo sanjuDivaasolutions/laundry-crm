@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Category;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -20,7 +19,6 @@ class OrderItemFactory extends Factory
 
         return [
             'order_id' => Order::factory(),
-            'category_id' => Category::factory(),
             'item_id' => Item::factory(),
             'service_id' => Service::factory(),
             'item_name' => $this->faker->word,

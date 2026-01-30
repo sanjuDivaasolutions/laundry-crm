@@ -13,7 +13,6 @@ class OrderItem extends Model
 
     protected $fillable = [
         'order_id',
-        'category_id',
         'item_id',
         'service_id',
         'item_name',
@@ -39,7 +38,6 @@ class OrderItem extends Model
     protected $filterable = [
         'id',
         'order_id',
-        'category_id',
         'item_name',
         'service_name',
         'barcode',
@@ -62,11 +60,6 @@ class OrderItem extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
-    }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
     }
 
     public function item(): BelongsTo

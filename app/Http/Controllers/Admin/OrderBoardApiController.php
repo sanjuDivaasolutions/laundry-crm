@@ -225,8 +225,8 @@ class OrderBoardApiController extends Controller
     {
         abort_if(Gate::denies('order_delete'), Response::HTTP_FORBIDDEN);
 
-        // Instead of deleting, we update the status to Cancelled (id: 6)
-        $cancelledStatusId = 6;
+        // Instead of deleting, we update the status to Cancelled (id: 1)
+        $cancelledStatusId = 1;
 
         $this->posService->updateOrderStatus($order, $cancelledStatusId);
 
