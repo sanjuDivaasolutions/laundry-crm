@@ -15,9 +15,16 @@
                             <span class="text-white opacity-75 fs-7">Branch: Main Street</span>
                         </div>
                     </div>
-                    <div class="text-end">
-                        <span class="text-white opacity-75 fs-7">Today</span>
-                        <h3 class="fs-4 fw-bold text-white mb-0">{{ todayDate }}</h3>
+                    <div class="d-flex align-items-center gap-4">
+                        <!-- Search Orders Button -->
+                        <button class="btn btn-sm btn-light d-flex align-items-center gap-2" @click="openHistoryModal">
+                            <i class="ki-duotone ki-magnifier fs-4"><span class="path1"></span><span class="path2"></span></i>
+                            Orders
+                        </button>
+                        <div class="text-end">
+                            <span class="text-white opacity-75 fs-7">Today</span>
+                            <h3 class="fs-4 fw-bold text-white mb-0">{{ todayDate }}</h3>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -245,13 +252,7 @@
                             Create Order
                         </button>
                         <button class="btn btn-sm btn-icon btn-light" title="Print">
-                            <i class="ki-duotone ki-printer fs-5">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                                <span class="path3"></span>
-                                <span class="path4"></span>
-                                <span class="path5"></span>
-                            </i>
+                            <FormIcon icon="feather:printer" width="20" height="20" />
                         </button>
                     </div>
                 </div>
@@ -513,180 +514,231 @@
             </div>
         </div>
 
-        <!-- Order Details Modal (Redesigned) -->
+        <!-- Order Details Modal - Minimal Design -->
         <div class="modal fade" id="orderDetailModal" tabindex="-1" ref="orderModalRef">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content" v-if="modalOrderDetail">
-                    <!-- Modal Header -->
-                    <div class="modal-header border-0 pb-0 justify-content-end">
-                        <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" @click="closeOrderModal">
-                            <i class="ki-duotone ki-cross fs-1">
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+                <div class="modal-content border-0 shadow-lg rounded-3" v-if="modalOrderDetail">
+                    <!-- Header -->
+                    <div class="d-flex align-items-center justify-content-between px-5 pt-5 pb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="fs-2 fw-bold text-gray-900">#{{ modalOrderDetail.order_number }}</span>
+                            <span class="badge rounded-pill px-3 py-2" :class="getStatusPillClass(modalOrderDetail.processing_status)">
+                                {{ modalOrderDetail.processing_status }}
+                            </span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary" @click="closeOrderModal">
+                            <FormIcon icon="feather:x" width="20" height="20" />
+                        </button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="px-5 pb-5">
+                        <!-- Customer Info -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center text-gray-800 mb-1">
+                                <i class="ki-duotone ki-user fs-5 text-gray-500 me-2"><span class="path1"></span><span class="path2"></span></i>
+                                <span class="fs-6 fw-semibold">{{ modalOrderDetail.customer?.name }}</span>
+                            </div>
+                            <div class="d-flex align-items-center text-gray-600">
+                                <i class="ki-duotone ki-phone fs-5 text-gray-500 me-2"><span class="path1"></span><span class="path2"></span></i>
+                                <span class="fs-7">{{ modalOrderDetail.customer?.phone }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Created Time -->
+                        <div class="d-flex align-items-center text-gray-500 fs-7 mb-4">
+                            <i class="ki-duotone ki-time fs-6 me-2"><span class="path1"></span><span class="path2"></span></i>
+                            Created {{ getTimeAgo(modalOrderDetail.created_at) }}
+                            <span class="text-gray-400 ms-2">({{ formatTimeOnly(modalOrderDetail.created_at) }})</span>
+                        </div>
+
+                        <div class="separator mb-4"></div>
+
+                        <!-- Order Items -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <i class="ki-duotone ki-handcart fs-5 text-gray-600"><span class="path1"></span><span class="path2"></span></i>
+                                <span class="fs-6 fw-semibold text-gray-800">Order Items</span>
+                                <span class="badge badge-light-primary fs-8 ms-1">{{ modalOrderDetail.items[0]?.service_name }}</span>
+                            </div>
+                            <div class="d-flex flex-column gap-2">
+                                <div v-for="item in modalOrderDetail.items" :key="item.id" class="d-flex justify-content-between">
+                                    <span class="text-gray-700 fs-6">{{ item.item_name }} × {{ item.quantity }}</span>
+                                    <span class="text-gray-800 fs-6 fw-semibold">{{ formatCurrency(item.total_price) }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Amount -->
+                        <div class="d-flex justify-content-between align-items-center py-3 border-top">
+                            <span class="fs-5 fw-bold text-gray-900">Total Amount</span>
+                            <span class="fs-3 fw-bolder text-primary">{{ formatCurrency(modalOrderDetail.total_amount) }}</span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 mt-4">
+                            <!-- Status IDs: 2=Pending, 3=Washing, 4=Drying, 5=Ready -->
+                            <button
+                                v-if="modalOrderDetail.processing_status_id === 2"
+                                type="button"
+                                class="btn btn-primary flex-grow-1"
+                                @click="moveAndCloseModal(modalOrderDetail.id, 3)"
+                            >
+                                Start Washing <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                            <button
+                                v-else-if="modalOrderDetail.processing_status_id === 3"
+                                type="button"
+                                class="btn btn-info flex-grow-1"
+                                @click="moveAndCloseModal(modalOrderDetail.id, 4)"
+                            >
+                                Move to Drying <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                            <button
+                                v-else-if="modalOrderDetail.processing_status_id === 4"
+                                type="button"
+                                class="btn flex-grow-1 text-white"
+                                style="background-color: #8b5cf6;"
+                                @click="moveAndCloseModal(modalOrderDetail.id, 5)"
+                            >
+                                Mark as Ready <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                            <button
+                                v-else-if="modalOrderDetail.processing_status_id === 5"
+                                type="button"
+                                class="btn btn-success flex-grow-1"
+                                @click="closeOrderModal"
+                            >
+                                Ready for Pickup
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-danger"
+                                @click="confirmCancelOrder(modalOrderDetail.id)"
+                            >
+                                <i class="bi bi-x-circle me-1"></i> Cancel Order
+                            </button>
+                        </div>
+
+                        <!-- Warning Text -->
+                        <div class="text-center mt-3">
+                            <span class="text-gray-500 fs-8">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Canceling will remove this order permanently
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History Modal -->
+        <div class="modal fade" id="orderHistoryModal" tabindex="-1" ref="historyModalRef">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content border-0 shadow-lg rounded-3">
+                    <!-- Header -->
+                    <div class="modal-header border-0 px-6 pt-5 pb-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="ki-duotone ki-time fs-2 text-gray-700">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                             </i>
+                            <h3 class="modal-title fs-3 fw-bold text-gray-900 mb-0">Order History</h3>
                         </div>
+                        <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary" @click="closeHistoryModal">
+                            <FormIcon icon="feather:x" width="20" height="20" />
+                        </button>
                     </div>
 
-                    <!-- Modal Body -->
-                    <div class="modal-body scroll-y mx-5 mx-xl-15 pt-0 pb-15">
-                        <!-- Heading -->
-                        <div class="text-center mb-13">
-                            <h1 class="mb-3">Order #{{ modalOrderDetail.order_number }}</h1>
-                            <div class="d-flex flex-center gap-2">
-                                <span class="badge fw-bold px-4 py-3" :class="getStatusBadgeClass(modalOrderDetail.processing_status)">
-                                    {{ modalOrderDetail.processing_status }}
-                                </span>
-                                <span v-if="modalOrderDetail.urgent" class="badge badge-light-danger fw-bold px-4 py-3">URGENT</span>
-                            </div>
+                    <!-- Body -->
+                    <div class="modal-body px-6 py-5">
+                        <!-- Search Input -->
+                        <div class="position-relative mb-5">
+                            <i class="ki-duotone ki-magnifier fs-3 position-absolute top-50 translate-middle-y ms-4 text-gray-500">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            <input
+                                type="text"
+                                class="form-control form-control-lg ps-12 border-gray-300"
+                                placeholder="Search by order #, customer name or phone..."
+                                v-model="historySearch"
+                                @input="searchHistory"
+                            />
                         </div>
 
-                        <!-- Info Section -->
-                        <div class="row g-9 mb-8">
-                            <!-- Customer Info -->
-                            <div class="col-md-6">
-                                <div class="bg-light rounded p-5 h-100 border border-transparent">
-                                    <div class="d-flex align-items-center mb-4">
-                                        <div class="symbol symbol-40px symbol-circle me-3">
-                                            <span class="symbol-label bg-primary text-inverse-primary fs-4 fw-bold">
-                                                {{ modalOrderDetail.customer?.name.charAt(0) }}
+                        <!-- Table -->
+                        <div class="table-responsive">
+                            <table class="table table-row-bordered align-middle gy-4 gs-4">
+                                <thead>
+                                    <tr class="text-gray-500 fw-semibold fs-7 text-uppercase">
+                                        <th class="min-w-100px">Order #</th>
+                                        <th class="min-w-150px">Customer</th>
+                                        <th class="min-w-200px">Items</th>
+                                        <th class="min-w-100px">Service</th>
+                                        <th class="min-w-80px text-end">Total</th>
+                                        <th class="min-w-80px">Payment</th>
+                                        <th class="min-w-120px">Completed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-if="historyLoading">
+                                        <td colspan="7" class="text-center py-10">
+                                            <span class="spinner-border spinner-border-sm text-primary me-2"></span>
+                                            Loading orders...
+                                        </td>
+                                    </tr>
+                                    <tr v-else-if="historyOrders.length === 0">
+                                        <td colspan="7" class="text-center py-10 text-gray-500">
+                                            No completed orders found
+                                        </td>
+                                    </tr>
+                                    <tr v-for="order in historyOrders" :key="order.id" class="hover-bg-light">
+                                        <td>
+                                            <span class="fw-bold text-gray-800">#{{ order.order_number }}</span>
+                                            <span v-if="order.processing_status_id === 1" class="badge badge-light-danger ms-2 fs-8">Cancelled</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center text-gray-800 fs-7">
+                                                <i class="ki-duotone ki-user fs-6 text-gray-500 me-1"><span class="path1"></span><span class="path2"></span></i>
+                                                {{ order.customer_name }}
+                                            </div>
+                                            <div class="d-flex align-items-center text-gray-500 fs-8">
+                                                <i class="ki-duotone ki-phone fs-7 text-gray-400 me-1"><span class="path1"></span><span class="path2"></span></i>
+                                                {{ order.customer_phone }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-gray-700 fs-7">{{ order.item_summary }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-light-primary fs-8">{{ order.service_name }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="fw-bold text-gray-800">{{ formatCurrency(order.total_amount) }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge fs-8" :class="getPaymentMethodBadge(order.payment_method)">
+                                                {{ order.payment_method_label }}
                                             </span>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <span class="text-gray-800 fs-5 fw-bold">{{ modalOrderDetail.customer?.name }}</span>
-                                            <span class="text-muted fs-7">Customer Details</span>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex align-items-center text-gray-600 fs-6">
-                                            <i class="ki-duotone ki-phone fs-4 me-2"><span class="path1"></span><span class="path2"></span></i>
-                                            {{ modalOrderDetail.customer?.phone }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Order Meta -->
-                            <div class="col-md-6">
-                                <div class="bg-light rounded p-5 h-100 border border-transparent">
-                                    <div class="d-flex flex-column gap-5">
-                                        <div class="d-flex align-items-center">
-                                            <div class="symbol symbol-35px me-3">
-                                                <span class="symbol-label bg-white">
-                                                    <i class="ki-duotone ki-calendar-tick fs-2 text-info"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></i>
-                                                </span>
-                                            </div>
-                                            <div class="d-flex flex-column">
-                                                <span class="text-gray-400 fs-8 fw-bold">CREATED AT</span>
-                                                <span class="text-gray-800 fs-7 fw-bold">{{ getTimeAgo(modalOrderDetail.created_at) }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <div class="symbol symbol-35px me-3">
-                                                <span class="symbol-label bg-white">
-                                                    <i class="ki-duotone ki-delivery-3 fs-2 text-warning"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                                                </span>
-                                            </div>
-                                            <div class="d-flex flex-column">
-                                                <span class="text-gray-400 fs-8 fw-bold">SERVICE TYPE</span>
-                                                <span class="text-gray-800 fs-7 fw-bold">{{ modalOrderDetail.items[0]?.service_name }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-gray-600 fs-7">{{ formatCompletedDate(order.completed_at) }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
 
-                        <!-- Items Section -->
-                        <div class="mb-10">
-                            <h4 class="text-gray-800 fw-bold mb-5 d-flex align-items-center gap-2">
-                                <i class="ki-duotone ki-basket fs-3 text-primary"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-                                Order Items
-                            </h4>
-                            
-                            <div class="mh-300px scroll-y px-1">
-                                <div v-for="item in modalOrderDetail.items" :key="item.id" 
-                                     class="d-flex flex-stack py-4 border-bottom border-gray-300 border-bottom-dashed">
-                                    <div class="d-flex align-items-center">
-                                        <div class="symbol symbol-35px me-4">
-                                            <span class="symbol-label bg-light-primary text-primary fw-bold">
-                                                {{ item.quantity }}x
-                                            </span>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <span class="text-gray-800 fs-6 fw-bold">{{ item.item_name }}</span>
-                                            <span v-if="item.notes" class="text-muted fs-7 italic">{{ item.notes }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <span class="text-gray-800 fs-6 fw-bold">{{ formatCurrency(item.total_price) }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Summary & Pricing -->
-                        <div class="bg-gray-100 rounded-2 p-6 mb-10">
-                            <div class="d-flex flex-stack mb-2">
-                                <span class="text-gray-600 fs-6 fw-bold">Subtotal</span>
-                                <span class="text-gray-800 fs-6 fw-bold">{{ formatCurrency(modalOrderDetail.subtotal) }}</span>
-                            </div>
-                            <div v-if="modalOrderDetail.discount_amount > 0" class="d-flex flex-stack mb-2">
-                                <span class="text-gray-600 fs-6 fw-bold">Discount</span>
-                                <span class="text-danger fs-6 fw-bold">-{{ formatCurrency(modalOrderDetail.discount_amount) }}</span>
-                            </div>
-                            <div class="separator separator-dashed my-3"></div>
-                            <div class="d-flex flex-stack">
-                                <span class="text-gray-800 fs-4 fw-bold">Total Payable</span>
-                                <span class="text-primary fs-3 fw-bolder">{{ formatCurrency(modalOrderDetail.total_amount) }}</span>
-                            </div>
-                        </div>
-
-                         <!-- Actions -->
-                        <div class="d-flex flex-stack gap-3">
-                            <button
-                                type="button"
-                                class="btn btn-light-danger fs-7 fw-bold"
-                                @click="confirmCancelOrder(modalOrderDetail.id)"
-                            >
-                                <i class="ki-duotone ki-trash fs-2 me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
-                                Cancel Order
-                            </button>
-
-                            <div class="d-flex gap-3 flex-grow-1 justify-content-end">
-                                <!-- Status IDs: 2=Pending, 3=Washing, 4=Drying, 5=Ready, 6=Delivered -->
-                                <button
-                                    v-if="modalOrderDetail.processing_status_id === 2"
-                                    type="button"
-                                    class="btn btn-primary fs-7 fw-bold"
-                                    @click="moveAndCloseModal(modalOrderDetail.id, 3)"
-                                >
-                                    Move to Washing <i class="ki-duotone ki-arrow-right fs-4 ms-1"><span class="path1"></span><span class="path2"></span></i>
-                                </button>
-                                 <button
-                                    v-else-if="modalOrderDetail.processing_status_id === 3"
-                                    type="button"
-                                    class="btn btn-info fs-7 fw-bold"
-                                    @click="moveAndCloseModal(modalOrderDetail.id, 4)"
-                                >
-                                    Move to Drying <i class="ki-duotone ki-arrow-right fs-4 ms-1"><span class="path1"></span><span class="path2"></span></i>
-                                </button>
-                                <button
-                                    v-else-if="modalOrderDetail.processing_status_id === 4"
-                                    type="button"
-                                    class="btn btn-success fs-7 fw-bold"
-                                    style="background-color: #8b5cf6;"
-                                    @click="moveAndCloseModal(modalOrderDetail.id, 5)"
-                                >
-                                    Mark as Ready <i class="ki-duotone ki-arrow-right fs-4 ms-1"><span class="path1"></span><span class="path2"></span></i>
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-light fs-7 fw-bold"
-                                    @click="closeOrderModal"
-                                >
-                                    Close
-                                </button>
-                            </div>
+                        <!-- Footer Stats -->
+                        <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                            <span class="text-gray-500 fs-7">
+                                Showing {{ historyOrders.length }} of {{ historyTotal }} completed orders
+                            </span>
+                            <span class="fs-6">
+                                <span class="text-gray-600 fw-semibold">Total Revenue:</span>
+                                <span class="text-primary fw-bold ms-2">{{ formatCurrency(historyRevenue) }}</span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -703,6 +755,7 @@ import Swal from "sweetalert2";
 import { Modal } from "bootstrap";
 import { formatCurrency } from "@utility@/currency";
 import { $toastSuccess, $toastError } from "@/core/helpers/utility";
+import FormIcon from "@common@/components/form/FormIcon.vue";
 
 const posStore = usePosStore();
 
@@ -733,6 +786,16 @@ const showOrderModal = ref(false);
 const modalOrderDetail = ref(null);
 const orderModalRef = ref(null);
 let bootstrapModal = null;
+
+// History modal state
+const historyModalRef = ref(null);
+let historyModal = null;
+const historyOrders = ref([]);
+const historySearch = ref("");
+const historyLoading = ref(false);
+const historyTotal = ref(0);
+const historyRevenue = ref(0);
+let historySearchTimeout = null;
 
 const paymentMethods = [
     { value: "cash", label: "Cash" },
@@ -913,6 +976,16 @@ function getStatusBadgeClass(status) {
     return 'badge-light-secondary';
 }
 
+function getStatusPillClass(status) {
+    const statusLower = status?.toLowerCase() || '';
+    if (statusLower.includes('pending')) return 'bg-warning text-dark';
+    if (statusLower.includes('washing')) return 'bg-info text-white';
+    if (statusLower.includes('drying')) return 'bg-primary text-white';
+    if (statusLower.includes('ready')) return 'bg-success text-white';
+    if (statusLower.includes('cancelled')) return 'bg-danger text-white';
+    return 'bg-secondary text-white';
+}
+
 async function searchCustomer() {
     const query = newOrder.value.customer_phone.trim();
     customerFound.value = false;
@@ -1065,6 +1138,69 @@ function getPaymentBadgeClass(status) {
         paid: "badge-light-success",
     };
     return classes[status] || "badge-light";
+}
+
+function getPaymentMethodBadge(method) {
+    const badges = {
+        cash: "badge-light-success",
+        card: "badge-light-info",
+        upi: "badge-light-primary",
+        other: "badge-light-secondary",
+    };
+    return badges[method] || "badge-light";
+}
+
+function formatCompletedDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString('en-US', { month: 'short' });
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${day} ${month}, ${hours}:${minutes}`;
+}
+
+// History Modal Functions
+async function openHistoryModal() {
+    if (historyModalRef.value) {
+        historyModal = new Modal(historyModalRef.value);
+        historyModal.show();
+    }
+    await fetchOrderHistory();
+}
+
+function closeHistoryModal() {
+    if (historyModal) {
+        historyModal.hide();
+    }
+    historySearch.value = "";
+}
+
+async function fetchOrderHistory(search = "") {
+    historyLoading.value = true;
+    try {
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+
+        const response = await ApiService.get(`pos/history?${params.toString()}`);
+        if (response.data.success) {
+            historyOrders.value = response.data.data.orders || [];
+            historyTotal.value = response.data.data.total || 0;
+            historyRevenue.value = response.data.data.revenue || 0;
+        }
+    } catch (error) {
+        console.error("Failed to fetch order history:", error);
+        historyOrders.value = [];
+    } finally {
+        historyLoading.value = false;
+    }
+}
+
+function searchHistory() {
+    if (historySearchTimeout) clearTimeout(historySearchTimeout);
+    historySearchTimeout = setTimeout(() => {
+        fetchOrderHistory(historySearch.value);
+    }, 300);
 }
 
 // Lifecycle

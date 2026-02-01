@@ -15,7 +15,7 @@ class PaymentResource extends JsonResource
             'amount' => $this->amount,
             'formatted_amount' => number_format($this->amount, 2),
             'payment_method' => $this->payment_method, // Enum
-            'payment_method_label' => $this->payment_method?->label() ?? $this->payment_method?->value ?? $this->payment_method,
+            'payment_method_label' => $this->payment_method?->getLabel() ?? $this->payment_method?->value ?? $this->payment_method,
             'transaction_reference' => $this->transaction_reference,
             'notes' => $this->notes,
             'received_by' => $this->whenLoaded('receivedBy', fn () => $this->receivedBy?->name),

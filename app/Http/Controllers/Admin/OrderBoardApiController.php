@@ -234,12 +234,81 @@ class OrderBoardApiController extends Controller
     }
 
     /**
+     * Get completed orders history.
+     *
+     * GET /api/v1/pos/history
+     */
+    public function getHistory(Request $request): JsonResponse
+    {
+        abort_if(Gate::denies('order_access'), Response::HTTP_FORBIDDEN);
+
+        $search = trim($request->query('search', ''));
+
+        $query = Order::with(['customer' => fn($q) => $q->withTrashed(), 'orderItems', 'payments'])
+            ->whereIn('processing_status_id', [1, 6]) // Cancelled (1) or Delivered (6)
+            ->orderBy('updated_at', 'desc');
+
+        // Apply search filter
+        if ($search) {
+            $searchLower = strtolower($search);
+            $query->where(function ($q) use ($search, $searchLower) {
+                // Search by Order Number
+                $q->where('order_number', 'like', "%{$search}%")
+                    // Or match Customer Name (case insensitive)
+                    ->orWhereHas('customer', function ($cq) use ($searchLower) {
+                        $cq->withTrashed()
+                           ->whereRaw('LOWER(name) LIKE ?', ["%{$searchLower}%"]);
+                    })
+                    // Or match Customer Phone
+                    ->orWhereHas('customer', function ($cq) use ($search) {
+                        $cq->withTrashed()
+                           ->where('phone', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Get total matching the query before limit
+        $total = $query->clone()->count();
+
+        $orders = $query->limit(50)->get();
+
+        $formattedOrders = $orders->map(function ($order) {
+            $lastPayment = $order->payments->last();
+            $completedAt = $order->closed_at ?? $order->updated_at;
+
+            return [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'customer_name' => $order->customer?->name ?? 'Unknown Customer',
+                'customer_phone' => $order->customer?->phone ?? '-',
+                'item_summary' => $this->getItemSummary($order),
+                'service_name' => $order->orderItems->first()?->service_name ?? '',
+                'total_amount' => (float) $order->total_amount,
+                'payment_method' => $lastPayment?->payment_method?->value ?? 'cash',
+                'payment_method_label' => $lastPayment?->payment_method?->getLabel() ?? 'Cash',
+                'completed_at' => $completedAt?->format('Y-m-d H:i:s'),
+                'processing_status' => $order->processing_status_id === 1 ? 'Cancelled' : 'Completed',
+                'processing_status_id' => $order->processing_status_id,
+            ];
+        });
+
+        // Calculate total revenue from displayed orders (only completed ones)
+        $revenue = $orders->where('processing_status_id', 6)->sum('total_amount');
+
+        return $this->success([
+            'orders' => $formattedOrders,
+            'total' => $total,
+            'revenue' => (float) $revenue,
+        ]);
+    }
+
+    /**
      * Get a summary of items for display.
      */
     protected function getItemSummary(Order $order): string
     {
         return $order->orderItems
-            ->map(fn ($item) => "{$item->item_name} x{$item->quantity}")
+            ->map(fn ($item) => "{$item->item_name} ×{$item->quantity}")
             ->implode(', ');
     }
 }

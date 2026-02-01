@@ -197,6 +197,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
         Route::get('board', 'OrderBoardApiController@getBoardData')->name('board');
         Route::get('statistics', 'OrderBoardApiController@getStatistics')->name('statistics');
         Route::get('items', 'OrderBoardApiController@getItems')->name('items');
+        Route::get('history', 'OrderBoardApiController@getHistory')->name('history');
         Route::get('customers/search', 'OrderBoardApiController@searchCustomers')->name('customers.search');
         Route::post('orders', 'OrderBoardApiController@store')->name('orders.store');
         Route::get('orders/{order}', 'OrderBoardApiController@show')->name('orders.show');
