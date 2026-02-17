@@ -319,6 +319,18 @@ const systemRoutes = [
                     breadcrumbs: ["Reports"],
                 },
             },
+            {
+                path: "reports/:type",
+                name: "reports.show",
+                component: () => import("@modules@/reports/Show.vue"),
+                meta: {
+                    pageTitle: "Report Details",
+                    breadcrumbs: [
+                        { label: "Reports", route: "reports.index" },
+                        "Details",
+                    ],
+                },
+            },
             // POS Board
             {
                 path: "pos",
