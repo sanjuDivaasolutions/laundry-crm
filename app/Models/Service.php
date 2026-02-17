@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Service extends Model
 {
-    use BelongsToTenant, HasAdvancedFilter, HasFactory, SoftDeletes;
+    use BelongsToTenant, HasAdvancedFilter, HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'tenant_id',
@@ -69,5 +71,14 @@ class Service extends Model
     public function scopeOrdered(Builder $query): void
     {
         $query->orderBy('display_order')->orderBy('name');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'code', 'description', 'is_active'])
+            ->logOnlyDirty()
+            ->useLogName('service')
+            ->setDescriptionForEvent(fn (string $eventName): string => "Service {$this->name} was {$eventName}");
     }
 }

@@ -29,7 +29,6 @@ class UpdateProductRequest extends FormRequest
     use CustomFormRequest;
 
     private array $idObjects = [
-        'category',
         'unit_01',
         'unit_02',
         'supplier',
@@ -81,11 +80,6 @@ class UpdateProductRequest extends FormRequest
                 'string',
                 'required',
                 'unique:products,sku,'.request()->route('product')->id,
-            ],
-            'category_id' => [
-                'integer',
-                'exists:categories,id',
-                'nullable',
             ],
             'company_id' => [
                 'integer',

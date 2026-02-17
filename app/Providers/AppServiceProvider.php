@@ -19,7 +19,6 @@
 
 namespace App\Providers;
 
-use App\Models\Category;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Item;
@@ -132,7 +131,6 @@ class AppServiceProvider extends ServiceProvider
         // Format: 'route_parameter' => ModelClass::class
         $tenantScopedModels = [
             'item' => Item::class,
-            'category' => Category::class,
             'customer' => Customer::class,
             'order' => Order::class,
             'payment' => Payment::class,
@@ -148,7 +146,7 @@ class AppServiceProvider extends ServiceProvider
                 // This explicit binding ensures it works even if scope was bypassed
                 $model = $modelClass::where('id', $value)->first();
 
-                if (!$model) {
+                if (! $model) {
                     // Return 404 - don't reveal if resource exists in another tenant
                     abort(404);
                 }

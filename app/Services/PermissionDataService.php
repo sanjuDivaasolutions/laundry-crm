@@ -54,6 +54,9 @@ class PermissionDataService
             ['module' => 'service', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
             ['module' => 'customer', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
             ['module' => 'order', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
+            ['module' => 'payment', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
+            ['module' => 'delivery', 'actions' => ['create', 'edit', 'show', 'delete', 'access'], 'group' => 'General'],
+            ['module' => 'report', 'actions' => ['access'], 'group' => 'General'],
         ];
 
         $simpleCustom = [];

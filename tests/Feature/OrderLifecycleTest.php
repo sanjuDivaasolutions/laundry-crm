@@ -20,7 +20,7 @@ beforeEach(function () {
     $this->artisan('db:seed', ['--class' => 'OrderStatusSeeder']);
 
     $this->tenant = Tenant::factory()->create();
-    app(\App\Services\TenantService::class)->set($this->tenant);
+    app(\App\Services\TenantService::class)->setTenant($this->tenant);
 });
 
 test('order remains open through washing drying and ready stages', function () {
@@ -78,17 +78,21 @@ test('order closes only upon pickup', function () {
 
 test('order items capture garment details and services', function () {
     $order = Order::factory()->create(['tenant_id' => $this->tenant->id]);
+    $laundryItem = Item::factory()->create(['tenant_id' => $this->tenant->id]);
+    $service = Service::factory()->create(['tenant_id' => $this->tenant->id]);
 
-    $item = OrderItem::factory()->create([
+    $orderItem = OrderItem::factory()->create([
         'order_id' => $order->id,
+        'item_id' => $laundryItem->id,
+        'service_id' => $service->id,
         'color' => 'Blue',
         'brand' => 'Levis',
         'defect_notes' => 'Small stain on left sleeve',
     ]);
 
-    expect($item->color)->toBe('Blue');
-    expect($item->brand)->toBe('Levis');
-    expect($item->defect_notes)->toBe('Small stain on left sleeve');
-    expect($item->item)->toBeInstanceOf(Item::class);
-    expect($item->service)->toBeInstanceOf(Service::class);
+    expect($orderItem->color)->toBe('Blue');
+    expect($orderItem->brand)->toBe('Levis');
+    expect($orderItem->defect_notes)->toBe('Small stain on left sleeve');
+    expect($orderItem->item)->toBeInstanceOf(Item::class);
+    expect($orderItem->service)->toBeInstanceOf(Service::class);
 });

@@ -30,7 +30,6 @@ class StoreProductRequest extends FormRequest
     use CustomFormRequest;
 
     private array $idObjects = [
-        'category',
         'company',
         'unit_01',
         'unit_02',
@@ -87,11 +86,6 @@ class StoreProductRequest extends FormRequest
             ],
             'has_inventory' => [
                 'integer',
-            ],
-            'category_id' => [
-                'integer',
-                'exists:categories,id',
-                'nullable',
             ],
             'company_id' => [
                 'integer',

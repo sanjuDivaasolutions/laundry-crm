@@ -1,7 +1,7 @@
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
- *  *  Last modified: 05/02/25, 4:01 pm
+ *  *  Last modified: 13/02/26, 12:00 pm
  *
  */
 
@@ -50,6 +50,12 @@ const mainMenuPages = [
                     },
                 ],
             },
+            {
+                heading: "Deliveries",
+                route: "/deliveries",
+                gate: "delivery_access",
+                icon: "feather:truck",
+            },
         ],
     },
     {
@@ -77,6 +83,20 @@ const mainMenuPages = [
                         icon: "feather:settings",
                     },
                 ],
+            },
+        ],
+    },
+    {
+        topMenu: false,
+        heading: "Analytics",
+        route: "/analytics",
+        gate: "report_access",
+        pages: [
+            {
+                heading: "Reports",
+                route: "/reports",
+                gate: "report_access",
+                icon: "feather:bar-chart-2",
             },
         ],
     },

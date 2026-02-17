@@ -23,6 +23,9 @@
                                     class="text-gray-800 text-hover-primary fs-2 fw-bold me-1"
                                     >{{ entry.name }}</a
                                 >
+                                <span v-if="entry.loyalty_tier" class="badge ms-2" :class="tierBadge">
+                                    {{ (entry.loyalty_tier || '').charAt(0).toUpperCase() + (entry.loyalty_tier || '').slice(1) }}
+                                </span>
                             </div>
 
                             <div
@@ -40,9 +43,17 @@
                                 >
                                     {{ entry.customer_code }}
                                 </a>
+                                <span v-if="entry.loyalty_points" class="text-gray-400 me-5 mb-2">
+                                    {{ entry.loyalty_points }} pts
+                                </span>
                             </div>
                         </div>
                         <div class="d-flex my-4">
+                            <RouterLink
+                                title="Edit Customer"
+                                :to="{ name: 'customers.edit', params: { id: id } }"
+                                class="btn btn-sm btn-light-primary me-3"
+                            ><FormIcon icon="feather:edit" /></RouterLink>
                             <RouterLink
                                 title="Back to Customers"
                                 :to="{ name: 'customers.index' }"
@@ -83,6 +94,19 @@
                             Orders
                         </router-link>
                     </li>
+                    <li class="nav-item">
+                        <router-link
+                            :to="{
+                                name: 'customers.show',
+                                params: { id: id, tab: 'loyalty' },
+                            }"
+                            @click.prevent="switchTab('loyalty')"
+                            class="nav-link text-active-primary me-6"
+                            :class="tab === 'loyalty' ? 'active' : ''"
+                        >
+                            Loyalty
+                        </router-link>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -97,12 +121,18 @@
         v-if="tab === 'orders'"
         :orders="entry.recent_orders || []"
     />
+    <LoyaltyInfo
+        v-if="tab === 'loyalty'"
+        :customer-id="id"
+        :customer="entry"
+    />
 </template>
 
 <script setup>
 import { useModuleFormStore } from "@modules@/customers/customersFormStore";
 import Overview from "./ShowComponents/Overview.vue";
 import OrdersHistory from "./ShowComponents/OrdersHistory.vue";
+import LoyaltyInfo from "./ShowComponents/LoyaltyInfo.vue";
 import { computed, onBeforeMount, ref } from "vue";
 import { useRoute } from "vue-router";
 import FormIcon from "@common@/components/form/FormIcon.vue";
@@ -115,6 +145,16 @@ const showFields = computed(() => moduleFormStore.showFields);
 
 const tab = ref("overview");
 const id = ref(null);
+
+const tierBadge = computed(() => {
+    const tier = entry.value?.loyalty_tier || "bronze";
+    return {
+        bronze: "badge-light-warning",
+        silver: "badge-light-secondary",
+        gold: "badge-warning",
+        platinum: "badge-light-info",
+    }[tier] || "badge-light-secondary";
+});
 
 const switchTab = (tabName) => {
     tab.value = tabName;

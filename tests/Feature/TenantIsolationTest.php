@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Company;
 use App\Models\Tenant;
 use App\Models\User;
-use App\Models\Company;
 use App\Services\TenantService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -19,14 +19,15 @@ test('models are scoped to current tenant', function () {
 
     // Create User in Tenant 1
     $user1 = User::factory()->create(['email' => 'user@tenant1.com', 'name' => 'User T1']);
-    
+
     // Create Company in Tenant 1
     $company1 = Company::create([
-        'name' => 'Company T1', 
-        'code' => 'C1', 
-        'address_1' => 'Addr 1', 
+        'name' => 'Company T1',
+        'code' => 'C1',
+        'address_1' => 'Addr 1',
+        'address_2' => '',
         'active' => true,
-        'user_id' => $user1->id
+        'user_id' => $user1->id,
     ]);
 
     // Verify tenant_id was automatically set
@@ -44,7 +45,7 @@ test('models are scoped to current tenant', function () {
 
     // Verify User 1 is NOT visible in Tenant 2 scope
     expect(User::find($user1->id))->toBeNull();
-    
+
     // Verify Company 1 is NOT visible in Tenant 2 scope
     expect(Company::find($company1->id))->toBeNull();
 
@@ -56,24 +57,22 @@ test('models are scoped to current tenant', function () {
 
     // Verify User 1 IS visible again
     expect(User::find($user1->id)->id)->toBe($user1->id);
-    
+
     // Verify User 2 is NOT visible in Tenant 1 scope
     expect(User::find($user2->id))->toBeNull();
 });
 
-test('middleware identifies tenant from header', function () {
+test('middleware identifies tenant from domain', function () {
     $tenant = Tenant::create(['name' => 'Header Tenant', 'domain' => 'header.test', 'active' => true]);
+    $tenantService = app(TenantService::class);
 
-    $response = $this->withHeaders(['X-Tenant-ID' => $tenant->id])
-                     ->getJson('/api/v1/verify'); // Assuming a public or basic route exists
-    
-    // We can't easily assert the internal state of the singleton from an integration test 
-    // without inspecting the app state or response side-effects.
-    // However, if the middleware works, the request should proceed.
-    // A better test would be a route that returns the current tenant ID.
-    
-    // For now, let's just assert the request doesn't crash 
-    // and if we had a route returning tenant info, we'd check that.
-    
-    $response->assertStatus(200); // Or whatever status verify returns
+    // Test domain-based resolution directly via the middleware
+    $request = Request::create('/api/v1/test', 'GET', [], [], [], [
+        'HTTP_HOST' => 'header.test',
+    ]);
+
+    $middleware = new \App\Http\Middleware\IdentifyTenant($tenantService);
+    $middleware->handle($request, fn ($r) => response('ok'));
+
+    expect($tenantService->getId())->toBe($tenant->id);
 });

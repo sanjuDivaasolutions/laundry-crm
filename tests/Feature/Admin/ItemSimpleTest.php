@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Category;
 use App\Models\Item;
 use App\Models\Tenant;
 use App\Models\User;
@@ -13,23 +12,20 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->tenant = Tenant::create(['name' => 'Test Tenant', 'domain' => 'test.test', 'active' => true]);
     app(TenantService::class)->setTenant($this->tenant);
-    
+
     $this->user = User::factory()->create(['tenant_id' => $this->tenant->id]);
-    
+
     // Allow item permissions for the test
-    Gate::define('item_access', fn() => true);
-    Gate::define('item_create', fn() => true);
-    Gate::define('item_show', fn() => true);
-    Gate::define('item_edit', fn() => true);
-    Gate::define('item_delete', fn() => true);
+    Gate::define('item_access', fn () => true);
+    Gate::define('item_create', fn () => true);
+    Gate::define('item_show', fn () => true);
+    Gate::define('item_edit', fn () => true);
+    Gate::define('item_delete', fn () => true);
 });
 
 test('can create an item with a single price', function () {
-    $category = Category::factory()->create(['tenant_id' => $this->tenant->id]);
-
     $data = [
         'name' => 'Laundry Item',
-        'category_id' => $category->id,
         'description' => 'Test description',
         'price' => 10.50,
         'display_order' => 1,
@@ -42,14 +38,12 @@ test('can create an item with a single price', function () {
     $response->assertStatus(201)
         ->assertJsonFragment([
             'name' => 'Laundry Item',
-            'price' => "10.50",
-            'category_id' => $category->id,
+            'price' => '10.50',
         ]);
 
     $this->assertDatabaseHas('items', [
         'name' => 'Laundry Item',
         'price' => 10.50,
-        'category_id' => $category->id,
         'tenant_id' => $this->tenant->id,
     ]);
 });
@@ -57,15 +51,12 @@ test('can create an item with a single price', function () {
 test('can update an item price', function () {
     $item = Item::factory()->create([
         'tenant_id' => $this->tenant->id,
-        'price' => 5.00
+        'price' => 5.00,
     ]);
-
-    $category = Category::factory()->create(['tenant_id' => $this->tenant->id]);
 
     $data = [
         'name' => 'Updated Item',
         'price' => 15.75,
-        'category_id' => $category->id,
     ];
 
     $response = $this->actingAs($this->user, 'admin')
@@ -73,27 +64,24 @@ test('can update an item price', function () {
 
     $response->assertStatus(202)
         ->assertJsonFragment([
-            'price' => "15.75",
-            'category_id' => $category->id,
+            'price' => '15.75',
         ]);
 
     $this->assertDatabaseHas('items', [
         'id' => $item->id,
         'price' => 15.75,
-        'category_id' => $category->id,
     ]);
 });
 
 test('item resource does not contain multi-price data', function () {
     $item = Item::factory()->create([
         'tenant_id' => $this->tenant->id,
-        'price' => 20.00
+        'price' => 20.00,
     ]);
 
     $response = $this->actingAs($this->user, 'admin')
         ->getJson("/api/v1/items/{$item->id}");
 
     $response->assertStatus(200)
-        ->assertJsonMissing(['item_prices'])
-        ->assertJsonMissing(['categories']);
+        ->assertJsonMissing(['item_prices']);
 });

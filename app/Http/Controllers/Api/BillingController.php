@@ -36,7 +36,9 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        return $this->error('No tenant context found.', 400);
+        if (! $tenant) {
+            return $this->error('No tenant context found.', 400);
+        }
 
         $subscriptionStatus = $this->stripeService->getSubscriptionStatus($tenant);
         $upcomingInvoice = $this->stripeService->getUpcomingInvoice($tenant);
@@ -72,7 +74,9 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        return $this->error('No tenant context found.', 400);
+        if (! $tenant) {
+            return $this->error('No tenant context found.', 400);
+        }
 
         if (! $tenant->hasStripeId()) {
             return $this->error('No billing account found. Please subscribe to a plan first.', 400);
@@ -113,7 +117,9 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        return $this->error('No tenant context found.', 400);
+        if (! $tenant) {
+            return $this->error('No tenant context found.', 400);
+        }
 
         $limit = min((int) $request->query('limit', 20), 100);
         $invoices = $this->stripeService->getInvoices($tenant, $limit);
@@ -130,7 +136,9 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        return $this->error('No tenant context found.', 400);
+        if (! $tenant) {
+            return $this->error('No tenant context found.', 400);
+        }
 
         $upcoming = $this->stripeService->getUpcomingInvoice($tenant);
 
@@ -154,7 +162,9 @@ class BillingController extends Controller
 
         $tenant = $this->tenantService->getTenant();
 
-        return $this->error('No tenant context found.', 400);
+        if (! $tenant) {
+            return $this->error('No tenant context found.', 400);
+        }
 
         if (! $tenant->hasStripeId()) {
             return $this->error('No billing account found.', 400);
@@ -198,7 +208,9 @@ class BillingController extends Controller
     {
         $tenant = $this->tenantService->getTenant();
 
-        return $this->error('No tenant context found.', 400);
+        if (! $tenant) {
+            return $this->error('No tenant context found.', 400);
+        }
 
         if (! $tenant->hasStripeId()) {
             // Create customer first

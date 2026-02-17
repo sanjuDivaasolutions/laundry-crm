@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -22,11 +22,6 @@ return new class extends Migration
         'items' => [
             'items_tenant_active_idx' => ['tenant_id', 'is_active'],
             'items_tenant_created_idx' => ['tenant_id', 'created_at'],
-            'items_tenant_category_idx' => ['tenant_id', 'category_id'],
-        ],
-        'categories' => [
-            'categories_tenant_active_idx' => ['tenant_id', 'is_active'],
-            'categories_tenant_created_idx' => ['tenant_id', 'created_at'],
         ],
         'orders' => [
             'orders_tenant_status_idx' => ['tenant_id', 'status'],
@@ -61,7 +56,7 @@ return new class extends Migration
     {
         foreach ($this->indexes as $table => $tableIndexes) {
             // Skip if table doesn't exist
-            if (!Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 continue;
             }
 
@@ -70,13 +65,13 @@ return new class extends Migration
                     // Check if all columns exist
                     $allColumnsExist = true;
                     foreach ($columns as $column) {
-                        if (!Schema::hasColumn($table, $column)) {
+                        if (! Schema::hasColumn($table, $column)) {
                             $allColumnsExist = false;
                             break;
                         }
                     }
 
-                    if (!$allColumnsExist) {
+                    if (! $allColumnsExist) {
                         continue;
                     }
 
@@ -97,7 +92,7 @@ return new class extends Migration
     public function down(): void
     {
         foreach ($this->indexes as $table => $tableIndexes) {
-            if (!Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 continue;
             }
 
@@ -121,14 +116,16 @@ return new class extends Migration
 
         if ($driver === 'mysql') {
             $result = DB::select("SHOW INDEX FROM {$table} WHERE Key_name = ?", [$indexName]);
+
             return count($result) > 0;
         }
 
         if ($driver === 'pgsql') {
             $result = DB::select(
-                "SELECT 1 FROM pg_indexes WHERE tablename = ? AND indexname = ?",
+                'SELECT 1 FROM pg_indexes WHERE tablename = ? AND indexname = ?',
                 [$table, $indexName]
             );
+
             return count($result) > 0;
         }
 
@@ -137,6 +134,7 @@ return new class extends Migration
                 "SELECT 1 FROM sqlite_master WHERE type = 'index' AND name = ?",
                 [$indexName]
             );
+
             return count($result) > 0;
         }
 

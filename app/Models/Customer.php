@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use App\Support\HasAdvancedFilter;
 use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Customer extends Model
 {
-    use BelongsToTenant, HasAdvancedFilter, HasFactory, SoftDeletes;
+    use BelongsToTenant, HasAdvancedFilter, HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'tenant_id',
@@ -21,6 +23,10 @@ class Customer extends Model
         'phone',
         'address',
         'is_active',
+        'loyalty_points',
+        'total_orders_count',
+        'total_spent',
+        'loyalty_tier',
     ];
 
     protected $orderable = [
@@ -50,6 +56,9 @@ class Customer extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'loyalty_points' => 'integer',
+        'total_orders_count' => 'integer',
+        'total_spent' => 'decimal:2',
     ];
 
     public function orders(): HasMany
@@ -62,8 +71,22 @@ class Customer extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function loyaltyTransactions(): HasMany
+    {
+        return $this->hasMany(LoyaltyTransaction::class);
+    }
+
     public function scopeActive(Builder $query): void
     {
         $query->where('is_active', true);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'phone', 'address', 'is_active', 'loyalty_points', 'loyalty_tier'])
+            ->logOnlyDirty()
+            ->useLogName('customer')
+            ->setDescriptionForEvent(fn (string $eventName): string => "Customer {$this->name} was {$eventName}");
     }
 }

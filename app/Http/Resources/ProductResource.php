@@ -41,13 +41,6 @@ class ProductResource extends JsonResource
             'barcode' => $this->barcode,
             'barcode_type' => $this->barcode_type,
             'barcode_image' => $this->barcode_image ?? null,
-            'category_id' => $this->category_id,
-            'category' => $this->whenLoaded('category', function () {
-                return [
-                    'id' => $this->category->id,
-                    'name' => $this->category->name,
-                ];
-            }),
             'company_id' => $this->company_id,
             'company' => $this->whenLoaded('company', function () {
                 return [

@@ -14,10 +14,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Order extends Model
 {
-    use BelongsToTenant, HasAdvancedFilter, HasFactory, SoftDeletes;
+    use BelongsToTenant, HasAdvancedFilter, HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'tenant_id',
@@ -152,5 +154,18 @@ class Order extends Model
             'picked_up_at' => now(),
             'closed_at' => now(),
         ]);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'order_number', 'customer_id', 'order_date', 'promised_date',
+                'total_amount', 'paid_amount', 'balance_amount', 'payment_status',
+                'processing_status_id', 'order_status_id', 'urgent', 'hanger_number',
+            ])
+            ->logOnlyDirty()
+            ->useLogName('order')
+            ->setDescriptionForEvent(fn (string $eventName): string => "Order {$this->order_number} was {$eventName}");
     }
 }

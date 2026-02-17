@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Item;
 use App\Models\Tenant;
@@ -27,13 +26,13 @@ class ImportService
     /**
      * Import items for a tenant.
      *
-     * @param Tenant $tenant The tenant to import for
+     * @param  Tenant  $tenant  The tenant to import for
      * @return array Import results
      */
     public static function importItems(Tenant $tenant): array
     {
         $file = request()->file('file');
-        if (!$file) {
+        if (! $file) {
             return ['error' => 'No file uploaded'];
         }
 
@@ -42,7 +41,7 @@ class ImportService
 
         // Check quota before import
         $quotaService = app(QuotaService::class);
-        if (!$quotaService->canCreate('items', count($data), $tenant)) {
+        if (! $quotaService->canCreate('items', count($data), $tenant)) {
             return ['error' => 'Import would exceed item quota limit'];
         }
 
@@ -52,7 +51,6 @@ class ImportService
                 $validator = Validator::make($row, [
                     'name' => 'required|string|max:100',
                     'code' => 'nullable|string|max:50',
-                    'category_id' => 'nullable|exists_tenant:categories,id',
                     'price' => 'required|numeric|min:0',
                 ]);
 
@@ -61,25 +59,12 @@ class ImportService
                         'row' => $index + 1,
                         'errors' => $validator->errors()->toArray(),
                     ];
+
                     continue;
                 }
 
                 // CRITICAL: Assign tenant_id
                 $row['tenant_id'] = $tenant->id;
-
-                // Validate FK belongs to tenant (if category_id provided)
-                if (!empty($row['category_id'])) {
-                    $categoryExists = Category::where('id', $row['category_id'])
-                        ->where('tenant_id', $tenant->id)
-                        ->exists();
-                    if (!$categoryExists) {
-                        $results['errors'][] = [
-                            'row' => $index + 1,
-                            'errors' => ['category_id' => 'Category not found or belongs to another tenant'],
-                        ];
-                        continue;
-                    }
-                }
 
                 Item::create($row);
                 $results['imported']++;
@@ -88,7 +73,8 @@ class ImportService
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            return ['error' => 'Import failed: ' . $e->getMessage()];
+
+            return ['error' => 'Import failed: '.$e->getMessage()];
         }
 
         // Invalidate quota cache
@@ -103,7 +89,7 @@ class ImportService
     public static function importCustomers(Tenant $tenant): array
     {
         $file = request()->file('file');
-        if (!$file) {
+        if (! $file) {
             return ['error' => 'No file uploaded'];
         }
 
@@ -112,7 +98,7 @@ class ImportService
 
         // Check quota
         $quotaService = app(QuotaService::class);
-        if (!$quotaService->canCreate('customers', count($data), $tenant)) {
+        if (! $quotaService->canCreate('customers', count($data), $tenant)) {
             return ['error' => 'Import would exceed customer quota limit'];
         }
 
@@ -131,6 +117,7 @@ class ImportService
                         'row' => $index + 1,
                         'errors' => $validator->errors()->toArray(),
                     ];
+
                     continue;
                 }
 
@@ -144,76 +131,11 @@ class ImportService
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            return ['error' => 'Import failed: ' . $e->getMessage()];
+
+            return ['error' => 'Import failed: '.$e->getMessage()];
         }
 
         $quotaService->invalidateUsageCache('customers', $tenant);
-
-        return $results;
-    }
-
-    /**
-     * Import categories for a tenant.
-     */
-    public static function importCategories(Tenant $tenant): array
-    {
-        $file = request()->file('file');
-        if (!$file) {
-            return ['error' => 'No file uploaded'];
-        }
-
-        $data = self::parseImportFile($file);
-        $results = ['imported' => 0, 'errors' => []];
-
-        // Check quota
-        $quotaService = app(QuotaService::class);
-        if (!$quotaService->canCreate('categories', count($data), $tenant)) {
-            return ['error' => 'Import would exceed category quota limit'];
-        }
-
-        DB::beginTransaction();
-        try {
-            foreach ($data as $index => $row) {
-                $validator = Validator::make($row, [
-                    'name' => 'required|string|max:100',
-                    'display_order' => 'nullable|integer|min:0',
-                    'is_active' => 'nullable|boolean',
-                ]);
-
-                if ($validator->fails()) {
-                    $results['errors'][] = [
-                        'row' => $index + 1,
-                        'errors' => $validator->errors()->toArray(),
-                    ];
-                    continue;
-                }
-
-                // CRITICAL: Assign tenant_id
-                $row['tenant_id'] = $tenant->id;
-
-                // Check for duplicate name within tenant
-                $exists = Category::where('name', $row['name'])
-                    ->where('tenant_id', $tenant->id)
-                    ->exists();
-                if ($exists) {
-                    $results['errors'][] = [
-                        'row' => $index + 1,
-                        'errors' => ['name' => 'Category name already exists'],
-                    ];
-                    continue;
-                }
-
-                Category::create($row);
-                $results['imported']++;
-            }
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return ['error' => 'Import failed: ' . $e->getMessage()];
-        }
-
-        $quotaService->invalidateUsageCache('categories', $tenant);
 
         return $results;
     }
@@ -246,6 +168,7 @@ class ImportService
             while (($row = fgetcsv($handle)) !== false) {
                 if ($headers === null) {
                     $headers = array_map('trim', $row);
+
                     continue;
                 }
 

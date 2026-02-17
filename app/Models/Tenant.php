@@ -102,14 +102,6 @@ class Tenant extends Model
     }
 
     /**
-     * Categories belonging to this tenant.
-     */
-    public function categories(): HasMany
-    {
-        return $this->hasMany(Category::class);
-    }
-
-    /**
      * Settings for this tenant.
      */
     public function tenantSettings(): HasMany
@@ -162,8 +154,7 @@ class Tenant extends Model
      */
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(\Laravel\Cashier\Subscription::class, 'tenant_id')
-            ->from('tenant_subscriptions');
+        return $this->hasMany(TenantSubscription::class, 'tenant_id');
     }
 
     // =========================================================================
@@ -185,7 +176,7 @@ class Tenant extends Model
     {
         return $this->trial_ends_at !== null
             && $this->trial_ends_at->isPast()
-            && !$this->hasActiveSubscription();
+            && ! $this->hasActiveSubscription();
     }
 
     /**
@@ -193,7 +184,7 @@ class Tenant extends Model
      */
     public function trialDaysRemaining(): int
     {
-        if (!$this->trial_ends_at || $this->trial_ends_at->isPast()) {
+        if (! $this->trial_ends_at || $this->trial_ends_at->isPast()) {
             return 0;
         }
 
@@ -205,7 +196,7 @@ class Tenant extends Model
      */
     public function shouldShowTrialWarning(): bool
     {
-        if (!$this->onTrial()) {
+        if (! $this->onTrial()) {
             return false;
         }
 
@@ -277,7 +268,7 @@ class Tenant extends Model
     public function canAccess(): bool
     {
         // Account must be active
-        if (!$this->active) {
+        if (! $this->active) {
             return false;
         }
 
@@ -309,7 +300,7 @@ class Tenant extends Model
      */
     public function isReadOnly(): bool
     {
-        return $this->trialExpired() && !$this->hasActiveSubscription() && !$this->isInGracePeriod();
+        return $this->trialExpired() && ! $this->hasActiveSubscription() && ! $this->isInGracePeriod();
     }
 
     /**
@@ -318,13 +309,13 @@ class Tenant extends Model
     public function getCurrentPlanCode(): ?string
     {
         // On trial - return trial plan
-        if ($this->onTrial() && !$this->hasActiveSubscription()) {
+        if ($this->onTrial() && ! $this->hasActiveSubscription()) {
             return 'trial';
         }
 
         $subscription = $this->subscription('default');
 
-        if (!$subscription || !$subscription->active()) {
+        if (! $subscription || ! $subscription->active()) {
             return null;
         }
 
@@ -348,7 +339,7 @@ class Tenant extends Model
     {
         $planCode = $this->getCurrentPlanCode();
 
-        if (!$planCode) {
+        if (! $planCode) {
             return null;
         }
 
@@ -372,7 +363,7 @@ class Tenant extends Model
      */
     public function gracePeriodDaysRemaining(): int
     {
-        if (!$this->grace_period_ends_at || $this->grace_period_ends_at->isPast()) {
+        if (! $this->grace_period_ends_at || $this->grace_period_ends_at->isPast()) {
             return 0;
         }
 
@@ -466,7 +457,7 @@ class Tenant extends Model
     {
         $plan = $this->getCurrentPlan();
 
-        if (!$plan) {
+        if (! $plan) {
             return 0;
         }
 
@@ -498,7 +489,6 @@ class Tenant extends Model
      * - users: Total users
      * - customers: Total customers
      * - orders_per_month: Orders created this month
-     * - categories: Total categories
      * - services: Total services
      * - api_calls_per_day: API calls today (from cache)
      */
@@ -510,7 +500,6 @@ class Tenant extends Model
             'customers' => $this->customers()->count(),
             'orders_per_month' => $this->getMonthlyOrderCount(),
             'orders_per_day' => $this->getDailyOrderCount(),
-            'categories' => $this->categories()->count(),
             'services' => $this->services()->count(),
             'payments' => $this->payments()->count(),
             'roles' => $this->roles()->count(),
@@ -547,7 +536,8 @@ class Tenant extends Model
      */
     protected function getDailyApiCallCount(): int
     {
-        $cacheKey = "tenant:{$this->id}:api_calls:" . now()->toDateString();
+        $cacheKey = "tenant:{$this->id}:api_calls:".now()->toDateString();
+
         return (int) cache()->get($cacheKey, 0);
     }
 
@@ -556,7 +546,7 @@ class Tenant extends Model
      */
     public function incrementApiCallCount(): void
     {
-        $cacheKey = "tenant:{$this->id}:api_calls:" . now()->toDateString();
+        $cacheKey = "tenant:{$this->id}:api_calls:".now()->toDateString();
         $ttl = now()->endOfDay()->diffInSeconds(now());
         cache()->increment($cacheKey, 1);
         cache()->put($cacheKey, cache()->get($cacheKey, 1), $ttl);
@@ -608,6 +598,7 @@ class Tenant extends Model
         }
 
         $usage = $this->getResourceUsage($resource);
+
         return min(100, (int) round(($usage / $limit) * 100));
     }
 
@@ -618,7 +609,7 @@ class Tenant extends Model
     {
         $plan = $this->getCurrentPlan();
 
-        if (!$plan) {
+        if (! $plan) {
             return false;
         }
 

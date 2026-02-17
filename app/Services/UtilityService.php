@@ -3,11 +3,17 @@
 namespace App\Services;
 
 use cbagdawala\LaravelIdGenerator\IdGenerator;
+use Illuminate\Support\Facades\DB;
 
 class UtilityService
 {
     public static function generateCode($config)
     {
+        // IdGenerator uses information_schema which is not available in SQLite
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return self::generateCodeFallback($config);
+        }
+
         $c = [
             'table' => $config['table'],
             'field' => $config['field'] ?? null,
@@ -21,6 +27,27 @@ class UtilityService
         }
 
         return IdGenerator::generate($c);
+    }
+
+    protected static function generateCodeFallback(array $config): string
+    {
+        $table = $config['table'];
+        $field = $config['field'] ?? 'code';
+        $prefix = $config['prefix'] ?? '';
+        $length = $config['length'] ?? 10;
+
+        $last = DB::table($table)
+            ->where($field, 'like', $prefix.'%')
+            ->orderByDesc($field)
+            ->value($field);
+
+        if ($last) {
+            $number = (int) str_replace($prefix, '', $last) + 1;
+        } else {
+            $number = 1;
+        }
+
+        return $prefix.str_pad((string) $number, $length - strlen($prefix), '0', STR_PAD_LEFT);
     }
 
     public static function dsRound($value, $decimal = null)

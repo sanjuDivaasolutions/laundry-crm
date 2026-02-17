@@ -25,13 +25,15 @@ use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Company extends Model implements HasMedia
 {
-    use BelongsToTenant, HasAdvancedFilter, HasFactory, InteractsWithMedia, Searchable;
+    use BelongsToTenant, HasAdvancedFilter, HasFactory, InteractsWithMedia, LogsActivity, Searchable;
 
     protected $appends = [
         'image',
@@ -134,5 +136,14 @@ class Company extends Model implements HasMedia
         }
 
         return 'data:'.$media->mime_type.';base64,'.base64_encode($fileContent);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'code', 'address_1', 'active'])
+            ->logOnlyDirty()
+            ->useLogName('company')
+            ->setDescriptionForEvent(fn (string $eventName): string => "Company {$this->name} was {$eventName}");
     }
 }

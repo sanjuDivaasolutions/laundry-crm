@@ -20,7 +20,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Currency;
@@ -173,15 +172,6 @@ class SearchApiController extends Controller
                     'scopes' => ['active'],
                 ];
 
-            case 'categories':
-                return [
-                    'class' => Category::class,
-                    'field' => 'name',
-                    'idValue' => 'id',
-                    'labelValue' => 'name',
-                    'scopes' => ['active'],
-                ];
-
             case 'services':
                 return [
                     'class' => Service::class,
@@ -259,11 +249,6 @@ class SearchApiController extends Controller
     public function items()
     {
         return Item::active()->ordered()->get(['id', 'name', 'code', 'price']);
-    }
-
-    public function categories()
-    {
-        return Category::active()->ordered()->get(['id', 'name']);
     }
 
     public function services()

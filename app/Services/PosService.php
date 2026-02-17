@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\OrderStatusTypeEnum;
 use App\Enums\PaymentStatusEnum;
+use App\Enums\ProcessingStatusEnum;
 use App\Models\Customer;
 use App\Models\Item;
 use App\Models\Order;
@@ -15,6 +16,8 @@ use App\Models\Payment;
 use App\Models\ProcessingStatus;
 use App\Models\Service;
 use App\Models\ServicePrice;
+use App\Models\User;
+use App\Notifications\OrderStatusNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -26,7 +29,8 @@ use Illuminate\Support\Facades\DB;
 class PosService
 {
     public function __construct(
-        protected TenantService $tenantService
+        protected TenantService $tenantService,
+        protected LoyaltyService $loyaltyService
     ) {}
 
     /**
@@ -225,7 +229,12 @@ class PosService
             'changed_at' => now(),
         ]);
 
-        return $order->fresh(['customer', 'orderItems', 'processingStatus']);
+        $freshOrder = $order->fresh(['customer', 'orderItems', 'processingStatus']);
+
+        // Send notification to order creator
+        $this->dispatchStatusNotification($freshOrder, $newStatusId);
+
+        return $freshOrder;
     }
 
     /**
@@ -268,7 +277,7 @@ class PosService
                 'payment_status' => $paymentStatus,
             ]);
 
-            // If fully paid, mark as delivered
+            // If fully paid, mark as delivered and award loyalty points
             if ($paymentStatus === PaymentStatusEnum::Paid) {
                 $this->updateOrderStatus($order, 6); // Delivered
                 $order->update([
@@ -276,6 +285,8 @@ class PosService
                     'closed_at' => now(),
                     'order_status_id' => 2, // Closed
                 ]);
+
+                $this->loyaltyService->awardPointsForOrder($order);
             }
 
             return [
@@ -385,5 +396,26 @@ class PosService
         $sequence = $lastPayment ? ((int) substr($lastPayment->payment_number, -4)) + 1 : 1;
 
         return sprintf('%s%s%04d', $prefix, $date, $sequence);
+    }
+
+    /**
+     * Dispatch notification when order status changes.
+     */
+    protected function dispatchStatusNotification(Order $order, int $newStatusId): void
+    {
+        $newStatus = ProcessingStatus::find($newStatusId);
+        $statusName = $newStatus?->status_name ?? 'Unknown';
+
+        $statusType = match ($statusName) {
+            ProcessingStatusEnum::Ready->value => 'ready',
+            ProcessingStatusEnum::Delivered->value => 'completed',
+            default => 'processing',
+        };
+
+        // Notify the order creator (staff member)
+        $creator = User::find($order->created_by_employee_id);
+        if ($creator) {
+            $creator->notify(new OrderStatusNotification($order, $statusType, $statusName));
+        }
     }
 }

@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
-import defaultIndexState from "./categoriesIndexData";
+import defaultIndexState from "./deliveriesIndexData";
 import { performRemoveItem } from "@common@/components/moduleHelper";
 
 export const useModuleIndexStore = defineStore({
-    id: "categories-index-store",
+    id: "deliveries-index-store",
     state: () => {
         return defaultIndexState;
     },

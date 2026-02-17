@@ -27,16 +27,16 @@ class QuotaService
     /**
      * Check if tenant can create more of a resource.
      *
-     * @param string $resource Resource type (items, users, etc.)
-     * @param int $amount Amount to add (default 1)
-     * @param Tenant|null $tenant Specific tenant or current context
+     * @param  string  $resource  Resource type (items, users, etc.)
+     * @param  int  $amount  Amount to add (default 1)
+     * @param  Tenant|null  $tenant  Specific tenant or current context
      * @return bool True if allowed, false if would exceed limit
      */
     public function canCreate(string $resource, int $amount = 1, ?Tenant $tenant = null): bool
     {
         $tenant = $tenant ?? $this->tenantService->getTenant();
 
-        if (!$tenant) {
+        if (! $tenant) {
             return true; // No tenant context, allow (handled elsewhere)
         }
 
@@ -55,8 +55,8 @@ class QuotaService
     /**
      * Check multiple resources at once.
      *
-     * @param array $resources Array of [resource => amount] pairs
-     * @param Tenant|null $tenant Specific tenant or current context
+     * @param  array  $resources  Array of [resource => amount] pairs
+     * @param  Tenant|null  $tenant  Specific tenant or current context
      * @return array Array of resource => bool (true if allowed)
      */
     public function canCreateMultiple(array $resources, ?Tenant $tenant = null): array
@@ -102,7 +102,7 @@ class QuotaService
     {
         $tenant = $tenant ?? $this->tenantService->getTenant();
 
-        if (!$tenant) {
+        if (! $tenant) {
             return [
                 'available' => true,
                 'usage' => 0,
@@ -119,7 +119,7 @@ class QuotaService
         $available = $limit === -1 || $usage < $limit;
         $message = null;
 
-        if (!$available) {
+        if (! $available) {
             $message = "You've reached your {$resource} limit of {$limit}.";
         } elseif ($percentage >= 90) {
             $remaining = $limit - $usage;
@@ -142,7 +142,7 @@ class QuotaService
     {
         $tenant = $tenant ?? $this->tenantService->getTenant();
 
-        if (!$tenant) {
+        if (! $tenant) {
             return [];
         }
 
@@ -164,7 +164,7 @@ class QuotaService
     {
         $tenant = $tenant ?? $this->tenantService->getTenant();
 
-        if (!$tenant) {
+        if (! $tenant) {
             return false;
         }
 
@@ -203,7 +203,6 @@ class QuotaService
             \App\Models\User::class => 'users',
             \App\Models\Customer::class => 'customers',
             \App\Models\Order::class => 'orders_per_month',
-            \App\Models\Category::class => 'categories',
             \App\Models\Service::class => 'services',
             \App\Models\Payment::class => 'payments',
             \App\Models\Role::class => 'roles',

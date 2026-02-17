@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **Mega Sign Rental ERP 2024**, a Laravel 9 application with Vue 3 frontend for managing sign rental business operations. Built by Divaa Solutions, it includes comprehensive modules for inventory management, sales, purchases, quotations, contracts, and reporting.
+This is **Laundry CRM**, a multi-tenant SaaS application built with Laravel 11 and Vue 3 for managing laundry business operations. Built by Divaa Solutions, it features a POS Kanban board for real-time order tracking, customer management, delivery scheduling, loyalty rewards, and comprehensive business reporting.
 
 ## Development Commands
 
@@ -14,9 +14,10 @@ This is **Mega Sign Rental ERP 2024**, a Laravel 9 application with Vue 3 fronte
 - `php artisan db:seed` - Seed database
 - `php artisan optimize:clear` - Clear all cached files
 - `php artisan storage:link` - Create storage symlink
-- `php artisan queue:work` - Process queued jobs
+- `php artisan queue:work` - Process queued jobs (required for notifications)
 - `composer install` - Install PHP dependencies
 - `composer dump-autoload` - Regenerate autoload files
+- `vendor/bin/pint --dirty` - Format changed PHP files
 
 ### Frontend (Vue/Vite)
 - `npm run dev` - Start Vite development server with HMR
@@ -24,132 +25,142 @@ This is **Mega Sign Rental ERP 2024**, a Laravel 9 application with Vue 3 fronte
 - `npm install` - Install Node dependencies
 
 ### Testing
-- `php artisan test` - Run PHPUnit tests (if configured)
-- Tests are located in `tests/` directory
+- `php artisan test --compact` - Run all Pest tests
+- `php artisan test --compact --filter=testName` - Run specific test
+- Tests are located in `tests/Feature` and `tests/Unit` directories
 
 ## Architecture Overview
 
 ### Backend Structure
-- **Laravel 9** with custom multi-tenant architecture using company scoping
+- **Laravel 11** with `BelongsToTenant` trait for 8-layer tenant isolation
 - **JWT Authentication** via php-open-source-saver/jwt-auth
 - **Advanced Filtering System** using custom `HasAdvancedFilter` trait
-- **Service Layer Pattern** - Core business logic in `app/Services/`
-- **Resource Pattern** - API responses via `app/Http/Resources/`
-- **Scope-based Multi-tenancy** - Department and Buyer scopes for data isolation
-- **Custom Form Requests** - Validation in `app/Http/Requests/`
+- **Service Layer Pattern** - Business logic in `app/Services/` (PosService, ReportService, LoyaltyService, StripeService, TenantService)
+- **Resource Pattern** - API responses via `app/Http/Resources/Admin/` (Resource for listing, EditResource for forms)
+- **Tenant-scoped Multi-tenancy** - `BelongsToTenant` trait auto-scopes all queries to current tenant
+- **Custom Form Requests** - Gate-based authorization + validation in `app/Http/Requests/`
+- **Permission system** - Dynamic permissions via `PermissionDataService` using `{module}_{action}` pattern
 
 ### Frontend Structure
 - **Vue 3** with Composition API and TypeScript support
 - **Metronic Theme** - Located in `resources/metronic/`
 - **Modular Architecture** - Feature modules in `resources/modules/`
-- **Pinia State Management** - Each module has its own store
+- **Pinia State Management** - Dual-store pattern (IndexStore + FormStore per module)
 - **Vue Router** with nested routes for CRUD operations
+- **Configuration-driven UI** - Forms and datatables defined via JS data objects
 - **Vite Build System** with path aliases:
-  - `@` → `/resources/metronic`
-  - `@modules@` → `/resources/modules`
-  - `@common@` → `/resources/modules/common`
-  - `@utility@` → `/resources/utility`
+  - `@` -> `/resources/metronic`
+  - `@modules@` -> `/resources/modules`
+  - `@common@` -> `/resources/modules/common`
+  - `@utility@` -> `/resources/utility`
 
 ### Key Design Patterns
-- **Module Pattern** - Each business entity (products, buyers, suppliers, etc.) has its own module with:
-  - Index.vue (listing)
-  - Create.vue/Edit.vue (forms)
-  - Show.vue (detail view)
-  - FormData.js (form configuration)
-  - FormStore.js (form state management)
-  - IndexData.js (listing configuration)
-  - IndexStore.js (listing state management)
+- **Module Pattern** - Each business entity has its own module with:
+  - Index.vue (listing), Create.vue/Edit.vue (forms), Show.vue (detail view)
+  - FormData.js (form configuration), FormStore.js (form state)
+  - IndexData.js (listing configuration), IndexStore.js (listing state)
   - Module.js (route definitions)
 
 ### Database Architecture
-- **Multi-company setup** with company_id scoping
-- **Comprehensive inventory tracking** with warehouses, shelves, and batch management
-- **Advanced taxation system** supporting multiple tax classes and rates
-- **Audit trail** through activity logging
-- **Soft deletes** on most entities
+- **Multi-tenant** with `tenant_id` on all business tables + `BelongsToTenant` trait
+- **Tenant-scoped unique constraints** for order_number, payment_number, customer_code
+- **Soft deletes** on orders, customers, items, services, order_items, delivery_schedules
+- **Processing status workflow**: Pending -> Washing -> Drying -> Ready Area -> Delivered (or Cancelled)
+- **Order status**: Open -> Closed
+- **Payment status enum**: unpaid, partial, paid
 
 ## Business Modules
 
-### Core Entities
-- **Products/Services** - Inventory items with batch tracking, shelving, and pricing
-- **Buyers/Suppliers** - Customer and vendor management with contact addresses
-- **Purchase Orders/Invoices** - Procurement workflow
-- **Sales Orders/Invoices** - Sales workflow with contract integration
-- **Quotations** - Estimate management with approval workflow
-- **Inwards** - Goods receipt and inventory updates
-- **Contracts** - Subscription-based agreements with Stripe integration
-- **Inventory Adjustments** - Stock corrections and write-offs
-- **Expenses** - Cost tracking with categorization
-- **Reports** - Sales, profit/loss, and stock reports
+### Core Laundry Operations
+- **POS Kanban Board** - 5-column real-time order management (Pending/Washing/Drying/Ready/Delivered)
+- **Orders** - Full CRUD with line items, discount/tax calculation, status tracking
+- **Order Items** - Garment tracking with item, service, quantity, color, brand, defect notes
+- **Customers** - Management with loyalty points, tier system, order history
+- **Payments** - Cash, card, UPI payment processing with auto-status updates
+- **Items** - Master catalog of laundry items (Shirt, Pants, Suit, etc.)
+- **Services** - Laundry services (Wash & Iron, Dry Clean, Iron Only, etc.)
+- **Service Prices** - Item x Service price matrix
+- **Categories** - Item categorization
 
 ### Supporting Systems
-- **Multi-language** support with dynamic translations
-- **Permission-based access control** with roles and abilities
-- **Media management** via Spatie Media Library
-- **Email notifications** with queue processing
-- **PDF generation** for invoices, orders, and reports
-- **Excel import/export** functionality
-- **Newsletter management** with subscriber tracking
+- **Delivery Scheduling** - Pickup and delivery scheduling with status tracking
+- **Customer Loyalty** - Points system with Bronze/Silver/Gold/Platinum tiers
+- **Reports** - Daily/weekly/monthly analytics, revenue trends, top services/customers
+- **Notifications** - Email notifications for order status changes (queued via ShouldQueue)
+- **Billing** - Stripe subscription management (Starter/Professional/Enterprise plans)
+- **Announcements** - Tenant-scoped user announcements with dismiss support
+- **Multi-language** support with dynamic translations (`lang/en/cruds.php`, `lang/en/custom-cruds.php`)
+- **Permission-based access control** - `{module}_{action}` pattern (order_create, customer_edit, etc.)
 
 ## Key Services
 
-- **ReportService** - Business intelligence and analytics
-- **InventoryService** - Stock management and tracking
-- **InvoiceService** - Invoice processing and tax calculations
-- **AuthService** - Authentication and user management
-- **StripeService** - Payment processing and subscriptions
-- **CompanyService** - Multi-tenant company management
-- **LanguageService** - Internationalization support
+- **PosService** - POS Kanban board operations, quick order creation, payment processing
+- **ReportService** - Daily/weekly/monthly summaries, revenue trends, top services/customers
+- **LoyaltyService** - Points earning, redemption, tier management
+- **TenantService** - Tenant resolution and context management
+- **StripeService** - Subscription billing, payment methods, invoices
+- **LanguageService** - Internationalization and translation management
+- **UtilityService** - Code generation (ORD-, CUST-, SVC- prefixes)
+
+## API Routes Structure
+
+All authenticated routes under `/api/v1/` with `jwt.admin.verify` middleware:
+- `orders` - Full resource CRUD
+- `customers` - Full resource CRUD
+- `services` / `items` - Full resource CRUD
+- `pos/*` - POS board, quick orders, status updates, payments
+- `reports/*` - daily, weekly, monthly, revenue-trend, top-services, top-customers
+- `deliveries/*` - Scheduling CRUD with today's view
 
 ## Configuration Notes
 
-- **Multi-tenancy** configured via `DepartmentScope` and `BuyerScope`
-- **Default currency** and system settings in `config/system.php`
+- **Multi-tenancy** configured via `BelongsToTenant` trait + `identify.tenant` middleware
+- **CORS** configured via `config/cors.php` (use `CORS_ALLOWED_ORIGINS` env variable)
 - **JWT configuration** in `config/jwt.php`
-- **Media library** settings in `config/media.php`
-- **Custom date scopes** for filtering via `config/date-scopes.php`
+- **Stripe plans** in database via PlanController
+- **Login rate limiting** - 5 attempts per minute
 
 ## Development Guidelines
 
 ### When Working with Models
-- Always check for existing scopes (Department, Buyer, Company)
+- Always use the `BelongsToTenant` trait for tenant-scoped models
 - Use the `HasAdvancedFilter` trait for listing pages
-- Implement proper relationships and eager loading
+- Define `$orderable`, `$filterable`, `$searchable` arrays for the filter system
 - Follow the existing naming conventions for attributes and methods
 
 ### When Working with Controllers
-- Extend base API controllers for consistency
-- Use Form Requests for validation
-- Implement proper authorization via Gates
+- Extend base `Controller` class for `$this->success()` and `$this->error()` helpers
+- Use Form Requests with `CustomFormRequest` trait for validation
+- Use `Gate::denies()` via `abort_if()` for authorization
 - Return Resource collections for API responses
-- Use the SearchFilters trait for filtering
+- Use ControllerRequest, ExportRequest, SearchFilters traits for listing controllers
 
-### When Working with Frontend
-- Follow the existing module structure
-- Use the common components from `@common@`
-- Implement proper error handling and loading states
-- Use Pinia stores for state management
-- Follow TypeScript conventions where applicable
+### When Working with Permissions
+- Permissions are defined in `app/Services/PermissionDataService.php`
+- Pattern: `{module}_{action}` where action is create/edit/show/delete/access
+- Run `php artisan db:seed --class=PermissionsTableSeeder` after adding new permissions
+- Then run `php artisan db:seed --class=PermissionRoleTableSeeder` to assign to roles
 
 ### When Working with Database
-- All migrations should include proper foreign key constraints
-- Use the existing migration naming pattern
-- Consider multi-tenancy implications
+- All business tables must include `tenant_id` with cascading delete
+- Unique constraints should be tenant-scoped: `unique(['tenant_id', 'field_name'])`
+- Use soft deletes on entities that could be referenced by other records
 - Add indexes for frequently queried columns
 
-## Import/Export Templates
-Available in `import-templates/`:
-- Products template (v3)
-- Purchase invoices template (v1)
-- Sales invoices template (v1)
-- Bank transaction template (v1)
-- Petty cash template (v4)
+## Seeding Order
+
+Run `php artisan db:seed` which executes in this order:
+1. TenantsTableSeeder -> PermissionGroupsTableSeeder -> PermissionsTableSeeder
+2. LanguageTableSeeder -> LanguageTermGroupTableSeeder -> LanguageTermTableSeeder -> LanguageTranslationTableSeeder
+3. RolesTableSeeder -> PermissionRoleTableSeeder -> UsersTableSeeder
+4. CurrenciesTableSeeder -> RoleUserTableSeeder
+5. ProcessingStatusSeeder -> OrderStatusSeeder -> CategorySeeder -> ServiceSeeder -> ItemSeeder
+6. CustomerSeeder -> OrderSeeder
 
 ## Deployment
-- Uses `deploy.sh` for deployment automation
-- Clockwork profiler available for debugging (remove in production)
-- Media files stored in `public/storage` (ensure proper permissions)
-- Queue processing required for email functionality
+- Queue processing required for email notifications (`php artisan queue:work`)
+- Set `CORS_ALLOWED_ORIGINS` environment variable for production
+- Media files stored in `public/storage` (ensure `php artisan storage:link`)
 
 ===
 

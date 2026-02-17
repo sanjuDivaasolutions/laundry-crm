@@ -29,6 +29,12 @@ class AnnouncementController extends Controller
         $tenant = $this->tenantService->getTenant();
         $user = $request->user();
 
+        if (! $tenant || ! $user) {
+            return $this->success(['announcements' => []]);
+        }
+
+        $announcements = Announcement::getForTenantUser($tenant, $user);
+
         return $this->success([
             'announcements' => $announcements->map(fn ($a) => [
                 'id' => $a->id,

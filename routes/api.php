@@ -17,7 +17,6 @@
  *
  */
 
-use App\Services\LanguageService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -40,45 +39,15 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     Route::get('locales/messages', 'LocalesController@messages')->name('locales.messages');
 
     // Login with tenant context resolution (identify.tenant middleware sets tenant from subdomain)
-    Route::post('login', 'Auth\LoginController')->middleware('identify.tenant');
+    Route::post('login', 'Auth\LoginController')->middleware(['identify.tenant', 'throttle:5,1']);
 
     // Password Reset Routes
     Route::post('forgot_password', 'UsersApiController@passwordResetRequest')->name('password.email');
     Route::post('reset_password', 'Auth\ResetPasswordController@reset')->name('password.update');
 
-    // Storage:link
-    Route::get('storage-link', function () {
-        \Illuminate\Support\Facades\Artisan::call('storage:link');
-
-        return response()->json(['message' => 'Storage link created successfully.']);
-    });
-
-    // Optimize
-    Route::get('optimize', function () {
-        Artisan::call('optimize:clear');
-
-        return response()->json(['message' => 'Optimize cleared successfully.']);
-    });
-
-    // Reinstall Permissions
-    Route::get('reinstall-permissions', function () {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('permission_role')->truncate();
-        DB::table('permissions')->truncate();
-        DB::table('permission_groups')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-        Artisan::call('db:seed', ['--class' => 'PermissionGroupsTableSeeder']);
-        Artisan::call('db:seed', ['--class' => 'PermissionsTableSeeder']);
-        Artisan::call('db:seed', ['--class' => 'PermissionRoleTableSeeder']);
-        response()->json(['message' => 'Permissions reinstalled successfully.']);
-    });
-
-    Route::get('update-language-terms', function () {
-        // Assuming LanguageService is kept or specific parts moved
-        \App\Services\LanguageService::updateLanguageData();
-
-        return response()->json(['message' => 'Language terms updated successfully.']);
-    });
+    // Admin utility routes - should only be used via CLI or protected environment
+    // These are intentionally removed from public API access for security.
+    // Use `php artisan storage:link`, `php artisan optimize:clear`, and `php artisan db:seed` instead.
 
     // Test route
     Route::get('test', function () {
@@ -191,6 +160,48 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     // Services
     Route::resource('services', 'ServiceApiController');
     Route::get('services-csv', 'ServiceApiController@getCsv');
+
+    // Delivery Scheduling
+    Route::prefix('deliveries')->name('deliveries.')->group(function () {
+        Route::get('today', 'DeliveryScheduleApiController@today')->name('today');
+        Route::get('/', 'DeliveryScheduleApiController@index')->name('index');
+        Route::get('{delivery}/edit', 'DeliveryScheduleApiController@edit')->name('edit');
+        Route::post('/', 'DeliveryScheduleApiController@store')->name('store');
+        Route::put('{delivery}', 'DeliveryScheduleApiController@update')->name('update');
+        Route::delete('{delivery}', 'DeliveryScheduleApiController@destroy')->name('destroy');
+    });
+
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('daily', 'ReportApiController@daily')->name('daily');
+        Route::get('weekly', 'ReportApiController@weekly')->name('weekly');
+        Route::get('monthly', 'ReportApiController@monthly')->name('monthly');
+        Route::get('revenue-trend', 'ReportApiController@revenueTrend')->name('revenue-trend');
+        Route::get('top-services', 'ReportApiController@topServices')->name('top-services');
+        Route::get('top-customers', 'ReportApiController@topCustomers')->name('top-customers');
+        Route::get('payment-methods', 'ReportApiController@paymentMethods')->name('payment-methods');
+        Route::get('status-distribution', 'ReportApiController@statusDistribution')->name('status-distribution');
+    });
+
+    // Exports (Excel/PDF - all queued)
+    Route::prefix('exports')->name('exports.')->group(function () {
+        Route::post('{module}/{format}', 'ExportApiController@export')->name('queue');
+        Route::get('download/{filename}', 'ExportApiController@download')->name('download-file');
+    });
+
+    // Notifications
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', 'NotificationApiController@index')->name('index');
+        Route::get('unread-count', 'NotificationApiController@unreadCount')->name('unread-count');
+        Route::post('{id}/read', 'NotificationApiController@markAsRead')->name('read');
+        Route::post('read-all', 'NotificationApiController@markAllAsRead')->name('read-all');
+    });
+
+    // Activity Logs
+    Route::prefix('activity-logs')->name('activity-logs.')->group(function () {
+        Route::get('/', 'ActivityLogApiController@index')->name('index');
+        Route::get('{id}', 'ActivityLogApiController@show')->name('show');
+    });
 
     // POS Board
     Route::prefix('pos')->name('pos.')->group(function () {

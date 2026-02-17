@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
-import defaultFormState, { defaultEntry } from "./categoriesFormData";
+import defaultFormState, { defaultEntry } from "./deliveriesFormData";
 import { getEditData, getShowData } from "@common@/components/moduleHelper";
 
 export const useModuleFormStore = defineStore({
-    id: "categories-form-store",
+    id: "deliveries-form-store",
     state: () => {
         return defaultFormState;
     },

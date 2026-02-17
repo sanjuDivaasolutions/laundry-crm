@@ -6,7 +6,6 @@ use App\Enums\WebhookStatus;
 use App\Models\StripeWebhookLog;
 use App\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 
 uses(RefreshDatabase::class);
 
@@ -24,7 +23,7 @@ beforeEach(function () {
 describe('SEC-002: Stripe Webhook Idempotency', function () {
 
     it('creates webhook log entry for new events', function () {
-        $eventId = 'evt_' . uniqid();
+        $eventId = 'evt_'.uniqid();
 
         StripeWebhookLog::create([
             'stripe_event_id' => $eventId,
@@ -52,7 +51,7 @@ describe('SEC-002: Stripe Webhook Idempotency', function () {
         ]);
 
         // Second insertion with same event ID should fail
-        expect(fn() => StripeWebhookLog::create([
+        expect(fn () => StripeWebhookLog::create([
             'stripe_event_id' => $eventId,
             'event_type' => 'invoice.paid',
             'status' => WebhookStatus::PENDING,
@@ -141,15 +140,15 @@ describe('SEC-002: Stripe Webhook Idempotency', function () {
             'stripe_event_id' => 'evt_old',
             'event_type' => 'test',
             'status' => WebhookStatus::PROCESSED,
-            'created_at' => now()->subDays(45),
         ]);
+        // Backdate using query builder to bypass fillable restriction
+        StripeWebhookLog::where('id', $old->id)->update(['created_at' => now()->subDays(45)]);
 
         // Create recent processed webhook
         StripeWebhookLog::create([
             'stripe_event_id' => 'evt_recent',
             'event_type' => 'test',
             'status' => WebhookStatus::PROCESSED,
-            'created_at' => now()->subDays(5),
         ]);
 
         $oldLogs = StripeWebhookLog::oldProcessed(30)->get();

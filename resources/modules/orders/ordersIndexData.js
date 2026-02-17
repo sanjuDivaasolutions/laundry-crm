@@ -10,21 +10,23 @@ const defaultIndexState = {
         singular: module.singular,
         plural: module.plural,
         showType: "link",
-        formType: "modal",
-        formClickAction: ``,
+        formType: "link",
         permission_prefix: `${module.snakeSlug}_`,
-        query: { sort: "order_number", order: "desc", limit: 50, s: "" },
+        query: { sort: "id", order: "desc", limit: 50, s: "" },
         saveState: true,
         tableRowClick: {
             enabled: false,
-            type: "link",
-            action: ``,
-            actionPayloadField: "id",
         },
     },
     listPageConfigs: {
-        hasActionButtons: false,
-        actionButtons: [],
+        hasActionButtons: true,
+        actionButtons: [
+            {
+                type: "link",
+                label: `Create ${module.singular}`,
+                action: { name: `${module.id}.create` },
+            },
+        ],
     },
     filters: [
         {
@@ -34,6 +36,31 @@ const defaultIndexState = {
             name: "s",
             field: "s",
             value: null,
+        },
+        {
+            type: "select",
+            label: "Payment Status",
+            name: "payment_status",
+            field: "payment_status",
+            value: null,
+            options: [
+                { label: "All", value: null },
+                { label: "Unpaid", value: "unpaid" },
+                { label: "Partial", value: "partial" },
+                { label: "Paid", value: "paid" },
+            ],
+        },
+        {
+            type: "select",
+            label: "Urgent",
+            name: "urgent",
+            field: "urgent",
+            value: null,
+            options: [
+                { label: "All", value: null },
+                { label: "Yes", value: 1 },
+                { label: "No", value: 0 },
+            ],
         },
     ],
     columns: [
@@ -49,6 +76,7 @@ const defaultIndexState = {
             field: "order_date",
             thComp: "TranslatedHeader",
             sortable: true,
+            colStyle: "width: 110px;",
         },
         {
             title: `customer.title_singular`,
@@ -63,12 +91,21 @@ const defaultIndexState = {
             tdComp: "DatatableCurrency",
             sortable: true,
             align: "right",
+            colStyle: "width: 120px;",
+        },
+        {
+            title: `Payment`,
+            field: "payment_status",
+            thComp: "TranslatedHeader",
+            sortable: true,
+            colStyle: "width: 100px;",
         },
         {
             title: `order.fields.order_status`,
             field: "order_status",
             thComp: "TranslatedHeader",
             sortable: true,
+            colStyle: "width: 120px;",
         },
         {
             title: "general.fields.actions",
@@ -77,7 +114,7 @@ const defaultIndexState = {
             tdComp: "DatatableActions",
             isActions: true,
             sortable: false,
-            colStyle: "width: 100px;",
+            colStyle: "width: 120px;",
         },
     ],
 };

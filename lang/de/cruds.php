@@ -296,24 +296,12 @@ return [
         'title' => 'Inventory',
         'title_singular' => 'Inventory',
     ],
-    'category' => [
-        'title' => 'Categories',
-        'title_singular' => 'Category',
-        'fields' => [
-            'id' => 'ID',
-            'name' => 'Name',
-            'active' => 'Active',
-            'created_at' => 'Created at',
-            'updated_at' => 'Updated at',
-        ],
-    ],
     'product' => [
         'title' => 'Products',
         'title_singular' => 'Product',
         'fields' => [
             'id' => 'ID',
             'code' => 'Code',
-            'category' => 'Category',
             'description' => 'Description',
             'supplier' => 'Supplier',
             'active' => 'Active',

@@ -21,17 +21,20 @@ namespace App\Models;
 
 use App\Notifications\ResetPasswordNotification;
 use App\Support\HasAdvancedFilter;
-use App\Traits\Searchable;
 use App\Traits\BelongsToTenant;
+use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\CausesActivity;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use BelongsToTenant, HasAdvancedFilter, HasFactory, Notifiable, Searchable;
+    use BelongsToTenant, CausesActivity, HasAdvancedFilter, HasFactory, LogsActivity, Notifiable, Searchable;
 
     /**
      * The table associated with the model.
@@ -178,5 +181,14 @@ class User extends Authenticatable implements JWTSubject
     public function canAccessCompany(int $companyId): bool
     {
         return $this->isAdmin() || $this->company_id === $companyId;
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email', 'active'])
+            ->logOnlyDirty()
+            ->useLogName('user')
+            ->setDescriptionForEvent(fn (string $eventName): string => "User {$this->name} was {$eventName}");
     }
 }

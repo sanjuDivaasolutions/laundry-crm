@@ -1,7 +1,7 @@
 /*
  *
  *  *  Copyright (c) 2025 Divaa Solutions. All rights reserved.
- *  *  Last modified: 05/02/25, 4:00 pm
+ *  *  Last modified: 05/02/25, 4:00 pm
  *
  */
 
@@ -134,6 +134,7 @@ const systemRoutes = [
                     breadcrumbs: ["Companies"],
                 },
             },
+            // Items
             {
                 path: "items",
                 name: "items.index",
@@ -172,6 +173,7 @@ const systemRoutes = [
                 name: "items.show",
                 redirect: to => ({ name: "items.edit", params: { id: to.params.id } }),
             },
+            // Services
             {
                 path: "services",
                 name: "services.index",
@@ -181,13 +183,38 @@ const systemRoutes = [
                     breadcrumbs: ["Services"],
                 },
             },
+            // Customers
             {
                 path: "customers",
                 name: "customers.index",
                 component: () => import("@modules@/customers/Index.vue"),
                 meta: {
                     pageTitle: "customer.title",
-                    breadcrumbs: ["customer.title"],
+                    breadcrumbs: ["Customers"],
+                },
+            },
+            {
+                path: "customers/create",
+                name: "customers.create",
+                component: () => import("@modules@/customers/Create.vue"),
+                meta: {
+                    pageTitle: "Create Customer",
+                    breadcrumbs: [
+                        { label: "Customers", route: "customers.index" },
+                        "Create",
+                    ],
+                },
+            },
+            {
+                path: "customers/edit/:id",
+                name: "customers.edit",
+                component: () => import("@modules@/customers/Edit.vue"),
+                meta: {
+                    pageTitle: "Edit Customer",
+                    breadcrumbs: [
+                        { label: "Customers", route: "customers.index" },
+                        "Edit",
+                    ],
                 },
             },
             {
@@ -197,18 +224,43 @@ const systemRoutes = [
                 meta: {
                     pageTitle: "customer.title",
                     breadcrumbs: [
-                        { label: "customer.title", route: "customers.index" },
-                        "general.fields.details",
+                        { label: "Customers", route: "customers.index" },
+                        "Details",
                     ],
                 },
             },
+            // Orders
             {
                 path: "orders",
                 name: "orders.index",
                 component: () => import("@modules@/orders/Index.vue"),
                 meta: {
                     pageTitle: "order.title",
-                    breadcrumbs: ["order.title"],
+                    breadcrumbs: ["Orders"],
+                },
+            },
+            {
+                path: "orders/create",
+                name: "orders.create",
+                component: () => import("@modules@/orders/Create.vue"),
+                meta: {
+                    pageTitle: "Create Order",
+                    breadcrumbs: [
+                        { label: "Orders", route: "orders.index" },
+                        "Create",
+                    ],
+                },
+            },
+            {
+                path: "orders/edit/:id",
+                name: "orders.edit",
+                component: () => import("@modules@/orders/Edit.vue"),
+                meta: {
+                    pageTitle: "Edit Order",
+                    breadcrumbs: [
+                        { label: "Orders", route: "orders.index" },
+                        "Edit",
+                    ],
                 },
             },
             {
@@ -218,9 +270,53 @@ const systemRoutes = [
                 meta: {
                     pageTitle: "order.title",
                     breadcrumbs: [
-                        { label: "order.title", route: "orders.index" },
-                        "general.fields.details",
+                        { label: "Orders", route: "orders.index" },
+                        "Details",
                     ],
+                },
+            },
+            // Deliveries
+            {
+                path: "deliveries",
+                name: "deliveries.index",
+                component: () => import("@modules@/deliveries/Index.vue"),
+                meta: {
+                    pageTitle: "Deliveries",
+                    breadcrumbs: ["Deliveries"],
+                },
+            },
+            {
+                path: "deliveries/create",
+                name: "deliveries.create",
+                component: () => import("@modules@/deliveries/Create.vue"),
+                meta: {
+                    pageTitle: "Schedule Delivery",
+                    breadcrumbs: [
+                        { label: "Deliveries", route: "deliveries.index" },
+                        "Schedule",
+                    ],
+                },
+            },
+            {
+                path: "deliveries/edit/:id",
+                name: "deliveries.edit",
+                component: () => import("@modules@/deliveries/Edit.vue"),
+                meta: {
+                    pageTitle: "Edit Delivery",
+                    breadcrumbs: [
+                        { label: "Deliveries", route: "deliveries.index" },
+                        "Edit",
+                    ],
+                },
+            },
+            // Reports
+            {
+                path: "reports",
+                name: "reports.index",
+                component: () => import("@modules@/reports/Index.vue"),
+                meta: {
+                    pageTitle: "Reports",
+                    breadcrumbs: ["Reports"],
                 },
             },
             // POS Board

@@ -33,6 +33,7 @@
         "picqer/php-barcode-generator": "^2.4",
         "predis/predis": "^2.2",
         "riskihajar/terbilang": "^2.0",
+        "spatie/laravel-activitylog": "^4.11",
         "spatie/laravel-medialibrary": "^11.0"
     },
     "require-dev": {

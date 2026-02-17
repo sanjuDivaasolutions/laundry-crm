@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
             RoleUserTableSeeder::class,
             ProcessingStatusSeeder::class,
             OrderStatusSeeder::class,
-            CategorySeeder::class,
             ServiceSeeder::class,
             ItemSeeder::class,
             CustomerSeeder::class,

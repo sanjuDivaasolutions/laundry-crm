@@ -8,10 +8,12 @@ use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Payment extends Model
 {
-    use BelongsToTenant, HasAdvancedFilter, HasFactory;
+    use BelongsToTenant, HasAdvancedFilter, HasFactory, LogsActivity;
 
     public $timestamps = false;
 
@@ -68,5 +70,14 @@ class Payment extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['payment_number', 'order_id', 'customer_id', 'amount', 'payment_method', 'transaction_reference'])
+            ->logOnlyDirty()
+            ->useLogName('payment')
+            ->setDescriptionForEvent(fn (string $eventName): string => "Payment {$this->payment_number} was {$eventName}");
     }
 }

@@ -2,9 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentStatusEnum;
-use App\Enums\ProcessingStatusEnum;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderStatus;
@@ -33,8 +31,12 @@ class OrderFactory extends Factory
             'paid_amount' => 0,
             'balance_amount' => 0,
             'payment_status' => PaymentStatusEnum::Unpaid,
-            'processing_status_id' => ProcessingStatus::where('status_name', ProcessingStatusEnum::Pending->value)->first()?->id ?? 1,
-            'order_status_id' => OrderStatus::where('status_name', OrderStatusEnum::Open->value)->first()?->id ?? 1,
+            'processing_status_id' => fn () => ProcessingStatus::where('status_name', 'Pending')->first()?->id
+                ?? ProcessingStatus::first()?->id
+                ?? ProcessingStatus::create(['status_name' => 'Pending', 'display_order' => 1, 'is_active' => true])->id,
+            'order_status_id' => fn () => OrderStatus::where('status_name', 'Open')->first()?->id
+                ?? OrderStatus::first()?->id
+                ?? OrderStatus::create(['status_name' => 'Open', 'display_order' => 1, 'is_active' => true])->id,
             'created_by_employee_id' => 1,
             'urgent' => false,
             'hanger_number' => null,
