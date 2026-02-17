@@ -32,6 +32,6 @@ class LanguageTermTableSeeder extends Seeder
                 }
             }
         }
-        LanguageTerm::insert($insert);
+        LanguageTerm::insertOrIgnore($insert);
     }
 }

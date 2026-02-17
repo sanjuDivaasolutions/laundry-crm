@@ -28,6 +28,6 @@ class CurrenciesTableSeeder extends Seeder
             // Add other default currencies if needed
         ];
 
-        Currency::insert($currencies);
+        Currency::insertOrIgnore($currencies);
     }
 }

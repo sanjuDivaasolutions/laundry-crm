@@ -12,18 +12,11 @@ class PermissionGroupsTableSeeder extends Seeder
     {
         $data = PermissionDataService::getGroupData();
 
-        $groups = [];
-        $count = 1;
         foreach ($data as $g) {
-            $groups[] = [
-                'id' => $count,
-                'name' => $g,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-            $count++;
+            PermissionGroup::firstOrCreate(
+                ['name' => $g],
+                ['created_at' => now(), 'updated_at' => now()]
+            );
         }
-
-        PermissionGroup::insert($groups);
     }
 }

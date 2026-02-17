@@ -41,7 +41,7 @@ class LanguageTranslationTableSeeder extends Seeder
             }
         }
 
-        Translation::insert($insert);
+        Translation::insertOrIgnore($insert);
     }
 
     private function loadTranslations($locale, $file)

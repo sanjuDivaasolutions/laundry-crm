@@ -32,6 +32,6 @@ class CurrencyTableSeeder extends Seeder
             ],
         ];
 
-        Currency::insert($data);
+        Currency::insertOrIgnore($data);
     }
 }

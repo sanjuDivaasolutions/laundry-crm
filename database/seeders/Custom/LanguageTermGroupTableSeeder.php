@@ -10,6 +10,6 @@ class LanguageTermGroupTableSeeder extends Seeder
 {
     public function run()
     {
-        LanguageTermGroup::insert(LanguageService::getGroups());
+        LanguageTermGroup::insertOrIgnore(LanguageService::getGroups());
     }
 }

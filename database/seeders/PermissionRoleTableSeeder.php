@@ -11,10 +11,19 @@ class PermissionRoleTableSeeder extends Seeder
     public function run()
     {
         $admin_permissions = Permission::all();
-        Role::findOrFail(1)->permissions()->sync($admin_permissions->pluck('id'));
-        $user_permissions = $admin_permissions->filter(function ($permission) {
-            return substr($permission->title, 0, 5) != 'user_' && substr($permission->title, 0, 5) != 'role_' && substr($permission->title, 0, 11) != 'permission_';
-        });
-        Role::findOrFail(2)->permissions()->sync($user_permissions);
+
+        $adminRole = Role::where('title', 'Admin')->where('tenant_id', 1)->first();
+        $userRole = Role::where('title', 'User')->where('tenant_id', 1)->first();
+
+        if ($adminRole) {
+            $adminRole->permissions()->sync($admin_permissions->pluck('id'));
+        }
+
+        if ($userRole) {
+            $user_permissions = $admin_permissions->filter(function ($permission) {
+                return substr($permission->title, 0, 5) != 'user_' && substr($permission->title, 0, 5) != 'role_' && substr($permission->title, 0, 11) != 'permission_';
+            });
+            $userRole->permissions()->sync($user_permissions);
+        }
     }
 }

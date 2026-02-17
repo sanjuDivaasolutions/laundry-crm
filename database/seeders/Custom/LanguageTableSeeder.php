@@ -27,6 +27,6 @@ class LanguageTableSeeder extends Seeder
                 'updated_at' => now(),
             ],
         ];
-        Language::insert($data);
+        Language::insertOrIgnore($data);
     }
 }
