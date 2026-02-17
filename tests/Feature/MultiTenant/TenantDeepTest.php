@@ -8,8 +8,6 @@ use App\Models\Customer;
 use App\Services\TenantService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use App\Models\TenantQuota;
-
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
@@ -88,64 +86,55 @@ describe('Deep Tenant Isolation', function () {
 });
 
 describe('Quota Enforcement', function () {
-    
+
     test('cannot exceed defined resource quota', function () {
-        $tenant = Tenant::factory()->create();
-        app(TenantService::class)->setTenant($tenant);
-        
-        // Set quota: Max 2 Items
-        $tenant->quotas()->create([
-            'quota_code' => 'items',
-            'limit' => 2,
-            'period' => 'monthly'
+        $tenant = Tenant::factory()->create([
+            'trial_ends_at' => now()->addDays(14),
         ]);
-        
-        // Create 2 items (Allowed)
-        Item::factory()->count(2)->create();
-        
-        // Check "canUse" or "trackUsage" logic if exposed, 
-        // or rely on the Middleware/Observer that enforces it.
-        // Assuming the `HasEntitlements` trait has a method to check this.
-        
-        expect($tenant->couldExceedQuota('items'))->toBeTrue();
-        
-        // Attempting to track usage for a 3rd item should fail
-        $allowed = $tenant->trackUsage('items');
-        expect($allowed)->toBeFalse();
+        app(TenantService::class)->setTenant($tenant);
+
+        // Set trial plan with a limit of 2 items
+        config(['tenancy.plans.trial.limits.items' => 2]);
+
+        // Create 2 items (at limit)
+        Item::factory()->count(2)->create(['tenant_id' => $tenant->id]);
+
+        expect($tenant->hasReachedLimit('items'))->toBeTrue();
+        expect($tenant->getResourceUsage('items'))->toBe(2);
+        expect($tenant->getResourceLimit('items'))->toBe(2);
     });
 
     test('unlimited quota allows infinite resources', function () {
-        $tenant = Tenant::factory()->create();
-        app(TenantService::class)->setTenant($tenant);
-        
-        // Set quota: -1 (Unlimited)
-        $tenant->quotas()->create([
-            'quota_code' => 'items',
-            'limit' => -1, // Unlimited
-            'period' => 'monthly'
+        $tenant = Tenant::factory()->create([
+            'trial_ends_at' => now()->addDays(14),
         ]);
-        
-        // Create 100 fake items usage
-        $result = $tenant->trackUsage('items', 100);
-        
-        expect($result)->toBeTrue();
-        expect($tenant->couldExceedQuota('items', 1000))->toBeFalse();
+        app(TenantService::class)->setTenant($tenant);
+
+        // Set trial plan with unlimited items
+        config(['tenancy.plans.trial.limits.items' => -1]);
+
+        // Create many items
+        Item::factory()->count(10)->create(['tenant_id' => $tenant->id]);
+
+        expect($tenant->hasReachedLimit('items'))->toBeFalse();
+        expect($tenant->getResourceUsage('items'))->toBe(10);
     });
 });
 
 describe('Lifecycle & Status', function () {
-    
-    test('inactive tenant cannot resolve context', function () {
+
+    test('inactive tenant cannot access platform', function () {
         $tenant = Tenant::factory()->create(['active' => false]);
-        
-        // Depending on how IdentifyTenant middleware works, 
-        // this test might need to be a Feature test hitting an endpoint.
-        
-        $response = $this->withHeaders(['X-Tenant-ID' => $tenant->id])
-                         ->getJson('/api/user'); 
-                         
-        // Assuming middleware blocks inactive tenants
-        $response->assertStatus(403); 
+
+        // Inactive tenant should be denied access
+        expect($tenant->canAccess())->toBeFalse();
+
+        // Active tenant with trial should be allowed
+        $activeTenant = Tenant::factory()->create([
+            'active' => true,
+            'trial_ends_at' => now()->addDays(14),
+        ]);
+        expect($activeTenant->canAccess())->toBeTrue();
     });
 
     test('trial expiration logic', function () {
