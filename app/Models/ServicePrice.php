@@ -17,11 +17,13 @@ class ServicePrice extends Model
         'item_id',
         'service_id',
         'price',
+        'price_per_pound',
         'is_active',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'price_per_pound' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 

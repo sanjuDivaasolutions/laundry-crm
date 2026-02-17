@@ -18,6 +18,9 @@ class OrderItem extends Model
         'service_id',
         'item_name',
         'service_name',
+        'pricing_type',
+        'weight',
+        'weight_unit',
         'quantity',
         'unit_price',
         'total_price',
@@ -56,6 +59,7 @@ class OrderItem extends Model
         'quantity' => 'integer',
         'unit_price' => 'decimal:2',
         'total_price' => 'decimal:2',
+        'weight' => 'decimal:2',
     ];
 
     public function order(): BelongsTo

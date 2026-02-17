@@ -94,13 +94,14 @@
                             <table class="table table-row-bordered align-middle gy-4">
                                 <thead>
                                     <tr class="fw-bold text-muted bg-light">
-                                        <th class="ps-4" style="width: 200px;">Item</th>
-                                        <th style="width: 200px;">Service</th>
-                                        <th style="width: 80px;">Qty</th>
-                                        <th style="width: 120px;">Unit Price</th>
-                                        <th style="width: 120px;">Total</th>
-                                        <th style="width: 120px;">Color</th>
-                                        <th style="width: 120px;">Brand</th>
+                                        <th class="ps-4" style="width: 180px;">Item</th>
+                                        <th style="width: 180px;">Service</th>
+                                        <th style="width: 90px;">Type</th>
+                                        <th style="width: 80px;">Qty/Weight</th>
+                                        <th style="width: 110px;">Unit Price</th>
+                                        <th style="width: 110px;">Total</th>
+                                        <th style="width: 100px;">Color</th>
+                                        <th style="width: 100px;">Brand</th>
                                         <th style="width: 60px;"></th>
                                     </tr>
                                 </thead>
@@ -115,17 +116,27 @@
                                         <td>
                                             <select v-model="item.service_id" class="form-select form-select-sm" @change="onServiceChange(index)">
                                                 <option :value="null">Select</option>
-                                                <option v-for="s in services" :key="s.id" :value="s.id">{{ s.name }}</option>
+                                                <option v-for="s in services" :key="s.id" :value="s.id">{{ s.name }}{{ s.pricing_type === 'weight' ? ' (lb)' : '' }}</option>
                                             </select>
                                         </td>
                                         <td>
-                                            <input v-model.number="item.quantity" type="number" min="1" class="form-control form-control-sm" />
+                                            <select v-model="item.pricing_type" class="form-select form-select-sm" @change="onPricingTypeChange(index)">
+                                                <option value="piece">Piece</option>
+                                                <option value="weight">Weight</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div v-if="item.pricing_type === 'weight'" class="input-group input-group-sm">
+                                                <input v-model.number="item.weight" type="number" step="0.1" min="0.1" class="form-control form-control-sm" placeholder="lbs" />
+                                                <span class="input-group-text">lb</span>
+                                            </div>
+                                            <input v-else v-model.number="item.quantity" type="number" min="1" class="form-control form-control-sm" />
                                         </td>
                                         <td>
                                             <input v-model.number="item.unit_price" type="number" step="0.01" min="0" class="form-control form-control-sm" />
                                         </td>
                                         <td class="fw-semibold text-end">
-                                            {{ formatAmount(item.quantity * item.unit_price) }}
+                                            {{ formatAmount(getItemTotal(item)) }}
                                         </td>
                                         <td>
                                             <input v-model="item.color" type="text" class="form-control form-control-sm" placeholder="Color" />
@@ -173,6 +184,10 @@
                         <input v-model.number="form.tax_rate" type="number" step="0.01" min="0" class="form-control" />
                     </div>
                     <div class="col-md-3 mb-5">
+                        <label class="form-label">Tip Amount</label>
+                        <input v-model.number="form.tip_amount" type="number" step="0.01" min="0" class="form-control" />
+                    </div>
+                    <div class="col-md-3 mb-5">
                         <div class="bg-light-primary rounded p-4 mt-7">
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Subtotal:</span>
@@ -185,6 +200,10 @@
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Tax:</span>
                                 <span class="fw-semibold">{{ formatAmount(taxValue) }}</span>
+                            </div>
+                            <div v-if="form.tip_amount > 0" class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Tip:</span>
+                                <span class="fw-semibold text-info">{{ formatAmount(form.tip_amount) }}</span>
                             </div>
                             <div class="separator my-2"></div>
                             <div class="d-flex justify-content-between">
@@ -231,15 +250,23 @@ const form = reactive({
     discount_type: "flat",
     discount_amount: 0,
     tax_rate: 0,
-    items: [{ item_id: null, service_id: null, quantity: 1, unit_price: 0, color: "", brand: "" }],
+    tip_amount: 0,
+    items: [{ item_id: null, service_id: null, pricing_type: "piece", quantity: 1, weight: null, unit_price: 0, color: "", brand: "" }],
 });
 
 const formatAmount = (val) => {
     return parseFloat(val || 0).toFixed(2);
 };
 
+const getItemTotal = (item) => {
+    if (item.pricing_type === 'weight') {
+        return (item.weight || 0) * (item.unit_price || 0);
+    }
+    return (item.quantity || 0) * (item.unit_price || 0);
+};
+
 const subtotal = computed(() => {
-    return form.items.reduce((sum, i) => sum + (i.quantity || 0) * (i.unit_price || 0), 0);
+    return form.items.reduce((sum, i) => sum + getItemTotal(i), 0);
 });
 
 const discountValue = computed(() => {
@@ -254,11 +281,21 @@ const taxValue = computed(() => {
 });
 
 const total = computed(() => {
-    return subtotal.value - discountValue.value + taxValue.value;
+    return subtotal.value - discountValue.value + taxValue.value + (form.tip_amount || 0);
 });
 
 const addItem = () => {
-    form.items.push({ item_id: null, service_id: null, quantity: 1, unit_price: 0, color: "", brand: "" });
+    form.items.push({ item_id: null, service_id: null, pricing_type: "piece", quantity: 1, weight: null, unit_price: 0, color: "", brand: "" });
+};
+
+const onPricingTypeChange = (index) => {
+    if (form.items[index].pricing_type === 'weight') {
+        form.items[index].weight = null;
+        form.items[index].quantity = 1;
+    } else {
+        form.items[index].weight = null;
+        form.items[index].quantity = 1;
+    }
 };
 
 const removeItem = (index) => {

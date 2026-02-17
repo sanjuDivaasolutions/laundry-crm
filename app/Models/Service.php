@@ -21,6 +21,9 @@ class Service extends Model
         'name',
         'code',
         'description',
+        'pricing_type',
+        'price_per_pound',
+        'minimum_weight',
         'display_order',
         'is_active',
     ];
@@ -51,6 +54,8 @@ class Service extends Model
     protected $casts = [
         'display_order' => 'integer',
         'is_active' => 'boolean',
+        'price_per_pound' => 'decimal:2',
+        'minimum_weight' => 'decimal:2',
     ];
 
     public function servicePrices(): HasMany

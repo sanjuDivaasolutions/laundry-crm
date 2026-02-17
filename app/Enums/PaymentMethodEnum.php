@@ -6,7 +6,8 @@ enum PaymentMethodEnum: string
 {
     case Cash = 'cash';
     case Card = 'card';
-    case Upi = 'upi';
+    case ApplePay = 'apple_pay';
+    case GooglePay = 'google_pay';
     case Other = 'other';
 
     public function getLabel(): string
@@ -14,7 +15,8 @@ enum PaymentMethodEnum: string
         return match ($this) {
             self::Cash => 'Cash',
             self::Card => 'Card',
-            self::Upi => 'UPI',
+            self::ApplePay => 'Apple Pay',
+            self::GooglePay => 'Google Pay',
             self::Other => 'Other',
         };
     }
@@ -24,7 +26,8 @@ enum PaymentMethodEnum: string
         return match ($this) {
             self::Cash => 'success',
             self::Card => 'info',
-            self::Upi => 'primary',
+            self::ApplePay => 'dark',
+            self::GooglePay => 'primary',
             self::Other => 'gray',
         };
     }
@@ -34,7 +37,8 @@ enum PaymentMethodEnum: string
         return match ($this) {
             self::Cash => 'heroicon-m-banknotes',
             self::Card => 'heroicon-m-credit-card',
-            self::Upi => 'heroicon-m-device-phone-mobile',
+            self::ApplePay => 'heroicon-m-device-phone-mobile',
+            self::GooglePay => 'heroicon-m-device-phone-mobile',
             self::Other => 'heroicon-m-ellipsis-horizontal-circle',
         };
     }

@@ -174,13 +174,13 @@
                                     @click="toggleItem(item)"
                                 >
                                     <i class="ki-duotone ki-plus fs-7 me-1" v-if="!isItemSelected(item.id)"></i>
-                                    <span class="fs-8">{{ item.name }} ({{ formatCurrency(getItemDisplayPrice(item)) }})</span>
+                                    <span class="fs-8">{{ item.name }} ({{ formatCurrency(getItemDisplayPrice(item)) }}{{ isWeightBasedService ? '/lb' : '' }})</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Selected Items with Quantity -->
+                    <!-- Selected Items with Quantity or Weight -->
                     <div v-if="newOrder.items.length > 0" class="mb-4">
                         <div class="d-flex flex-column gap-2">
                             <div
@@ -189,7 +189,28 @@
                                 class="d-flex align-items-center justify-content-between bg-light-primary rounded p-2"
                             >
                                 <span class="text-gray-800 fs-7 fw-semibold">{{ getItemName(orderItem.item_id) }}</span>
-                                <div class="d-flex align-items-center gap-2">
+                                <!-- Weight input for weight-based services -->
+                                <div v-if="isWeightBasedService" class="d-flex align-items-center gap-2">
+                                    <input
+                                        type="number"
+                                        class="form-control form-control-sm form-control-solid"
+                                        style="width: 70px;"
+                                        v-model.number="orderItem.weight"
+                                        step="0.1"
+                                        min="0.1"
+                                        placeholder="lbs"
+                                    />
+                                    <span class="text-muted fs-8">lb</span>
+                                    <button
+                                        class="btn btn-sm btn-icon btn-light-danger"
+                                        style="width: 28px; height: 28px;"
+                                        @click="newOrder.items.splice(index, 1)"
+                                    >
+                                        <i class="bi bi-x fs-4"></i>
+                                    </button>
+                                </div>
+                                <!-- Quantity stepper for piece-based services -->
+                                <div v-else class="d-flex align-items-center gap-2">
                                     <button
                                         class="btn btn-sm btn-icon btn-light-danger"
                                         style="width: 28px; height: 28px;"
@@ -451,14 +472,50 @@
                                     <span class="fs-8 text-gray-600">Discount</span>
                                     <span class="fs-8">-{{ formatCurrency(selectedOrderDetail.discount_amount) }}</span>
                                 </div>
+                                <div v-if="payment.tip > 0" class="d-flex justify-content-between mb-1">
+                                    <span class="fs-8 text-gray-600">Tip</span>
+                                    <span class="fs-8 text-info">+{{ formatCurrency(payment.tip) }}</span>
+                                </div>
                                 <div class="d-flex justify-content-between mb-1">
                                     <span class="fs-8 text-gray-600">Paid</span>
                                     <span class="fs-8 text-success">-{{ formatCurrency(selectedOrderDetail.paid_amount) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between border-top pt-2 mt-2">
                                     <span class="fs-7 fw-bold">Balance Due</span>
-                                    <span class="fs-6 fw-bold text-primary">{{ formatCurrency(selectedOrderDetail.balance_amount) }}</span>
+                                    <span class="fs-6 fw-bold text-primary">{{ formatCurrency(balanceWithTip) }}</span>
                                 </div>
+                            </div>
+
+                            <!-- Tip -->
+                            <div class="mb-3">
+                                <label class="form-label fs-8 text-gray-600 mb-1">Add Tip</label>
+                                <div class="d-flex gap-2 mb-2">
+                                    <button
+                                        v-for="pct in tipPresets"
+                                        :key="pct"
+                                        class="btn btn-sm flex-grow-1"
+                                        :class="selectedTipPreset === pct ? 'btn-info' : 'btn-light'"
+                                        @click="applyTipPreset(pct)"
+                                    >
+                                        {{ pct }}%
+                                    </button>
+                                    <button
+                                        class="btn btn-sm"
+                                        :class="selectedTipPreset === 'custom' ? 'btn-info' : 'btn-light'"
+                                        @click="selectedTipPreset = 'custom'"
+                                    >
+                                        Custom
+                                    </button>
+                                </div>
+                                <input
+                                    v-if="selectedTipPreset === 'custom'"
+                                    type="number"
+                                    class="form-control form-control-solid form-control-sm"
+                                    v-model.number="payment.tip"
+                                    step="0.01"
+                                    min="0"
+                                    placeholder="Enter tip amount"
+                                />
                             </div>
 
                             <!-- Payment Method -->
@@ -774,7 +831,10 @@ const selectedOrderDetail = ref(null);
 const payment = ref({
     method: "cash",
     amount: 0,
+    tip: 0,
 });
+const selectedTipPreset = ref(null);
+const tipPresets = [10, 15, 20];
 const searchQuery = ref("");
 const searchingCustomer = ref(false);
 const customerSuggestions = ref([]);
@@ -800,7 +860,8 @@ let historySearchTimeout = null;
 const paymentMethods = [
     { value: "cash", label: "Cash" },
     { value: "card", label: "Card" },
-    { value: "upi", label: "UPI" },
+    { value: "apple_pay", label: "Apple Pay" },
+    { value: "google_pay", label: "Google Pay" },
 ];
 
 // Computed
@@ -824,8 +885,20 @@ function getItemPrice(itemId) {
         const servicePrice = item.service_prices.find(
             (sp) => sp.service_id === parseInt(newOrder.value.service_id)
         );
-        if (servicePrice && servicePrice.price !== null) {
-            return parseFloat(servicePrice.price);
+        if (servicePrice) {
+            if (isWeightBasedService.value && servicePrice.price_per_pound !== null) {
+                return parseFloat(servicePrice.price_per_pound);
+            }
+            if (servicePrice.price !== null) {
+                return parseFloat(servicePrice.price);
+            }
+        }
+    }
+
+    if (isWeightBasedService.value) {
+        const service = services.value.find((s) => s.id === parseInt(newOrder.value.service_id));
+        if (service && service.price_per_pound) {
+            return parseFloat(service.price_per_pound);
         }
     }
 
@@ -839,8 +912,19 @@ function getItemDisplayPrice(item) {
         const servicePrice = item.service_prices.find(
             (sp) => sp.service_id === parseInt(newOrder.value.service_id)
         );
-        if (servicePrice && servicePrice.price !== null) {
-            return parseFloat(servicePrice.price);
+        if (servicePrice) {
+            if (isWeightBasedService.value && servicePrice.price_per_pound !== null) {
+                return parseFloat(servicePrice.price_per_pound);
+            }
+            if (servicePrice.price !== null) {
+                return parseFloat(servicePrice.price);
+            }
+        }
+    }
+    if (isWeightBasedService.value) {
+        const service = services.value.find((s) => s.id === parseInt(newOrder.value.service_id));
+        if (service && service.price_per_pound) {
+            return parseFloat(service.price_per_pound);
         }
     }
     return parseFloat(item.price) || 0;
@@ -849,6 +933,9 @@ function getItemDisplayPrice(item) {
 const orderSubtotal = computed(() => {
     return newOrder.value.items.reduce((sum, orderItem) => {
         const price = getItemPrice(orderItem.item_id);
+        if (isWeightBasedService.value) {
+            return sum + price * (orderItem.weight || 0);
+        }
         return sum + price * orderItem.quantity;
     }, 0);
 });
@@ -856,6 +943,16 @@ const orderSubtotal = computed(() => {
 const selectedServiceName = computed(() => {
     const service = services.value.find((s) => s.id === newOrder.value.service_id);
     return service?.name || "-";
+});
+
+const isWeightBasedService = computed(() => {
+    const service = services.value.find((s) => s.id === parseInt(newOrder.value.service_id));
+    return service && (service.pricing_type === 'weight' || service.pricing_type === 'both');
+});
+
+const balanceWithTip = computed(() => {
+    if (!selectedOrderDetail.value) return 0;
+    return selectedOrderDetail.value.balance_amount + (payment.value.tip || 0) - (selectedOrderDetail.value.tip_amount || 0);
 });
 
 const canCreateOrder = computed(() => {
@@ -1030,10 +1127,18 @@ function isItemSelected(itemId) {
 function toggleItem(item) {
     const index = newOrder.value.items.findIndex((i) => i.item_id === item.id);
     if (index === -1) {
-        newOrder.value.items.push({ item_id: item.id, quantity: 1 });
+        newOrder.value.items.push({ item_id: item.id, quantity: 1, weight: null });
     } else {
         newOrder.value.items.splice(index, 1);
     }
+}
+
+function applyTipPreset(pct) {
+    if (!selectedOrderDetail.value) return;
+    selectedTipPreset.value = pct;
+    const subtotal = selectedOrderDetail.value.subtotal - selectedOrderDetail.value.discount_amount;
+    payment.value.tip = parseFloat((subtotal * pct / 100).toFixed(2));
+    payment.value.amount = balanceWithTip.value;
 }
 
 function getItemName(itemId) {
@@ -1057,11 +1162,18 @@ async function createOrder() {
 
     creatingOrder.value = true;
     try {
+        const orderItems = newOrder.value.items.map((item) => ({
+            item_id: item.item_id,
+            quantity: item.quantity,
+            weight: isWeightBasedService.value ? item.weight : undefined,
+            weight_unit: isWeightBasedService.value ? 'lb' : undefined,
+            notes: item.notes,
+        }));
         await posStore.createOrder({
             customer_name: newOrder.value.customer_name,
             customer_phone: newOrder.value.customer_phone,
             service_id: newOrder.value.service_id,
-            items: newOrder.value.items,
+            items: orderItems,
             urgent: newOrder.value.urgent,
             notes: newOrder.value.notes,
         });
@@ -1100,6 +1212,8 @@ async function selectOrderForPayment(orderId) {
     try {
         selectedOrderDetail.value = await posStore.fetchOrderDetail(orderId);
         payment.value.amount = selectedOrderDetail.value.balance_amount;
+        payment.value.tip = selectedOrderDetail.value.tip_amount || 0;
+        selectedTipPreset.value = null;
     } catch (error) {
         console.error("Failed to fetch order detail:", error);
     }
@@ -1118,10 +1232,12 @@ async function completePayment() {
         await posStore.processPayment(selectedOrderId.value, {
             amount: payment.value.amount,
             payment_method: payment.value.method,
+            tip_amount: payment.value.tip || 0,
         });
 
         selectedOrderDetail.value = null;
-        payment.value = { method: "cash", amount: 0 };
+        payment.value = { method: "cash", amount: 0, tip: 0 };
+        selectedTipPreset.value = null;
 
         $toastSuccess("Payment complete! Order delivered.");
     } catch (error) {
@@ -1144,7 +1260,8 @@ function getPaymentMethodBadge(method) {
     const badges = {
         cash: "badge-light-success",
         card: "badge-light-info",
-        upi: "badge-light-primary",
+        apple_pay: "badge-light-dark",
+        google_pay: "badge-light-primary",
         other: "badge-light-secondary",
     };
     return badges[method] || "badge-light";

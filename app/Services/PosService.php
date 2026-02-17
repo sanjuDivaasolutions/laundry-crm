@@ -63,7 +63,7 @@ class PosService
             'orders_by_status' => $ordersByStatus,
             'statistics' => $this->getStatistics(),
             'items' => $this->getItemsWithPrices(),
-            'services' => Service::where('is_active', true)->get(['id', 'name']),
+            'services' => Service::where('is_active', true)->get(['id', 'name', 'pricing_type', 'price_per_pound', 'minimum_weight']),
         ];
     }
 
@@ -114,6 +114,7 @@ class PosService
                         'service_id' => $sp->service_id,
                         'service_name' => $sp->service?->name,
                         'price' => $sp->price,
+                        'price_per_pound' => $sp->price_per_pound,
                     ]),
                 ];
             });
@@ -162,6 +163,7 @@ class PosService
 
             // Create order items
             $service = Service::find($data['service_id']);
+            $isWeightBased = in_array($service->pricing_type, ['weight', 'both']);
 
             foreach ($data['items'] as $itemData) {
                 $item = Item::find($itemData['item_id']);
@@ -171,8 +173,19 @@ class PosService
                     ->where('service_id', $data['service_id'])
                     ->first();
 
-                $unitPrice = $servicePrice?->price ?? $item->price;
-                $quantity = $itemData['quantity'];
+                $itemPricingType = ($isWeightBased && isset($itemData['weight'])) ? 'weight' : 'piece';
+
+                if ($itemPricingType === 'weight') {
+                    $unitPrice = $servicePrice?->price_per_pound ?? $service->price_per_pound ?? 0;
+                    $weight = (float) $itemData['weight'];
+                    $totalPrice = $unitPrice * $weight;
+                    $quantity = 1;
+                } else {
+                    $unitPrice = $servicePrice?->price ?? $item->price;
+                    $weight = null;
+                    $quantity = $itemData['quantity'];
+                    $totalPrice = $unitPrice * $quantity;
+                }
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -180,9 +193,12 @@ class PosService
                     'service_id' => $data['service_id'],
                     'item_name' => $item->name,
                     'service_name' => $service->name,
+                    'pricing_type' => $itemPricingType,
+                    'weight' => $weight,
+                    'weight_unit' => $itemData['weight_unit'] ?? 'lb',
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
-                    'total_price' => $unitPrice * $quantity,
+                    'total_price' => $totalPrice,
                     'notes' => $itemData['notes'] ?? null,
                 ]);
             }
@@ -245,6 +261,18 @@ class PosService
         return DB::transaction(function () use ($order, $paymentData) {
             $amount = (float) $paymentData['amount'];
 
+            // Handle tip amount if provided
+            $tipAmount = (float) ($paymentData['tip_amount'] ?? 0);
+            if ($tipAmount > 0) {
+                $newTotalAmount = (float) $order->total_amount + $tipAmount - (float) $order->tip_amount;
+                $order->update([
+                    'tip_amount' => $tipAmount,
+                    'total_amount' => $newTotalAmount,
+                    'balance_amount' => $newTotalAmount - (float) $order->paid_amount,
+                ]);
+                $order->refresh();
+            }
+
             // Create payment record
             $payment = Payment::create([
                 'tenant_id' => $order->tenant_id,
@@ -260,8 +288,8 @@ class PosService
             ]);
 
             // Update order payment
-            $newPaidAmount = $order->paid_amount + $amount;
-            $newBalanceAmount = $order->total_amount - $newPaidAmount;
+            $newPaidAmount = (float) $order->paid_amount + $amount;
+            $newBalanceAmount = (float) $order->total_amount - $newPaidAmount;
 
             $paymentStatus = PaymentStatusEnum::Unpaid;
             if ($newBalanceAmount <= 0) {
@@ -342,24 +370,32 @@ class PosService
     {
         $subtotal = 0;
         $totalItems = 0;
+        $service = Service::find($serviceId);
+        $isWeightBased = in_array($service?->pricing_type, ['weight', 'both']);
 
         foreach ($items as $itemData) {
             $item = Item::find($itemData['item_id']);
-            $quantity = $itemData['quantity'];
 
-            // Get price from service_prices or default item price
             $servicePrice = ServicePrice::where('item_id', $item->id)
                 ->where('service_id', $serviceId)
                 ->first();
 
-            $unitPrice = $servicePrice?->price ?? $item->price;
-            $subtotal += $unitPrice * $quantity;
-            $totalItems += $quantity;
+            if ($isWeightBased && isset($itemData['weight'])) {
+                $unitPrice = $servicePrice?->price_per_pound ?? $service->price_per_pound ?? 0;
+                $weight = (float) $itemData['weight'];
+                $subtotal += $unitPrice * $weight;
+                $totalItems += 1;
+            } else {
+                $quantity = $itemData['quantity'];
+                $unitPrice = $servicePrice?->price ?? $item->price;
+                $subtotal += $unitPrice * $quantity;
+                $totalItems += $quantity;
+            }
         }
 
         return [
             'subtotal' => $subtotal,
-            'total_amount' => $subtotal, // Can add tax calculation here
+            'total_amount' => $subtotal,
             'total_items' => $totalItems,
         ];
     }

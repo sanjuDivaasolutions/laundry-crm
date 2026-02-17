@@ -16,10 +16,10 @@ class PaymentFactory extends Factory
     public function definition(): array
     {
         $tenantId = Tenant::factory();
-        
+
         return [
             'tenant_id' => $tenantId,
-            'payment_number' => 'PAY-' . $this->faker->unique()->numberBetween(10000, 99999),
+            'payment_number' => 'PAY-'.$this->faker->unique()->numberBetween(10000, 99999),
             'order_id' => Order::factory()->state(['tenant_id' => $tenantId]),
             'customer_id' => Customer::factory()->state(['tenant_id' => $tenantId]),
             'payment_date' => now(),
@@ -28,6 +28,7 @@ class PaymentFactory extends Factory
             'transaction_reference' => $this->faker->optional()->uuid,
             'notes' => $this->faker->sentence,
             'received_by_employee_id' => 1,
+            'created_at' => now(),
         ];
     }
 }

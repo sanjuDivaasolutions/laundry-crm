@@ -47,7 +47,8 @@ class LoyaltyService
         }
 
         $multiplier = self::TIER_MULTIPLIER[$customer->loyalty_tier] ?? 1.0;
-        $basePoints = (int) floor((float) $order->total_amount * self::POINTS_PER_UNIT);
+        $pointsBase = (float) $order->total_amount - (float) $order->tip_amount;
+        $basePoints = (int) floor($pointsBase * self::POINTS_PER_UNIT);
         $points = (int) floor($basePoints * $multiplier);
 
         if ($points <= 0) {

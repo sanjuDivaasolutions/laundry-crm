@@ -16,6 +16,7 @@ class OrderResource extends JsonResource
             'order_date' => $this->order_date?->format('Y-m-d'),
             'promised_date' => $this->promised_date?->format('Y-m-d'),
             'total_items' => $this->total_items,
+            'tip_amount' => $this->tip_amount,
             'total_amount' => $this->total_amount,
             'paid_amount' => $this->paid_amount,
             'balance_amount' => $this->balance_amount,

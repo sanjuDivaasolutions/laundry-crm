@@ -43,6 +43,7 @@ class Order extends Model
         'hanger_number',
         'tax_rate',
         'tax_amount',
+        'tip_amount',
         'discount_type',
         'created_by_employee_id',
         'closed_at',
@@ -92,6 +93,7 @@ class Order extends Model
         'balance_amount' => 'decimal:2',
         'tax_rate' => 'decimal:2',
         'tax_amount' => 'decimal:2',
+        'tip_amount' => 'decimal:2',
         'urgent' => 'boolean',
         'payment_status' => PaymentStatusEnum::class,
     ];

@@ -74,8 +74,16 @@ class OrderApiController extends Controller
             $items = $validated['items'] ?? [];
             unset($validated['items']);
 
-            $validated['total_items'] = collect($items)->sum('quantity');
-            $validated['subtotal'] = collect($items)->sum(fn ($i) => $i['quantity'] * $i['unit_price']);
+            $validated['total_items'] = collect($items)->sum(function ($i) {
+                return ($i['pricing_type'] ?? 'piece') === 'weight' ? 1 : $i['quantity'];
+            });
+            $validated['subtotal'] = collect($items)->sum(function ($i) {
+                if (($i['pricing_type'] ?? 'piece') === 'weight') {
+                    return ($i['weight'] ?? 0) * $i['unit_price'];
+                }
+
+                return $i['quantity'] * $i['unit_price'];
+            });
 
             $discountAmount = $validated['discount_amount'] ?? 0;
             if (($validated['discount_type'] ?? null) === 'percentage') {
@@ -86,7 +94,9 @@ class OrderApiController extends Controller
             $taxableAmount = $validated['subtotal'] - $discountAmount;
             $taxRate = $validated['tax_rate'] ?? 0;
             $validated['tax_amount'] = $taxableAmount * ($taxRate / 100);
-            $validated['total_amount'] = $taxableAmount + $validated['tax_amount'];
+            $tipAmount = $validated['tip_amount'] ?? 0;
+            $validated['tip_amount'] = $tipAmount;
+            $validated['total_amount'] = $taxableAmount + $validated['tax_amount'] + $tipAmount;
             $validated['balance_amount'] = $validated['total_amount'];
             $validated['paid_amount'] = 0;
 
@@ -103,15 +113,25 @@ class OrderApiController extends Controller
             foreach ($items as $itemData) {
                 $item = Item::find($itemData['item_id']);
                 $service = Service::find($itemData['service_id']);
+                $pricingType = $itemData['pricing_type'] ?? 'piece';
+
+                if ($pricingType === 'weight') {
+                    $totalPrice = ($itemData['weight'] ?? 0) * $itemData['unit_price'];
+                } else {
+                    $totalPrice = $itemData['quantity'] * $itemData['unit_price'];
+                }
 
                 $order->orderItems()->create([
                     'item_id' => $itemData['item_id'],
                     'service_id' => $itemData['service_id'],
                     'item_name' => $item?->name ?? 'Unknown',
                     'service_name' => $service?->name ?? 'Unknown',
-                    'quantity' => $itemData['quantity'],
+                    'pricing_type' => $pricingType,
+                    'weight' => $pricingType === 'weight' ? ($itemData['weight'] ?? null) : null,
+                    'weight_unit' => $itemData['weight_unit'] ?? 'lb',
+                    'quantity' => $pricingType === 'weight' ? 1 : $itemData['quantity'],
                     'unit_price' => $itemData['unit_price'],
-                    'total_price' => $itemData['quantity'] * $itemData['unit_price'],
+                    'total_price' => $totalPrice,
                     'color' => $itemData['color'] ?? null,
                     'brand' => $itemData['brand'] ?? null,
                     'defect_notes' => $itemData['defect_notes'] ?? null,
@@ -155,8 +175,16 @@ class OrderApiController extends Controller
             unset($validated['items']);
 
             if ($items !== null) {
-                $validated['total_items'] = collect($items)->sum('quantity');
-                $validated['subtotal'] = collect($items)->sum(fn ($i) => $i['quantity'] * $i['unit_price']);
+                $validated['total_items'] = collect($items)->sum(function ($i) {
+                    return ($i['pricing_type'] ?? 'piece') === 'weight' ? 1 : $i['quantity'];
+                });
+                $validated['subtotal'] = collect($items)->sum(function ($i) {
+                    if (($i['pricing_type'] ?? 'piece') === 'weight') {
+                        return ($i['weight'] ?? 0) * $i['unit_price'];
+                    }
+
+                    return $i['quantity'] * $i['unit_price'];
+                });
 
                 $discountAmount = $validated['discount_amount'] ?? $order->discount_amount;
                 if (($validated['discount_type'] ?? $order->discount_type) === 'percentage') {
@@ -167,7 +195,9 @@ class OrderApiController extends Controller
                 $taxableAmount = $validated['subtotal'] - $discountAmount;
                 $taxRate = $validated['tax_rate'] ?? $order->tax_rate;
                 $validated['tax_amount'] = $taxableAmount * ($taxRate / 100);
-                $validated['total_amount'] = $taxableAmount + $validated['tax_amount'];
+                $tipAmount = $validated['tip_amount'] ?? $order->tip_amount;
+                $validated['tip_amount'] = $tipAmount;
+                $validated['total_amount'] = $taxableAmount + $validated['tax_amount'] + (float) $tipAmount;
                 $validated['balance_amount'] = $validated['total_amount'] - $order->paid_amount;
 
                 $existingItemIds = collect($items)->pluck('id')->filter()->all();
@@ -176,15 +206,25 @@ class OrderApiController extends Controller
                 foreach ($items as $itemData) {
                     $item = Item::find($itemData['item_id']);
                     $service = Service::find($itemData['service_id']);
+                    $pricingType = $itemData['pricing_type'] ?? 'piece';
+
+                    if ($pricingType === 'weight') {
+                        $totalPrice = ($itemData['weight'] ?? 0) * $itemData['unit_price'];
+                    } else {
+                        $totalPrice = $itemData['quantity'] * $itemData['unit_price'];
+                    }
 
                     $orderItemData = [
                         'item_id' => $itemData['item_id'],
                         'service_id' => $itemData['service_id'],
                         'item_name' => $item?->name ?? 'Unknown',
                         'service_name' => $service?->name ?? 'Unknown',
-                        'quantity' => $itemData['quantity'],
+                        'pricing_type' => $pricingType,
+                        'weight' => $pricingType === 'weight' ? ($itemData['weight'] ?? null) : null,
+                        'weight_unit' => $itemData['weight_unit'] ?? 'lb',
+                        'quantity' => $pricingType === 'weight' ? 1 : $itemData['quantity'],
                         'unit_price' => $itemData['unit_price'],
-                        'total_price' => $itemData['quantity'] * $itemData['unit_price'],
+                        'total_price' => $totalPrice,
                         'color' => $itemData['color'] ?? null,
                         'brand' => $itemData['brand'] ?? null,
                         'defect_notes' => $itemData['defect_notes'] ?? null,

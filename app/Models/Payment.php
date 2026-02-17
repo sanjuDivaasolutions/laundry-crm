@@ -28,6 +28,7 @@ class Payment extends Model
         'transaction_reference',
         'notes',
         'received_by_employee_id',
+        'created_at',
     ];
 
     protected $orderable = [

@@ -79,13 +79,14 @@
                             <table class="table table-row-bordered align-middle gy-4">
                                 <thead>
                                     <tr class="fw-bold text-muted bg-light">
-                                        <th class="ps-4" style="width: 200px;">Item</th>
-                                        <th style="width: 200px;">Service</th>
-                                        <th style="width: 80px;">Qty</th>
-                                        <th style="width: 120px;">Unit Price</th>
-                                        <th style="width: 120px;">Total</th>
-                                        <th style="width: 120px;">Color</th>
-                                        <th style="width: 120px;">Brand</th>
+                                        <th class="ps-4" style="width: 180px;">Item</th>
+                                        <th style="width: 180px;">Service</th>
+                                        <th style="width: 90px;">Type</th>
+                                        <th style="width: 80px;">Qty/Weight</th>
+                                        <th style="width: 110px;">Unit Price</th>
+                                        <th style="width: 110px;">Total</th>
+                                        <th style="width: 100px;">Color</th>
+                                        <th style="width: 100px;">Brand</th>
                                         <th style="width: 60px;"></th>
                                     </tr>
                                 </thead>
@@ -100,16 +101,26 @@
                                         <td>
                                             <select v-model="item.service_id" class="form-select form-select-sm">
                                                 <option :value="null">Select</option>
-                                                <option v-for="s in services" :key="s.id" :value="s.id">{{ s.name }}</option>
+                                                <option v-for="s in services" :key="s.id" :value="s.id">{{ s.name }}{{ s.pricing_type === 'weight' ? ' (lb)' : '' }}</option>
                                             </select>
                                         </td>
                                         <td>
-                                            <input v-model.number="item.quantity" type="number" min="1" class="form-control form-control-sm" />
+                                            <select v-model="item.pricing_type" class="form-select form-select-sm" @change="onPricingTypeChange(index)">
+                                                <option value="piece">Piece</option>
+                                                <option value="weight">Weight</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div v-if="item.pricing_type === 'weight'" class="input-group input-group-sm">
+                                                <input v-model.number="item.weight" type="number" step="0.1" min="0.1" class="form-control form-control-sm" placeholder="lbs" />
+                                                <span class="input-group-text">lb</span>
+                                            </div>
+                                            <input v-else v-model.number="item.quantity" type="number" min="1" class="form-control form-control-sm" />
                                         </td>
                                         <td>
                                             <input v-model.number="item.unit_price" type="number" step="0.01" min="0" class="form-control form-control-sm" />
                                         </td>
-                                        <td class="fw-semibold text-end">{{ formatAmount(item.quantity * item.unit_price) }}</td>
+                                        <td class="fw-semibold text-end">{{ formatAmount(getItemTotal(item)) }}</td>
                                         <td>
                                             <input v-model="item.color" type="text" class="form-control form-control-sm" placeholder="Color" />
                                         </td>
@@ -150,6 +161,10 @@
                         <input v-model.number="form.tax_rate" type="number" step="0.01" min="0" class="form-control" />
                     </div>
                     <div class="col-md-3 mb-5">
+                        <label class="form-label">Tip Amount</label>
+                        <input v-model.number="form.tip_amount" type="number" step="0.01" min="0" class="form-control" />
+                    </div>
+                    <div class="col-md-3 mb-5">
                         <div class="bg-light-primary rounded p-4 mt-7">
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Subtotal:</span>
@@ -162,6 +177,10 @@
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Tax:</span>
                                 <span class="fw-semibold">{{ formatAmount(taxValue) }}</span>
+                            </div>
+                            <div v-if="form.tip_amount > 0" class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Tip:</span>
+                                <span class="fw-semibold text-info">{{ formatAmount(form.tip_amount) }}</span>
                             </div>
                             <div class="separator my-2"></div>
                             <div class="d-flex justify-content-between">
@@ -212,18 +231,35 @@ const form = reactive({
     discount_type: "flat",
     discount_amount: 0,
     tax_rate: 0,
+    tip_amount: 0,
     items: [],
 });
 
 const formatAmount = (val) => parseFloat(val || 0).toFixed(2);
 
-const subtotal = computed(() => form.items.reduce((sum, i) => sum + (i.quantity || 0) * (i.unit_price || 0), 0));
+const getItemTotal = (item) => {
+    if (item.pricing_type === 'weight') {
+        return (item.weight || 0) * (item.unit_price || 0);
+    }
+    return (item.quantity || 0) * (item.unit_price || 0);
+};
+const subtotal = computed(() => form.items.reduce((sum, i) => sum + getItemTotal(i), 0));
 const discountValue = computed(() => form.discount_type === "percentage" ? subtotal.value * ((form.discount_amount || 0) / 100) : (form.discount_amount || 0));
 const taxValue = computed(() => (subtotal.value - discountValue.value) * ((form.tax_rate || 0) / 100));
-const total = computed(() => subtotal.value - discountValue.value + taxValue.value);
+const total = computed(() => subtotal.value - discountValue.value + taxValue.value + (form.tip_amount || 0));
 
 const addItem = () => {
-    form.items.push({ id: null, item_id: null, service_id: null, quantity: 1, unit_price: 0, color: "", brand: "" });
+    form.items.push({ id: null, item_id: null, service_id: null, pricing_type: "piece", quantity: 1, weight: null, unit_price: 0, color: "", brand: "" });
+};
+
+const onPricingTypeChange = (index) => {
+    if (form.items[index].pricing_type === 'weight') {
+        form.items[index].weight = null;
+        form.items[index].quantity = 1;
+    } else {
+        form.items[index].weight = null;
+        form.items[index].quantity = 1;
+    }
 };
 
 const removeItem = (index) => {
@@ -263,12 +299,15 @@ const loadFormData = async () => {
         form.discount_type = order.discount_type || "flat";
         form.discount_amount = parseFloat(order.discount_amount) || 0;
         form.tax_rate = parseFloat(order.tax_rate) || 0;
+        form.tip_amount = parseFloat(order.tip_amount) || 0;
 
-        form.items = (order.order_items || []).map((oi) => ({
+        form.items = (order.order_items || order.items || []).map((oi) => ({
             id: oi.id,
             item_id: oi.item_id,
             service_id: oi.service_id,
+            pricing_type: oi.pricing_type || "piece",
             quantity: oi.quantity,
+            weight: oi.weight ? parseFloat(oi.weight) : null,
             unit_price: parseFloat(oi.unit_price),
             color: oi.color || "",
             brand: oi.brand || "",

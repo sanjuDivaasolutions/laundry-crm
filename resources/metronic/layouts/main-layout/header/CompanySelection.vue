@@ -86,7 +86,7 @@ const getUserCompanyId = () => {
 const company = ref({});
 const companyId = computed(() => getUserCompanyId());
 
-const activeCompanyName = computed(() => company.value.name);
+const activeCompanyName = computed(() => company.value?.name ?? '');
 
 const modal = ref({
     show: false,

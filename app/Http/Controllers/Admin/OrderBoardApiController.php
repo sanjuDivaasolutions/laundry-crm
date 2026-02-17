@@ -80,7 +80,9 @@ class OrderBoardApiController extends Controller
             'service_id' => ['required', 'integer', 'exists:services,id'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.item_id' => ['required', 'integer', 'exists:items,id'],
-            'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.quantity' => ['nullable', 'integer', 'min:1'],
+            'items.*.weight' => ['nullable', 'numeric', 'min:0.1'],
+            'items.*.weight_unit' => ['nullable', 'string', 'in:lb,kg'],
             'items.*.notes' => ['nullable', 'string', 'max:255'],
             'urgent' => ['boolean'],
             'notes' => ['nullable', 'string', 'max:500'],
@@ -121,7 +123,8 @@ class OrderBoardApiController extends Controller
 
         $validated = $request->validate([
             'amount' => ['required', 'numeric', 'min:0.01'],
-            'payment_method' => ['required', 'string', 'in:cash,card,upi,other'],
+            'payment_method' => ['required', 'string', 'in:cash,card,apple_pay,google_pay,other'],
+            'tip_amount' => ['nullable', 'numeric', 'min:0'],
             'transaction_reference' => ['nullable', 'string', 'max:100'],
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
@@ -158,6 +161,7 @@ class OrderBoardApiController extends Controller
             'history' => OrderStatusHistoryResource::collection($order->statusHistories()->oldest('changed_at')->get()),
             'subtotal' => (float) $order->subtotal,
             'discount_amount' => (float) $order->discount_amount,
+            'tip_amount' => (float) $order->tip_amount,
             'total_amount' => (float) $order->total_amount,
             'paid_amount' => (float) $order->paid_amount,
             'balance_amount' => (float) $order->balance_amount,
@@ -244,7 +248,7 @@ class OrderBoardApiController extends Controller
 
         $search = trim($request->query('search', ''));
 
-        $query = Order::with(['customer' => fn($q) => $q->withTrashed(), 'orderItems', 'payments'])
+        $query = Order::with(['customer' => fn ($q) => $q->withTrashed(), 'orderItems', 'payments'])
             ->whereIn('processing_status_id', [1, 6]) // Cancelled (1) or Delivered (6)
             ->orderBy('updated_at', 'desc');
 
@@ -257,12 +261,12 @@ class OrderBoardApiController extends Controller
                     // Or match Customer Name (case insensitive)
                     ->orWhereHas('customer', function ($cq) use ($searchLower) {
                         $cq->withTrashed()
-                           ->whereRaw('LOWER(name) LIKE ?', ["%{$searchLower}%"]);
+                            ->whereRaw('LOWER(name) LIKE ?', ["%{$searchLower}%"]);
                     })
                     // Or match Customer Phone
                     ->orWhereHas('customer', function ($cq) use ($search) {
                         $cq->withTrashed()
-                           ->where('phone', 'like', "%{$search}%");
+                            ->where('phone', 'like', "%{$search}%");
                     });
             });
         }
@@ -308,7 +312,13 @@ class OrderBoardApiController extends Controller
     protected function getItemSummary(Order $order): string
     {
         return $order->orderItems
-            ->map(fn ($item) => "{$item->item_name} ×{$item->quantity}")
+            ->map(function ($item) {
+                if ($item->pricing_type === 'weight' && $item->weight) {
+                    return "{$item->item_name} {$item->weight}{$item->weight_unit}";
+                }
+
+                return "{$item->item_name} ×{$item->quantity}";
+            })
             ->implode(', ');
     }
 }
