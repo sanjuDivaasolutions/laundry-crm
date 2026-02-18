@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\HasAdvancedFilter;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,9 +11,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderItem extends Model
 {
-    use HasAdvancedFilter, HasFactory, SoftDeletes;
+    use BelongsToTenant, HasAdvancedFilter, HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'tenant_id',
         'order_id',
         'item_id',
         'service_id',

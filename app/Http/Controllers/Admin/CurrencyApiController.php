@@ -52,6 +52,8 @@ class CurrencyApiController extends Controller
 
     public function store(StoreCurrencyRequest $request)
     {
+        abort_if(Gate::denies('currency_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $currency = Currency::create($request->validated());
 
         return (new CurrencyResource($currency))
@@ -77,6 +79,8 @@ class CurrencyApiController extends Controller
 
     public function update(UpdateCurrencyRequest $request, Currency $currency)
     {
+        abort_if(Gate::denies('currency_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $currency->update($request->validated());
 
         return (new CurrencyResource($currency))

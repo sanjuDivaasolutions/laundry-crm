@@ -21,6 +21,8 @@ class CountryApiController extends Controller
 
     public function store(StoreCountryRequest $request)
     {
+        abort_if(Gate::denies('country_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $country = Country::create($request->validated());
 
         return (new CountryResource($country))
@@ -46,6 +48,8 @@ class CountryApiController extends Controller
 
     public function update(UpdateCountryRequest $request, Country $country)
     {
+        abort_if(Gate::denies('country_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $country->update($request->validated());
 
         return (new CountryResource($country))

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\DeliverySchedule;
+use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -93,14 +95,22 @@ class DeliveryScheduleApiController extends Controller
         abort_if(Gate::denies('order_create'), Response::HTTP_FORBIDDEN);
 
         $validated = $request->validate([
-            'order_id' => ['required', 'integer', 'exists:orders,id'],
-            'customer_id' => ['required', 'integer', 'exists:customers,id'],
+            'order_id' => ['required', 'integer', function ($attribute, $value, $fail) {
+                if (! Order::where('id', $value)->exists()) {
+                    $fail('The selected order does not exist or does not belong to your organization.');
+                }
+            }],
+            'customer_id' => ['required', 'integer', function ($attribute, $value, $fail) {
+                if (! Customer::where('id', $value)->exists()) {
+                    $fail('The selected customer does not exist or does not belong to your organization.');
+                }
+            }],
             'type' => ['required', 'string', 'in:pickup,delivery'],
             'scheduled_date' => ['required', 'date', 'after_or_equal:today'],
             'scheduled_time' => ['nullable', 'date_format:H:i'],
             'address' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string', 'max:500'],
-            'assigned_to_employee_id' => ['nullable', 'integer'],
+            'assigned_to_employee_id' => ['nullable', 'integer', 'exists:users,id'],
         ]);
 
         $schedule = DeliverySchedule::create($validated);
@@ -120,6 +130,7 @@ class DeliveryScheduleApiController extends Controller
     public function update(Request $request, DeliverySchedule $delivery): JsonResponse
     {
         abort_if(Gate::denies('order_edit'), Response::HTTP_FORBIDDEN);
+        $delivery->ensureBelongsToCurrentTenant();
 
         $validated = $request->validate([
             'scheduled_date' => ['sometimes', 'date'],
@@ -147,6 +158,7 @@ class DeliveryScheduleApiController extends Controller
     public function destroy(DeliverySchedule $delivery): JsonResponse
     {
         abort_if(Gate::denies('order_delete'), Response::HTTP_FORBIDDEN);
+        $delivery->ensureBelongsToCurrentTenant();
 
         $delivery->delete();
 

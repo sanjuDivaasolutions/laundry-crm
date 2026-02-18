@@ -35,7 +35,6 @@ class PermissionsApiController extends Controller
     use ControllerRequest;
     use ExportRequest;
     use SearchFilters;
-    use SearchFilters;
 
     public function index()
     {
@@ -46,6 +45,8 @@ class PermissionsApiController extends Controller
 
     public function store(StorePermissionRequest $request)
     {
+        abort_if(Gate::denies('permission_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $permission = Permission::create($request->validated());
 
         return (new PermissionResource($permission))
@@ -73,6 +74,8 @@ class PermissionsApiController extends Controller
 
     public function update(UpdatePermissionRequest $request, Permission $permission)
     {
+        abort_if(Gate::denies('permission_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $permission->update($request->validated());
 
         return (new PermissionResource($permission))

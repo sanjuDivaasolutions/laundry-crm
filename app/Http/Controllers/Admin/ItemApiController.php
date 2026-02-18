@@ -56,6 +56,8 @@ class ItemApiController extends Controller
 
     public function store(StoreItemRequest $request)
     {
+        abort_if(Gate::denies('item_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         return DB::transaction(function () use ($request) {
             $validated = $request->validated();
             $servicePrices = $validated['service_prices'] ?? [];
@@ -95,6 +97,8 @@ class ItemApiController extends Controller
 
     public function update(UpdateItemRequest $request, Item $item)
     {
+        abort_if(Gate::denies('item_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         return DB::transaction(function () use ($request, $item) {
             $validated = $request->validated();
             $servicePrices = $validated['service_prices'] ?? [];

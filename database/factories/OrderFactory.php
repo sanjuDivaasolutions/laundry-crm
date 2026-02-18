@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\ProcessingStatus;
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class OrderFactory extends Factory
@@ -37,7 +38,7 @@ class OrderFactory extends Factory
             'order_status_id' => fn () => OrderStatus::where('status_name', 'Open')->first()?->id
                 ?? OrderStatus::first()?->id
                 ?? OrderStatus::create(['status_name' => 'Open', 'display_order' => 1, 'is_active' => true])->id,
-            'created_by_employee_id' => 1,
+            'created_by_employee_id' => User::factory(),
             'urgent' => false,
             'hanger_number' => null,
             'tax_rate' => 10.00,

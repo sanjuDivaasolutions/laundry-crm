@@ -985,7 +985,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { usePosStore } from "./PosStore";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
@@ -1020,6 +1020,9 @@ const searchingCustomer = ref(false);
 const customerSuggestions = ref([]);
 const customerFound = ref(false);
 let customerSearchTimeout = null;
+
+// Timer refs for cleanup
+let refreshIntervalId = null;
 
 // Modal state
 const showOrderModal = ref(false);
@@ -1672,9 +1675,32 @@ onMounted(() => {
     posStore.fetchBoardData();
 
     // Auto-refresh every 30 seconds
-    setInterval(() => {
+    refreshIntervalId = setInterval(() => {
         posStore.refreshStatistics();
     }, 30000);
+});
+
+onBeforeUnmount(() => {
+    // Clear auto-refresh interval
+    if (refreshIntervalId) {
+        clearInterval(refreshIntervalId);
+        refreshIntervalId = null;
+    }
+
+    // Clear search debounce timeout
+    if (historySearchTimeout) {
+        clearTimeout(historySearchTimeout);
+    }
+
+    // Dispose Bootstrap modals to prevent memory leaks
+    if (bootstrapModal) {
+        bootstrapModal.dispose();
+        bootstrapModal = null;
+    }
+    if (historyModal) {
+        historyModal.dispose();
+        historyModal = null;
+    }
 });
 
 // Watch for order selection changes

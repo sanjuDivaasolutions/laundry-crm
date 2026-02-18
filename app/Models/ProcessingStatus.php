@@ -2,12 +2,27 @@
 
 namespace App\Models;
 
+use App\Enums\ProcessingStatusEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class ProcessingStatus extends Model
 {
+    /**
+     * Get the ID for a given processing status enum value.
+     * Results are cached for the lifetime of the request.
+     */
+    public static function idFor(ProcessingStatusEnum $status): int
+    {
+        $map = Cache::store('array')->rememberForever('processing_status_map', function () {
+            return static::pluck('id', 'status_name')->toArray();
+        });
+
+        return $map[$status->value] ?? throw new \RuntimeException("Processing status '{$status->value}' not found in database.");
+    }
+
     protected $table = 'processing_status';
 
     public $timestamps = false; // Using custom seeders, no timestamps in migration for this lookup

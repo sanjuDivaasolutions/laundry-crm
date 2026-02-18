@@ -33,9 +33,9 @@ return [
     |
     */
 
-    'key' => env('STRIPE_KEY'),
+    'key' => env('STRIPE_PUBLIC_KEY'),
 
-    'secret' => env('STRIPE_SECRET'),
+    'secret' => env('STRIPE_SECRET_KEY'),
 
     /*
     |--------------------------------------------------------------------------

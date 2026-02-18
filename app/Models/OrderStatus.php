@@ -5,9 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class OrderStatus extends Model
 {
+    /**
+     * Get the ID for a given order status name.
+     * Results are cached for the lifetime of the request.
+     */
+    public static function idFor(string $statusName): int
+    {
+        $map = Cache::store('array')->rememberForever('order_status_map', function () {
+            return static::pluck('id', 'status_name')->toArray();
+        });
+
+        return $map[$statusName] ?? throw new \RuntimeException("Order status '{$statusName}' not found in database.");
+    }
+
     protected $table = 'order_status';
 
     public $timestamps = false;

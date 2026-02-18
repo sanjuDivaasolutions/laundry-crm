@@ -53,6 +53,8 @@ class ServiceApiController extends Controller
 
     public function store(StoreServiceRequest $request)
     {
+        abort_if(Gate::denies('service_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $service = Service::create($request->validated());
 
         return (new ServiceResource($service))
@@ -78,6 +80,8 @@ class ServiceApiController extends Controller
 
     public function update(UpdateServiceRequest $request, Service $service)
     {
+        abort_if(Gate::denies('service_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $service->update($request->validated());
 
         return (new ServiceResource($service))

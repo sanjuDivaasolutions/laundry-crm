@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderStatus;
 use App\Models\OrderStatusHistory;
 use App\Models\Payment;
 use App\Models\ProcessingStatus;
@@ -49,7 +50,7 @@ class PosService
         // Get processing statuses for columns (exclude Delivered and Cancelled for main board)
         $statuses = ProcessingStatus::active()
             ->ordered()
-            ->whereNotIn('id', [1, 6]) // Exclude Cancelled (1) and Delivered (6)
+            ->whereNotIn('status_name', [ProcessingStatusEnum::Cancelled->value, ProcessingStatusEnum::Delivered->value])
             ->get();
 
         // Group orders by status
@@ -84,13 +85,12 @@ class PosService
         $todayRevenue = Payment::whereDate('payment_date', $today)
             ->sum('amount');
 
-        // ProcessingStatus IDs: 2=Pending, 3=Washing, 4=Drying, 5=Ready, 6=Delivered
         return [
-            'pending' => $counts[2] ?? 0,
-            'washing' => $counts[3] ?? 0,
-            'drying' => $counts[4] ?? 0,
-            'ready' => $counts[5] ?? 0,
-            'completed' => $counts[6] ?? 0,
+            'pending' => $counts[ProcessingStatus::idFor(ProcessingStatusEnum::Pending)] ?? 0,
+            'washing' => $counts[ProcessingStatus::idFor(ProcessingStatusEnum::Washing)] ?? 0,
+            'drying' => $counts[ProcessingStatus::idFor(ProcessingStatusEnum::Drying)] ?? 0,
+            'ready' => $counts[ProcessingStatus::idFor(ProcessingStatusEnum::Ready)] ?? 0,
+            'completed' => $counts[ProcessingStatus::idFor(ProcessingStatusEnum::Delivered)] ?? 0,
             'today_revenue' => (float) $todayRevenue,
         ];
     }
@@ -154,8 +154,8 @@ class PosService
                 'paid_amount' => 0,
                 'balance_amount' => $totals['total_amount'],
                 'payment_status' => PaymentStatusEnum::Unpaid,
-                'processing_status_id' => 2, // Pending
-                'order_status_id' => 1, // Open
+                'processing_status_id' => ProcessingStatus::idFor(ProcessingStatusEnum::Pending),
+                'order_status_id' => OrderStatus::idFor('Open'),
                 'urgent' => $data['urgent'] ?? false,
                 'notes' => $data['notes'] ?? null,
                 'created_by_employee_id' => auth()->id(),
@@ -208,7 +208,7 @@ class PosService
                 'order_id' => $order->id,
                 'status_type' => OrderStatusTypeEnum::Processing,
                 'old_status_id' => null,
-                'new_status_id' => 2, // Pending
+                'new_status_id' => ProcessingStatus::idFor(ProcessingStatusEnum::Pending),
                 'changed_by_employee_id' => auth()->id(),
                 'remarks' => 'Order created',
                 'changed_at' => now(),
@@ -223,7 +223,11 @@ class PosService
      */
     public function updateQuickOrder(Order $order, array $data): Order
     {
-        if (! in_array($order->processing_status_id, [2, 3])) {
+        $editableStatuses = [
+            ProcessingStatus::idFor(ProcessingStatusEnum::Pending),
+            ProcessingStatus::idFor(ProcessingStatusEnum::Washing),
+        ];
+        if (! in_array($order->processing_status_id, $editableStatuses)) {
             abort(422, 'Order can only be edited when Pending or Washing.');
         }
 
@@ -304,8 +308,8 @@ class PosService
             'processing_status_id' => $newStatusId,
         ]);
 
-        // If moving to Ready (ID 5), set actual_ready_date
-        if ($newStatusId === 5) {
+        // If moving to Ready, set actual_ready_date
+        if ($newStatusId === ProcessingStatus::idFor(ProcessingStatusEnum::Ready)) {
             $order->update(['actual_ready_date' => now()]);
         }
 
@@ -382,11 +386,11 @@ class PosService
 
             // If fully paid, mark as delivered and award loyalty points
             if ($paymentStatus === PaymentStatusEnum::Paid) {
-                $this->updateOrderStatus($order, 6); // Delivered
+                $this->updateOrderStatus($order, ProcessingStatus::idFor(ProcessingStatusEnum::Delivered));
                 $order->update([
                     'picked_up_at' => now(),
                     'closed_at' => now(),
-                    'order_status_id' => 2, // Closed
+                    'order_status_id' => OrderStatus::idFor('Closed'),
                 ]);
 
                 $this->loyaltyService->awardPointsForOrder($order);
@@ -432,7 +436,9 @@ class PosService
     protected function generateCustomerCode(): string
     {
         $prefix = 'CUST';
-        $lastCustomer = Customer::orderBy('id', 'desc')->first();
+        $lastCustomer = Customer::orderBy('id', 'desc')
+            ->lockForUpdate()
+            ->first();
         $sequence = $lastCustomer ? $lastCustomer->id + 1 : 1;
 
         return sprintf('%s%06d', $prefix, $sequence);
@@ -484,6 +490,7 @@ class PosService
         $date = now()->format('ymd');
         $lastOrder = Order::whereDate('created_at', today())
             ->orderBy('id', 'desc')
+            ->lockForUpdate()
             ->first();
 
         $sequence = $lastOrder ? ((int) substr($lastOrder->order_number, -4)) + 1 : 1;
@@ -502,6 +509,7 @@ class PosService
         // Payment model has no timestamps, use payment_date instead
         $lastPayment = Payment::whereDate('payment_date', today())
             ->orderBy('id', 'desc')
+            ->lockForUpdate()
             ->first();
 
         $sequence = $lastPayment ? ((int) substr($lastPayment->payment_number, -4)) + 1 : 1;

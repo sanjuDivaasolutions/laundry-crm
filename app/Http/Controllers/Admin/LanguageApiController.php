@@ -50,6 +50,8 @@ class LanguageApiController extends Controller
 
     public function store(StoreLanguageRequest $request)
     {
+        abort_if(Gate::denies('language_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $language = Language::create($request->validated());
 
         $this->updateRelations($language, $request, true);
@@ -77,6 +79,8 @@ class LanguageApiController extends Controller
 
     public function update(UpdateLanguageRequest $request, Language $language)
     {
+        abort_if(Gate::denies('language_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $language->update($request->validated());
 
         $this->updateRelations($language, $request);

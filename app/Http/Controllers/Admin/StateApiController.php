@@ -22,6 +22,8 @@ class StateApiController extends Controller
 
     public function store(StoreStateRequest $request)
     {
+        abort_if(Gate::denies('state_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $state = State::create($request->validated());
 
         return (new StateResource($state))
@@ -49,6 +51,8 @@ class StateApiController extends Controller
 
     public function update(UpdateStateRequest $request, State $state)
     {
+        abort_if(Gate::denies('state_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
         $state->update($request->validated());
 
         return (new StateResource($state))

@@ -23,6 +23,7 @@ use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Currency;
+use App\Models\Customer;
 use App\Models\Item;
 use App\Models\Role;
 use App\Models\Service;
@@ -162,6 +163,15 @@ class SearchApiController extends Controller
                     'labelValue' => 'name',
                 ];
 
+            case 'customers':
+                return [
+                    'class' => Customer::class,
+                    'field' => 'name',
+                    'idValue' => 'id',
+                    'labelValue' => 'name',
+                    'additional' => ['phone', 'customer_code'],
+                ];
+
             case 'items':
                 return [
                     'class' => Item::class,
@@ -254,6 +264,11 @@ class SearchApiController extends Controller
     public function services()
     {
         return Service::active()->ordered()->get(['id', 'name', 'code']);
+    }
+
+    public function customers()
+    {
+        return Customer::where('is_active', true)->get(['id', 'name', 'phone', 'customer_code']);
     }
 
     private function getOptionData($type)

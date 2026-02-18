@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\ProcessingStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\OrderItemResource;
 use App\Http\Resources\Admin\OrderStatusHistoryResource;
 use App\Http\Resources\Admin\PaymentResource;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\ProcessingStatus;
 use App\Services\PosService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -173,8 +175,10 @@ class OrderBoardApiController extends Controller
 
         $order->load(['customer', 'orderItems', 'processingStatus', 'payments']);
 
-        $isEditable = in_array($order->processing_status_id, [2, 3])
-            && (float) $order->paid_amount <= 0;
+        $isEditable = in_array($order->processing_status_id, [
+            ProcessingStatus::idFor(ProcessingStatusEnum::Pending),
+            ProcessingStatus::idFor(ProcessingStatusEnum::Washing),
+        ]) && (float) $order->paid_amount <= 0;
 
         return $this->success([
             'id' => $order->id,
@@ -258,10 +262,7 @@ class OrderBoardApiController extends Controller
     {
         abort_if(Gate::denies('order_delete'), Response::HTTP_FORBIDDEN);
 
-        // Instead of deleting, we update the status to Cancelled (id: 1)
-        $cancelledStatusId = 1;
-
-        $this->posService->updateOrderStatus($order, $cancelledStatusId);
+        $this->posService->updateOrderStatus($order, ProcessingStatus::idFor(ProcessingStatusEnum::Cancelled));
 
         return $this->success(null, 'Order cancelled successfully');
     }
@@ -278,7 +279,10 @@ class OrderBoardApiController extends Controller
         $search = trim($request->query('search', ''));
 
         $query = Order::with(['customer' => fn ($q) => $q->withTrashed(), 'orderItems', 'payments'])
-            ->whereIn('processing_status_id', [1, 6]) // Cancelled (1) or Delivered (6)
+            ->whereIn('processing_status_id', [
+                ProcessingStatus::idFor(ProcessingStatusEnum::Cancelled),
+                ProcessingStatus::idFor(ProcessingStatusEnum::Delivered),
+            ])
             ->orderBy('updated_at', 'desc');
 
         // Apply search filter
@@ -320,13 +324,13 @@ class OrderBoardApiController extends Controller
                 'payment_method' => $lastPayment?->payment_method?->value ?? 'cash',
                 'payment_method_label' => $lastPayment?->payment_method?->getLabel() ?? 'Cash',
                 'completed_at' => $completedAt?->format('Y-m-d H:i:s'),
-                'processing_status' => $order->processing_status_id === 1 ? 'Cancelled' : 'Completed',
+                'processing_status' => $order->processing_status_id === ProcessingStatus::idFor(ProcessingStatusEnum::Cancelled) ? 'Cancelled' : 'Completed',
                 'processing_status_id' => $order->processing_status_id,
             ];
         });
 
         // Calculate total revenue from displayed orders (only completed ones)
-        $revenue = $orders->where('processing_status_id', 6)->sum('total_amount');
+        $revenue = $orders->where('processing_status_id', ProcessingStatus::idFor(ProcessingStatusEnum::Delivered))->sum('total_amount');
 
         return $this->success([
             'orders' => $formattedOrders,
