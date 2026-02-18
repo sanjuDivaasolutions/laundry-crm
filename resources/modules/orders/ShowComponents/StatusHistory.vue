@@ -4,13 +4,13 @@
         <!--begin::Card header-->
         <div class="card-header align-items-center border-0 mt-4">
             <h3 class="card-title align-items-start flex-column">
-                <span class="fw-bold mb-2 text-dark">{{ $t('order.history.timeline_title') }}</span>
-                <span class="text-muted fw-semobold fs-7">{{ $t('order.history.timeline_subtitle') }}</span>
+                <span class="fw-bold mb-2 text-dark">{{ $t('order.fields.history_timeline_title') }}</span>
+                <span class="text-muted fw-semobold fs-7">{{ $t('order.fields.history_timeline_subtitle') }}</span>
             </h3>
             <div class="card-toolbar">
                 <span class="badge badge-light-primary fs-7">
                     <i class="fas fa-clock me-1"></i>
-                    {{ history.length }} {{ $t('general.events') }}
+                    {{ history.length }} {{ $t('general.fields.events') }}
                 </span>
             </div>
         </div>
@@ -60,7 +60,7 @@
                             <i v-if="log.old_status_name" class="fas fa-long-arrow-alt-right text-gray-400 fs-4 me-2"></i>
                             <span>
                                 <span :class="getStatusBadgeClass(log.status_type, log.new_status_name)" class="fs-6 fw-bold px-3 py-2">
-                                    {{ log.new_status_name || $t('general.updated') }}
+                                    {{ log.new_status_name || $t('general.fields.updated') }}
                                 </span>
                             </span>
                         </div>
@@ -82,8 +82,8 @@
                     <div class="mb-5">
                         <i class="fas fa-history fs-3x text-gray-300"></i>
                     </div>
-                    <h4 class="text-gray-700 fw-semobold mb-2">{{ $t('order.history.empty_title') }}</h4>
-                    <p class="text-muted fs-6 mb-0">{{ $t('order.history.empty_description') }}</p>
+                    <h4 class="text-gray-700 fw-semobold mb-2">{{ $t('order.fields.history_empty_title') }}</h4>
+                    <p class="text-muted fs-6 mb-0">{{ $t('order.fields.history_empty_description') }}</p>
                 </div>
                 <!--end::Empty state-->
             </div>

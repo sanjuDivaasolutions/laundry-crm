@@ -70,17 +70,33 @@ class LanguageService
             if (isset($c['title']) && trim($c['title'])) {
                 $terms[$k][$k.'.title'] = $c['title'];
             }
+            if (isset($c['title_singular']) && trim($c['title_singular'])) {
+                $terms[$k][$k.'.title_singular'] = $c['title_singular'];
+            }
             $fields = (isset($c['fields']) && is_array($c['fields'])) ? $c['fields'] : [];
             foreach ($fields as $fk => $f) {
-                $idx = $fieldGroup.'.fields.'.$fk;
-                if (in_array($idx, $usedField)) {
-                    continue;
-                }
                 if (! trim($f)) {
                     continue;
                 }
-                $fieldTerms[$fieldGroup][$idx] = $f;
-                $usedField[] = $idx;
+
+                // General field key (e.g. general.fields.name)
+                $idx = $fieldGroup.'.fields.'.$fk;
+                if (! in_array($idx, $usedField)) {
+                    $fieldTerms[$fieldGroup][$idx] = $f;
+                    $usedField[] = $idx;
+                }
+
+                // Module-specific field key (e.g. customer.fields.name)
+                if ($k !== $fieldGroup) {
+                    $moduleIdx = $k.'.fields.'.$fk;
+                    if (! in_array($moduleIdx, $usedField)) {
+                        if (! isset($terms[$k])) {
+                            $terms[$k] = [];
+                        }
+                        $terms[$k][$moduleIdx] = $f;
+                        $usedField[] = $moduleIdx;
+                    }
+                }
             }
         }
 

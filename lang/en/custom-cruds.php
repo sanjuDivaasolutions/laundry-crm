@@ -62,12 +62,10 @@ return [
             'paid_amount' => 'Paid Amount',
             'balance_amount' => 'Balance Amount',
             'picked_up_at' => 'Picked Up At',
-        ],
-        'history' => [
-            'timeline_title' => 'Status Timeline',
-            'timeline_subtitle' => 'Complete order lifecycle tracking',
-            'empty_title' => 'No Status History Yet',
-            'empty_description' => 'Status changes will appear here as the order progresses',
+            'history_timeline_title' => 'Status Timeline',
+            'history_timeline_subtitle' => 'Complete order lifecycle tracking',
+            'history_empty_title' => 'No Status History Yet',
+            'history_empty_description' => 'Status changes will appear here as the order progresses',
         ],
         'notifications' => [
             'status_changed' => 'Order :order_number status changed to :status',

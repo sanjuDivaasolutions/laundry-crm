@@ -392,3 +392,37 @@ test('customer options endpoint returns customers', function () {
     $response->assertSuccessful();
     expect($response->json('data'))->toHaveCount(1);
 });
+
+// ============================================================
+// Task #12: Translation key generation
+// ============================================================
+
+test('LanguageService getCrudTerms generates module-specific field keys', function () {
+    $terms = \App\Services\LanguageService::getCrudTerms();
+
+    // Flatten all terms into a single key list
+    $allKeys = [];
+    foreach ($terms as $group) {
+        foreach ($group as $key => $value) {
+            $allKeys[] = $key;
+        }
+    }
+
+    // General field keys should exist
+    expect($allKeys)->toContain('general.fields.name');
+    expect($allKeys)->toContain('general.fields.id');
+    expect($allKeys)->toContain('general.fields.search');
+
+    // Module-specific field keys should also exist
+    expect($allKeys)->toContain('customer.fields.customer_code');
+    expect($allKeys)->toContain('customer.fields.name');
+    expect($allKeys)->toContain('order.fields.order_number');
+    expect($allKeys)->toContain('order.fields.order_date');
+    expect($allKeys)->toContain('item.fields.price');
+    expect($allKeys)->toContain('service.fields.code');
+
+    // Title singular should be extracted
+    expect($allKeys)->toContain('customer.title_singular');
+    expect($allKeys)->toContain('order.title_singular');
+    expect($allKeys)->toContain('item.title_singular');
+});
