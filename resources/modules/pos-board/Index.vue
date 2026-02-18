@@ -819,49 +819,83 @@
         <!-- Order History Modal -->
         <div class="modal fade" id="orderHistoryModal" tabindex="-1" ref="historyModalRef">
             <div class="modal-dialog modal-dialog-centered modal-xl">
-                <div class="modal-content border-0 shadow-lg rounded-3">
-                    <!-- Header -->
-                    <div class="modal-header border-0 px-6 pt-5 pb-0">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="ki-duotone ki-time fs-2 text-gray-700">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
-                            <h3 class="modal-title fs-3 fw-bold text-gray-900 mb-0">Order History</h3>
+                <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden">
+                    <!-- Header - Dark Gradient -->
+                    <div class="px-6 py-5" style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="ki-duotone ki-time fs-2x text-white">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                <div>
+                                    <h3 class="fs-2 fw-bold text-white mb-1">Order History</h3>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-white bg-opacity-20 text-white fs-8 px-3 py-1">
+                                            {{ historyTotal }} orders
+                                        </span>
+                                        <span class="badge bg-white bg-opacity-20 text-white fs-8 px-3 py-1">
+                                            {{ formatCurrency(historyRevenue) }} revenue
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-icon btn-active-color-white text-white" @click="closeHistoryModal">
+                                <FormIcon icon="feather:x" width="22" height="22" />
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary" @click="closeHistoryModal">
-                            <FormIcon icon="feather:x" width="20" height="20" />
-                        </button>
                     </div>
 
                     <!-- Body -->
                     <div class="modal-body px-6 py-5">
-                        <!-- Search Input -->
-                        <div class="position-relative mb-5">
-                            <i class="ki-duotone ki-magnifier fs-3 position-absolute top-50 translate-middle-y ms-4 text-gray-500">
+                        <!-- Search Input - Solid Background -->
+                        <div class="position-relative mb-4">
+                            <i class="ki-duotone ki-magnifier fs-4 position-absolute top-50 translate-middle-y ms-4 text-gray-500">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                             </i>
                             <input
                                 type="text"
-                                class="form-control form-control-lg ps-12 border-gray-300"
+                                class="form-control form-control-solid ps-12"
                                 placeholder="Search by order #, customer name or phone..."
                                 v-model="historySearch"
                                 @input="searchHistory"
                             />
                         </div>
 
+                        <!-- Summary Stat Cards -->
+                        <div class="row g-3 mb-5">
+                            <div class="col-4">
+                                <div class="bg-light-primary rounded p-3 text-center">
+                                    <div class="fs-3 fw-bolder text-primary">{{ historyTotal }}</div>
+                                    <div class="text-gray-600 fs-8 fw-semibold">Total Orders</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="bg-light-success rounded p-3 text-center">
+                                    <div class="fs-3 fw-bolder text-success">{{ formatCurrency(historyRevenue) }}</div>
+                                    <div class="text-gray-600 fs-8 fw-semibold">Revenue</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="bg-light-info rounded p-3 text-center">
+                                    <div class="fs-3 fw-bolder text-info">{{ formatCurrency(historyAvgOrder) }}</div>
+                                    <div class="text-gray-600 fs-8 fw-semibold">Avg Order</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Table -->
                         <div class="table-responsive">
-                            <table class="table table-row-bordered align-middle gy-4 gs-4">
+                            <table class="table align-middle gs-4 gy-4 mb-0">
                                 <thead>
-                                    <tr class="text-gray-500 fw-semibold fs-7 text-uppercase">
+                                    <tr class="fw-semibold text-gray-600 fs-7 border-bottom border-gray-200">
                                         <th class="min-w-100px">Order #</th>
-                                        <th class="min-w-150px">Customer</th>
+                                        <th class="min-w-140px">Customer</th>
                                         <th class="min-w-200px">Items</th>
                                         <th class="min-w-100px">Service</th>
                                         <th class="min-w-80px text-end">Total</th>
-                                        <th class="min-w-80px">Payment</th>
+                                        <th class="min-w-100px">Payment</th>
                                         <th class="min-w-120px">Completed</th>
                                     </tr>
                                 </thead>
@@ -869,60 +903,79 @@
                                     <tr v-if="historyLoading">
                                         <td colspan="7" class="text-center py-10">
                                             <span class="spinner-border spinner-border-sm text-primary me-2"></span>
-                                            Loading orders...
+                                            <span class="text-gray-600">Loading orders...</span>
                                         </td>
                                     </tr>
                                     <tr v-else-if="historyOrders.length === 0">
-                                        <td colspan="7" class="text-center py-10 text-gray-500">
-                                            No completed orders found
+                                        <td colspan="7" class="text-center py-15">
+                                            <i class="ki-duotone ki-document fs-3x text-gray-300 mb-3 d-block">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                            <div class="text-gray-500 fs-6 fw-semibold">No completed orders found</div>
+                                            <div class="text-gray-400 fs-7 mt-1">Try adjusting your search criteria</div>
                                         </td>
                                     </tr>
-                                    <tr v-for="order in historyOrders" :key="order.id" class="hover-bg-light">
+                                    <tr
+                                        v-for="order in historyOrders"
+                                        :key="order.id"
+                                        class="history-row"
+                                        :class="{ 'cancelled': order.processing_status_id === 1 }"
+                                    >
                                         <td>
-                                            <span class="fw-bold text-gray-800">#{{ order.order_number }}</span>
-                                            <span v-if="order.processing_status_id === 1" class="badge badge-light-danger ms-2 fs-8">Cancelled</span>
+                                            <span class="bg-light rounded-pill px-2 py-1 fw-bold text-gray-800 fs-7">#{{ order.order_number }}</span>
+                                            <span v-if="order.processing_status_id === 1" class="badge badge-light-danger fs-9 ms-1">Cancelled</span>
                                         </td>
                                         <td>
-                                            <div class="d-flex align-items-center text-gray-800 fs-7">
-                                                <i class="ki-duotone ki-user fs-6 text-gray-500 me-1"><span class="path1"></span><span class="path2"></span></i>
-                                                {{ order.customer_name }}
+                                            <div class="fw-semibold text-gray-800 fs-7">{{ order.customer_name }}</div>
+                                            <div class="text-muted fs-8">{{ order.customer_phone }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                <span
+                                                    v-for="(item, idx) in splitItemSummary(order.item_summary).slice(0, 3)"
+                                                    :key="idx"
+                                                    class="badge badge-light-secondary fs-9 fw-normal"
+                                                >{{ item }}</span>
+                                                <span
+                                                    v-if="splitItemSummary(order.item_summary).length > 3"
+                                                    class="badge badge-light fs-9 fw-semibold text-gray-600"
+                                                >+{{ splitItemSummary(order.item_summary).length - 3 }} more</span>
                                             </div>
-                                            <div class="d-flex align-items-center text-gray-500 fs-8">
-                                                <i class="ki-duotone ki-phone fs-7 text-gray-400 me-1"><span class="path1"></span><span class="path2"></span></i>
-                                                {{ order.customer_phone }}
-                                            </div>
                                         </td>
                                         <td>
-                                            <span class="text-gray-700 fs-7">{{ order.item_summary }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge badge-light-primary fs-8">{{ order.service_name }}</span>
+                                            <span class="badge badge-light-info fs-8">{{ order.service_name }}</span>
                                         </td>
                                         <td class="text-end">
-                                            <span class="fw-bold text-gray-800">{{ formatCurrency(order.total_amount) }}</span>
+                                            <span
+                                                class="fs-6 fw-bold"
+                                                :class="order.processing_status_id === 1 ? 'text-decoration-line-through text-gray-500' : 'text-gray-900'"
+                                            >{{ formatCurrency(order.total_amount) }}</span>
                                         </td>
                                         <td>
-                                            <span class="badge fs-8" :class="getPaymentMethodBadge(order.payment_method)">
+                                            <span class="badge fs-8 d-inline-flex align-items-center gap-1" :class="getPaymentMethodBadge(order.payment_method)">
+                                                <i :class="getPaymentMethodIcon(order.payment_method)" class="fs-8"></i>
                                                 {{ order.payment_method_label }}
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="text-gray-600 fs-7">{{ formatCompletedDate(order.completed_at) }}</span>
+                                            <div class="fw-semibold text-gray-800 fs-7">{{ formatHistoryDate(order.completed_at).date }}</div>
+                                            <div class="text-muted fs-8">{{ formatHistoryDate(order.completed_at).time }}</div>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
-                        <!-- Footer Stats -->
-                        <div class="d-flex justify-content-between align-items-center pt-4 border-top">
-                            <span class="text-gray-500 fs-7">
+                        <!-- Footer - Prominent Summary Bar -->
+                        <div class="bg-light-success rounded p-4 mt-5 d-flex justify-content-between align-items-center">
+                            <span class="text-gray-700 fs-7 fw-semibold">
                                 Showing {{ historyOrders.length }} of {{ historyTotal }} completed orders
                             </span>
-                            <span class="fs-6">
-                                <span class="text-gray-600 fw-semibold">Total Revenue:</span>
-                                <span class="text-primary fw-bold ms-2">{{ formatCurrency(historyRevenue) }}</span>
-                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-gray-600 fs-7">Total Revenue:</span>
+                                <span class="fs-3 fw-bolder text-success">{{ formatCurrency(historyRevenue) }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1098,6 +1151,11 @@ const canCreateOrder = computed(() => {
 
 const canProcessPayment = computed(() => {
     return payment.value.method && payment.value.amount > 0;
+});
+
+const historyAvgOrder = computed(() => {
+    if (!historyTotal.value || !historyRevenue.value) return 0;
+    return historyRevenue.value / historyTotal.value;
 });
 
 // Methods
@@ -1541,6 +1599,31 @@ function formatCompletedDate(dateString) {
     return `${day} ${month}, ${hours}:${minutes}`;
 }
 
+function splitItemSummary(summary) {
+    if (!summary) return [];
+    return summary.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
+function formatHistoryDate(dateString) {
+    if (!dateString) return { date: '-', time: '' };
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString('en-US', { month: 'short' });
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return { date: `${day} ${month}`, time: `${hours}:${minutes}` };
+}
+
+function getPaymentMethodIcon(method) {
+    const icons = {
+        cash: 'bi bi-cash-stack',
+        card: 'bi bi-credit-card',
+        apple_pay: 'bi bi-phone',
+        google_pay: 'bi bi-phone',
+    };
+    return icons[method] || 'bi bi-three-dots';
+}
+
 // History Modal Functions
 async function openHistoryModal() {
     if (historyModalRef.value) {
@@ -1618,5 +1701,18 @@ watch(selectedOrderId, (newId) => {
 .btn-xs {
     padding: 0.15rem 0.35rem;
     font-size: 0.75rem;
+}
+.history-row:nth-child(even) {
+    background-color: #f9fafb;
+}
+.history-row:hover {
+    background-color: #f1faff;
+    transition: background-color 0.15s ease;
+}
+.history-row.cancelled {
+    background-color: #fff5f5;
+}
+.history-row.cancelled:hover {
+    background-color: #fee2e2;
 }
 </style>
