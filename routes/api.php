@@ -213,6 +213,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
         Route::post('orders', 'OrderBoardApiController@store')->name('orders.store');
         Route::get('orders/{order}', 'OrderBoardApiController@show')->name('orders.show');
         Route::put('orders/{order}/status', 'OrderBoardApiController@updateStatus')->name('orders.status');
+        Route::put('orders/{order}', 'OrderBoardApiController@update')->name('orders.update');
         Route::post('orders/{order}/pay', 'OrderBoardApiController@processPayment')->name('orders.pay');
         Route::delete('orders/{order}', 'OrderBoardApiController@destroy')->name('orders.destroy');
     });

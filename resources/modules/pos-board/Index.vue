@@ -573,7 +573,7 @@
 
         <!-- Order Details Modal - Minimal Design -->
         <div class="modal fade" id="orderDetailModal" tabindex="-1" ref="orderModalRef">
-            <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-dialog modal-dialog-centered" :style="{ maxWidth: isEditMode ? '480px' : '380px' }">
                 <div class="modal-content border-0 shadow-lg rounded-3" v-if="modalOrderDetail">
                     <!-- Header -->
                     <div class="d-flex align-items-center justify-content-between px-5 pt-5 pb-3">
@@ -583,13 +583,23 @@
                                 {{ modalOrderDetail.processing_status }}
                             </span>
                         </div>
-                        <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary" @click="closeOrderModal">
-                            <FormIcon icon="feather:x" width="20" height="20" />
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <button
+                                v-if="isOrderEditable && !isEditMode"
+                                type="button"
+                                class="btn btn-sm btn-light-primary"
+                                @click="enterEditMode"
+                            >
+                                <i class="bi bi-pencil me-1"></i> Edit
+                            </button>
+                            <button type="button" class="btn btn-sm btn-icon btn-light btn-active-light-primary" @click="closeOrderModal">
+                                <FormIcon icon="feather:x" width="20" height="20" />
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Body -->
-                    <div class="px-5 pb-5">
+                    <!-- View Mode Body -->
+                    <div v-if="!isEditMode" class="px-5 pb-5">
                         <!-- Customer Info -->
                         <div class="mb-4">
                             <div class="d-flex align-items-center text-gray-800 mb-1">
@@ -683,6 +693,123 @@
                                 <i class="bi bi-exclamation-triangle me-1"></i>
                                 Canceling will remove this order permanently
                             </span>
+                        </div>
+                    </div>
+
+                    <!-- Edit Mode Body -->
+                    <div v-else class="px-5 pb-5">
+                        <!-- Item Picker Grid -->
+                        <div class="mb-4">
+                            <label class="form-label fs-7 text-gray-600">Select Items</label>
+                            <div class="row g-2">
+                                <div v-for="item in items" :key="item.id" class="col-6">
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm w-100 text-start"
+                                        :class="isEditItemSelected(item.id) ? 'btn-primary' : 'btn-light'"
+                                        @click="toggleEditItem(item)"
+                                    >
+                                        <i class="ki-duotone ki-plus fs-7 me-1" v-if="!isEditItemSelected(item.id)"></i>
+                                        <span class="fs-8">{{ item.name }} ({{ formatCurrency(getEditItemDisplayPrice(item)) }}{{ editServiceIsWeightBased ? '/lb' : '' }})</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selected Items with Controls -->
+                        <div v-if="editOrder.items.length > 0" class="mb-4">
+                            <label class="form-label fs-7 text-gray-600">Selected Items</label>
+                            <div class="d-flex flex-column gap-2">
+                                <div
+                                    v-for="(orderItem, index) in editOrder.items"
+                                    :key="index"
+                                    class="d-flex align-items-center justify-content-between bg-light-primary rounded p-2"
+                                >
+                                    <span class="text-gray-800 fs-7 fw-semibold">{{ getItemName(orderItem.item_id) }}</span>
+                                    <!-- Weight input for weight-based services -->
+                                    <div v-if="editServiceIsWeightBased" class="d-flex align-items-center gap-2">
+                                        <input
+                                            type="number"
+                                            class="form-control form-control-sm form-control-solid"
+                                            style="width: 70px;"
+                                            v-model.number="orderItem.weight"
+                                            step="0.1"
+                                            min="0.1"
+                                            placeholder="lbs"
+                                        />
+                                        <span class="text-muted fs-8">lb</span>
+                                        <button
+                                            class="btn btn-sm btn-icon btn-light-danger"
+                                            style="width: 28px; height: 28px;"
+                                            @click="editOrder.items.splice(index, 1)"
+                                        >
+                                            <i class="bi bi-x fs-4"></i>
+                                        </button>
+                                    </div>
+                                    <!-- Quantity stepper for piece-based services -->
+                                    <div v-else class="d-flex align-items-center gap-2">
+                                        <button
+                                            class="btn btn-sm btn-icon btn-light-danger"
+                                            style="width: 28px; height: 28px;"
+                                            @click="decreaseEditQuantity(index)"
+                                        >
+                                            <i class="bi bi-dash fs-4"></i>
+                                        </button>
+                                        <span class="fw-bold fs-6 w-25px text-center">{{ orderItem.quantity }}</span>
+                                        <button
+                                            class="btn btn-sm btn-icon btn-light-success"
+                                            style="width: 28px; height: 28px;"
+                                            @click="increaseEditQuantity(index)"
+                                        >
+                                            <i class="bi bi-plus fs-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-4">
+                            <label class="form-label fs-7 text-gray-600">Notes</label>
+                            <textarea
+                                class="form-control form-control-solid form-control-sm"
+                                rows="2"
+                                v-model="editOrder.notes"
+                                placeholder="Order notes..."
+                            ></textarea>
+                        </div>
+
+                        <!-- Urgent Toggle -->
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" type="checkbox" id="editUrgentToggle" v-model="editOrder.urgent" />
+                            <label class="form-check-label fs-7 text-gray-700" for="editUrgentToggle">Urgent Order</label>
+                        </div>
+
+                        <!-- Running Total -->
+                        <div class="d-flex justify-content-between align-items-center py-3 border-top mb-4">
+                            <span class="fs-5 fw-bold text-gray-900">Estimated Total</span>
+                            <span class="fs-3 fw-bolder text-primary">{{ formatCurrency(editOrderSubtotal) }}</span>
+                        </div>
+
+                        <!-- Save / Cancel Buttons -->
+                        <div class="d-flex gap-3">
+                            <button
+                                type="button"
+                                class="btn btn-light flex-grow-1"
+                                @click="cancelEditMode"
+                                :disabled="savingOrder"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-primary flex-grow-1"
+                                :disabled="editOrder.items.length === 0 || savingOrder"
+                                @click="saveOrderEdit"
+                            >
+                                <span class="spinner-border spinner-border-sm me-1" v-if="savingOrder"></span>
+                                Save Changes
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -847,6 +974,11 @@ const modalOrderDetail = ref(null);
 const orderModalRef = ref(null);
 let bootstrapModal = null;
 
+// Edit mode state
+const isEditMode = ref(false);
+const editOrder = ref({ items: [], urgent: false, notes: "" });
+const savingOrder = ref(false);
+
 // History modal state
 const historyModalRef = ref(null);
 let historyModal = null;
@@ -1005,6 +1137,138 @@ function closeOrderModal() {
         bootstrapModal.hide();
     }
     modalOrderDetail.value = null;
+    isEditMode.value = false;
+}
+
+// Edit mode computeds
+const isOrderEditable = computed(() => {
+    return modalOrderDetail.value?.is_editable === true;
+});
+
+const editServiceIsWeightBased = computed(() => {
+    if (!modalOrderDetail.value?.items?.length) return false;
+    const serviceId = modalOrderDetail.value.items[0]?.service_id;
+    const service = services.value.find((s) => s.id === serviceId);
+    return service && (service.pricing_type === 'weight' || service.pricing_type === 'both');
+});
+
+const editOrderSubtotal = computed(() => {
+    if (!modalOrderDetail.value?.items?.length) return 0;
+    const serviceId = modalOrderDetail.value.items[0]?.service_id;
+    return editOrder.value.items.reduce((sum, orderItem) => {
+        const item = items.value.find((i) => i.id === orderItem.item_id);
+        if (!item) return sum;
+        if (editServiceIsWeightBased.value) {
+            let price = 0;
+            if (item.service_prices) {
+                const sp = item.service_prices.find((sp) => sp.service_id === serviceId);
+                if (sp && sp.price_per_pound !== null) price = parseFloat(sp.price_per_pound);
+            }
+            if (!price) {
+                const service = services.value.find((s) => s.id === serviceId);
+                price = parseFloat(service?.price_per_pound) || 0;
+            }
+            return sum + price * (orderItem.weight || 0);
+        } else {
+            let price = 0;
+            if (item.service_prices) {
+                const sp = item.service_prices.find((sp) => sp.service_id === serviceId);
+                if (sp && sp.price !== null) price = parseFloat(sp.price);
+            }
+            if (!price) price = parseFloat(item.price) || 0;
+            return sum + price * orderItem.quantity;
+        }
+    }, 0);
+});
+
+// Edit mode functions
+function enterEditMode() {
+    editOrder.value = {
+        items: modalOrderDetail.value.items.map((item) => ({
+            item_id: item.item_id,
+            quantity: item.quantity,
+            weight: item.weight ? parseFloat(item.weight) : null,
+            weight_unit: item.weight_unit || 'lb',
+            notes: item.notes,
+        })),
+        urgent: modalOrderDetail.value.urgent,
+        notes: modalOrderDetail.value.notes || "",
+    };
+    isEditMode.value = true;
+}
+
+function cancelEditMode() {
+    isEditMode.value = false;
+    editOrder.value = { items: [], urgent: false, notes: "" };
+}
+
+function isEditItemSelected(itemId) {
+    return editOrder.value.items.some((i) => i.item_id === itemId);
+}
+
+function toggleEditItem(item) {
+    const index = editOrder.value.items.findIndex((i) => i.item_id === item.id);
+    if (index === -1) {
+        editOrder.value.items.push({ item_id: item.id, quantity: 1, weight: null, weight_unit: 'lb', notes: null });
+    } else {
+        editOrder.value.items.splice(index, 1);
+    }
+}
+
+function getEditItemDisplayPrice(item) {
+    if (!modalOrderDetail.value?.items?.length) return parseFloat(item.price) || 0;
+    const serviceId = modalOrderDetail.value.items[0]?.service_id;
+    if (serviceId && item.service_prices) {
+        const sp = item.service_prices.find((sp) => sp.service_id === serviceId);
+        if (sp) {
+            if (editServiceIsWeightBased.value && sp.price_per_pound !== null) return parseFloat(sp.price_per_pound);
+            if (sp.price !== null) return parseFloat(sp.price);
+        }
+    }
+    if (editServiceIsWeightBased.value) {
+        const service = services.value.find((s) => s.id === serviceId);
+        if (service && service.price_per_pound) return parseFloat(service.price_per_pound);
+    }
+    return parseFloat(item.price) || 0;
+}
+
+function increaseEditQuantity(index) {
+    editOrder.value.items[index].quantity++;
+}
+
+function decreaseEditQuantity(index) {
+    if (editOrder.value.items[index].quantity > 1) {
+        editOrder.value.items[index].quantity--;
+    } else {
+        editOrder.value.items.splice(index, 1);
+    }
+}
+
+async function saveOrderEdit() {
+    if (editOrder.value.items.length === 0 || savingOrder.value) return;
+    savingOrder.value = true;
+    try {
+        const payload = {
+            items: editOrder.value.items.map((item) => ({
+                item_id: item.item_id,
+                quantity: item.quantity,
+                weight: editServiceIsWeightBased.value ? item.weight : undefined,
+                weight_unit: editServiceIsWeightBased.value ? (item.weight_unit || 'lb') : undefined,
+                notes: item.notes,
+            })),
+            urgent: editOrder.value.urgent,
+            notes: editOrder.value.notes,
+        };
+        await posStore.updateOrder(modalOrderDetail.value.id, payload);
+        // Refresh modal detail
+        modalOrderDetail.value = await posStore.fetchOrderDetail(modalOrderDetail.value.id);
+        isEditMode.value = false;
+        $toastSuccess("Order updated successfully!");
+    } catch (error) {
+        $toastError(error.response?.data?.message || "Failed to update order");
+    } finally {
+        savingOrder.value = false;
+    }
 }
 
 async function moveAndCloseModal(orderId, newStatusId) {

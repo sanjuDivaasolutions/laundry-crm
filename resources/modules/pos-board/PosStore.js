@@ -126,6 +126,26 @@ export const usePosStore = defineStore("pos", () => {
         }
     }
 
+    async function updateOrder(orderId, orderData) {
+        try {
+            const response = await ApiService.vueInstance.axios.put(
+                `pos/orders/${orderId}`,
+                orderData
+            );
+            if (response.data.success) {
+                const index = orders.value.findIndex((o) => o.id === orderId);
+                if (index !== -1) {
+                    orders.value[index] = response.data.data;
+                }
+                await refreshStatistics();
+                return response.data.data;
+            }
+        } catch (error) {
+            console.error("Failed to update order:", error);
+            throw error;
+        }
+    }
+
     async function fetchOrderDetail(orderId) {
         try {
             const response = await ApiService.get(`pos/orders/${orderId}`);
@@ -185,6 +205,7 @@ export const usePosStore = defineStore("pos", () => {
         // Actions
         fetchBoardData,
         createOrder,
+        updateOrder,
         updateOrderStatus,
         processPayment,
         fetchOrderDetail,

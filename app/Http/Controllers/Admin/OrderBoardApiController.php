@@ -138,6 +138,31 @@ class OrderBoardApiController extends Controller
     }
 
     /**
+     * Update an existing order (items, notes, urgent).
+     *
+     * PUT /api/v1/pos/orders/{order}
+     */
+    public function update(Request $request, Order $order): JsonResponse
+    {
+        abort_if(Gate::denies('order_edit'), Response::HTTP_FORBIDDEN);
+
+        $validated = $request->validate([
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.item_id' => ['required', 'integer', 'exists:items,id'],
+            'items.*.quantity' => ['nullable', 'integer', 'min:1'],
+            'items.*.weight' => ['nullable', 'numeric', 'min:0.1'],
+            'items.*.weight_unit' => ['nullable', 'string', 'in:lb,kg'],
+            'items.*.notes' => ['nullable', 'string', 'max:255'],
+            'urgent' => ['boolean'],
+            'notes' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $order = $this->posService->updateQuickOrder($order, $validated);
+
+        return $this->success($this->formatOrderForBoard($order), 'Order updated successfully');
+    }
+
+    /**
      * Get single order details for payment panel.
      *
      * GET /api/v1/pos/orders/{order}
@@ -147,6 +172,9 @@ class OrderBoardApiController extends Controller
         abort_if(Gate::denies('order_show'), Response::HTTP_FORBIDDEN);
 
         $order->load(['customer', 'orderItems', 'processingStatus', 'payments']);
+
+        $isEditable = in_array($order->processing_status_id, [2, 3])
+            && (float) $order->paid_amount <= 0;
 
         return $this->success([
             'id' => $order->id,
@@ -170,6 +198,7 @@ class OrderBoardApiController extends Controller
             'processing_status_id' => $order->processing_status_id,
             'urgent' => $order->urgent,
             'notes' => $order->notes,
+            'is_editable' => $isEditable,
             'created_at' => $order->created_at->format('Y-m-d H:i:s'),
         ]);
     }

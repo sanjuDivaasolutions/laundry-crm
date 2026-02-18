@@ -219,6 +219,81 @@ class PosService
     }
 
     /**
+     * Update an existing quick order (items, notes, urgent flag).
+     */
+    public function updateQuickOrder(Order $order, array $data): Order
+    {
+        if (! in_array($order->processing_status_id, [2, 3])) {
+            abort(422, 'Order can only be edited when Pending or Washing.');
+        }
+
+        if ((float) $order->paid_amount > 0) {
+            abort(422, 'Order cannot be edited after a payment has been made.');
+        }
+
+        return DB::transaction(function () use ($order, $data) {
+            // Soft-delete existing order items
+            $order->orderItems()->delete();
+
+            // Determine service from existing items (service cannot change)
+            $serviceId = $order->orderItems()->withTrashed()->first()?->service_id;
+            $service = Service::find($serviceId);
+            $isWeightBased = $service && in_array($service->pricing_type, ['weight', 'both']);
+
+            // Recreate order items from payload
+            foreach ($data['items'] as $itemData) {
+                $item = Item::find($itemData['item_id']);
+                $servicePrice = ServicePrice::where('item_id', $item->id)
+                    ->where('service_id', $serviceId)
+                    ->first();
+
+                $itemPricingType = ($isWeightBased && isset($itemData['weight'])) ? 'weight' : 'piece';
+
+                if ($itemPricingType === 'weight') {
+                    $unitPrice = $servicePrice?->price_per_pound ?? $service->price_per_pound ?? 0;
+                    $weight = (float) $itemData['weight'];
+                    $totalPrice = $unitPrice * $weight;
+                    $quantity = 1;
+                } else {
+                    $unitPrice = $servicePrice?->price ?? $item->price;
+                    $weight = null;
+                    $quantity = $itemData['quantity'];
+                    $totalPrice = $unitPrice * $quantity;
+                }
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'item_id' => $item->id,
+                    'service_id' => $serviceId,
+                    'item_name' => $item->name,
+                    'service_name' => $service->name,
+                    'pricing_type' => $itemPricingType,
+                    'weight' => $weight,
+                    'weight_unit' => $itemData['weight_unit'] ?? 'lb',
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'total_price' => $totalPrice,
+                    'notes' => $itemData['notes'] ?? null,
+                ]);
+            }
+
+            // Recalculate totals
+            $totals = $this->calculateOrderTotals($data['items'], $serviceId);
+
+            $order->update([
+                'total_items' => $totals['total_items'],
+                'subtotal' => $totals['subtotal'],
+                'total_amount' => $totals['total_amount'],
+                'balance_amount' => $totals['total_amount'] - (float) $order->paid_amount,
+                'urgent' => $data['urgent'] ?? $order->urgent,
+                'notes' => $data['notes'] ?? $order->notes,
+            ]);
+
+            return $order->fresh(['customer', 'orderItems', 'processingStatus']);
+        });
+    }
+
+    /**
      * Update order processing status.
      */
     public function updateOrderStatus(Order $order, int $newStatusId): Order
