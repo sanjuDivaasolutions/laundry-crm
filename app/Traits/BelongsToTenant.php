@@ -39,10 +39,29 @@ trait BelongsToTenant
      */
     public static function bootBelongsToTenant(): void
     {
+        // Single-tenant mode: simplified scoping
+        if (config('tenancy.single_tenant_mode')) {
+            $defaultTenantId = (int) config('tenancy.default_tenant_id', 1);
+
+            static::addGlobalScope('tenant', function (Builder $builder) use ($defaultTenantId) {
+                $builder->where($builder->getModel()->getTable().'.tenant_id', $defaultTenantId);
+            });
+
+            static::creating(function (Model $model) use ($defaultTenantId) {
+                if (! $model->getAttribute('tenant_id')) {
+                    $model->setAttribute('tenant_id', $defaultTenantId);
+                }
+            });
+
+            return;
+        }
+
+        // Multi-tenant mode: full resolution chain (existing code)
         static::addGlobalScope('tenant', function (Builder $builder) {
             // Check if scope bypass is explicitly allowed
             if (static::$bypassTenantScope) {
                 static::$bypassTenantScope = false; // Reset for next query
+
                 return;
             }
 
@@ -50,7 +69,8 @@ trait BelongsToTenant
             $tenantId = $tenantService->getId();
 
             if ($tenantId) {
-                $builder->where($builder->getModel()->getTable() . '.tenant_id', $tenantId);
+                $builder->where($builder->getModel()->getTable().'.tenant_id', $tenantId);
+
                 return;
             }
 
@@ -74,6 +94,7 @@ trait BelongsToTenant
 
             if ($tenantId) {
                 $model->setAttribute('tenant_id', $tenantId);
+
                 return;
             }
 
@@ -99,15 +120,11 @@ trait BelongsToTenant
 
     /**
      * Scope to query within a specific tenant (for system operations).
-     *
-     * @param Builder $query
-     * @param int $tenantId
-     * @return Builder
      */
     public function scopeForTenant(Builder $query, int $tenantId): Builder
     {
         return $query->withoutGlobalScope('tenant')
-            ->where($this->getTable() . '.tenant_id', $tenantId);
+            ->where($this->getTable().'.tenant_id', $tenantId);
     }
 
     /**
@@ -136,12 +153,11 @@ trait BelongsToTenant
 
     /**
      * Check if current tenant matches the model's tenant.
-     *
-     * @return bool
      */
     public function belongsToCurrentTenant(): bool
     {
         $currentTenantId = app(TenantService::class)->getId();
+
         return $currentTenantId && $this->tenant_id === $currentTenantId;
     }
 
@@ -152,7 +168,7 @@ trait BelongsToTenant
      */
     public function ensureBelongsToCurrentTenant(): void
     {
-        if (!$this->belongsToCurrentTenant()) {
+        if (! $this->belongsToCurrentTenant()) {
             $currentTenantId = app(TenantService::class)->getId();
 
             logger()->warning('Cross-tenant access attempt blocked', [
@@ -181,7 +197,7 @@ trait BelongsToTenant
     protected static function shouldEnforceStrictTenantScope(): bool
     {
         // Disable strict mode in console (migrations, seeders, etc.)
-        if (App::runningInConsole() && !App::runningUnitTests()) {
+        if (App::runningInConsole() && ! App::runningUnitTests()) {
             return false;
         }
 

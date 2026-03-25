@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\PaymentStatusEnum;
 use App\Enums\ProcessingStatusEnum;
 use App\Models\Customer;
 use App\Models\Item;
@@ -19,6 +18,8 @@ use Illuminate\Support\Facades\Gate;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    config(['tenancy.single_tenant_mode' => false]);
+
     $this->artisan('db:seed', ['--class' => 'ProcessingStatusSeeder']);
     $this->artisan('db:seed', ['--class' => 'OrderStatusSeeder']);
 

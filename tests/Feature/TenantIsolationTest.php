@@ -9,6 +9,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('models are scoped to current tenant', function () {
+    config(['tenancy.single_tenant_mode' => false]);
+
     // Create two tenants
     $tenant1 = Tenant::create(['name' => 'Tenant 1', 'domain' => 'tenant1.test', 'active' => true]);
     $tenant2 = Tenant::create(['name' => 'Tenant 2', 'domain' => 'tenant2.test', 'active' => true]);
