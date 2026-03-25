@@ -3,6 +3,21 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Single Tenant Mode
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, the application runs in single-tenant mode:
+    | - Tenant resolution always uses default_tenant_id
+    | - Quota enforcement is skipped
+    | - SaaS routes (registration, billing, subscriptions) are disabled
+    | - Set to false to re-enable multi-tenant SaaS mode
+    |
+    */
+    'single_tenant_mode' => env('TENANCY_SINGLE_TENANT', true),
+    'default_tenant_id' => env('TENANCY_DEFAULT_TENANT_ID', 1),
+
+    /*
+    |--------------------------------------------------------------------------
     | Base Domain
     |--------------------------------------------------------------------------
     |
