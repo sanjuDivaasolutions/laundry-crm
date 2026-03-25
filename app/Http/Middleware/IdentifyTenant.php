@@ -48,6 +48,19 @@ class IdentifyTenant
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Single-tenant mode: skip resolution chain, use default tenant
+        if (config('tenancy.single_tenant_mode')) {
+            $defaultId = (int) config('tenancy.default_tenant_id', 1);
+            $tenant = Tenant::find($defaultId);
+
+            if ($tenant) {
+                $this->tenantService->setTenant($tenant);
+                $request->attributes->set('tenant_resolution_method', 'single_tenant_mode');
+            }
+
+            return $next($request);
+        }
+
         $tenant = $this->resolveTenant($request);
 
         if ($tenant) {

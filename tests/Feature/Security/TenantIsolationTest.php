@@ -10,6 +10,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    // Disable single-tenant mode so the full resolution chain is tested
+    config(['tenancy.single_tenant_mode' => false]);
+
     // Create two tenants for isolation testing
     $this->tenantA = Tenant::factory()->create(['name' => 'Tenant A', 'domain' => 'tenant-a', 'active' => true]);
     $this->tenantB = Tenant::factory()->create(['name' => 'Tenant B', 'domain' => 'tenant-b', 'active' => true]);
