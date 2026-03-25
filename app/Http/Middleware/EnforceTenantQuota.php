@@ -34,18 +34,20 @@ class EnforceTenantQuota
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure $next
-     * @param string|null $resource Resource to check quota for (e.g., 'items', 'orders_per_month')
-     * @param int $amount Amount to add (default 1 for create operations)
-     * @return Response
+     * @param  string|null  $resource  Resource to check quota for (e.g., 'items', 'orders_per_month')
+     * @param  int  $amount  Amount to add (default 1 for create operations)
      */
     public function handle(Request $request, Closure $next, ?string $resource = null, int $amount = 1): Response
     {
+        // Single-tenant mode: skip all quota enforcement
+        if (config('tenancy.single_tenant_mode')) {
+            return $next($request);
+        }
+
         $tenant = $this->tenantService->getTenant();
 
         // No tenant context - let IdentifyTenant handle this
-        if (!$tenant) {
+        if (! $tenant) {
             return $next($request);
         }
 
@@ -55,14 +57,14 @@ class EnforceTenantQuota
         }
 
         // 2. Check if tenant is active
-        if (!$tenant->active) {
+        if (! $tenant->active) {
             return $this->inactiveResponse();
         }
 
         // 3. Check trial expiration
         if ($tenant->trialExpired()) {
             // Trial expired, check if they have subscription
-            if (!$tenant->hasActiveSubscription()) {
+            if (! $tenant->hasActiveSubscription()) {
                 // No subscription - read-only mode
                 if ($this->isMutatingRequest($request)) {
                     return $this->trialExpiredResponse($tenant);
