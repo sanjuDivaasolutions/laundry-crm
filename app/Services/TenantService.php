@@ -16,7 +16,7 @@ class TenantService
     public function setTenant(?Tenant $tenant): void
     {
         $this->tenant = $tenant;
-        
+
         if ($tenant) {
             // Share tenant context with logs
             logger()->shareContext(['tenant_id' => $tenant->id]);
@@ -36,6 +36,15 @@ class TenantService
      */
     public function getId(): ?int
     {
-        return $this->tenant?->id;
+        if ($this->tenant) {
+            return $this->tenant->id;
+        }
+
+        // Single-tenant fallback
+        if (config('tenancy.single_tenant_mode')) {
+            return (int) config('tenancy.default_tenant_id', 1);
+        }
+
+        return null;
     }
 }
