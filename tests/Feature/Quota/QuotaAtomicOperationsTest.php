@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use App\Enums\QuotaPeriod;
 use App\Models\Tenant;
-use App\Models\TenantQuota;
 use App\Models\TenantUsage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    config(['tenancy.single_tenant_mode' => false]);
+
     $this->tenant = Tenant::factory()->create([
         'name' => 'Test Tenant',
         'active' => true,

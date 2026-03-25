@@ -10,6 +10,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    config(['tenancy.single_tenant_mode' => false]);
+
     $this->tenant = Tenant::factory()->create([
         'name' => 'Test Tenant',
         'stripe_id' => 'cus_test123',
