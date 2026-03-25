@@ -4,12 +4,17 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "test:e2e": "npx playwright test",
+        "test:e2e:headed": "npx playwright test --headed",
+        "test:e2e:ui": "npx playwright test --ui",
+        "test:e2e:report": "npx playwright show-report e2e-report"
     },
     "devDependencies": {
         "@ckeditor/ckeditor5-build-classic": "^39.0.2",
         "@ckeditor/ckeditor5-vue": "^7.3.0",
         "@iconify/vue": "^4.1.1",
+        "@playwright/test": "^1.58.2",
         "@rushstack/eslint-patch": "^1.1.4",
         "@types/array-sort": "^1.0.0",
         "@types/bootstrap": "^5.2.6",
