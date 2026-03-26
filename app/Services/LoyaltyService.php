@@ -42,7 +42,7 @@ class LoyaltyService
     public function awardPointsForOrder(Order $order): ?LoyaltyTransaction
     {
         $customer = $order->customer;
-        if (! $customer) {
+        if (! $customer || $customer->trashed()) {
             return null;
         }
 
@@ -115,21 +115,26 @@ class LoyaltyService
      */
     public function addBonusPoints(Customer $customer, int $points, string $reason): LoyaltyTransaction
     {
-        $newBalance = $customer->loyalty_points + $points;
+        return DB::transaction(function () use ($customer, $points, $reason) {
+            // Lock customer row to prevent concurrent balance modifications
+            $customer = Customer::where('id', $customer->id)->lockForUpdate()->first();
 
-        $transaction = LoyaltyTransaction::create([
-            'tenant_id' => $customer->tenant_id,
-            'customer_id' => $customer->id,
-            'type' => 'bonus',
-            'points' => $points,
-            'balance_after' => $newBalance,
-            'description' => $reason,
-        ]);
+            $newBalance = $customer->loyalty_points + $points;
 
-        $customer->update(['loyalty_points' => $newBalance]);
-        $this->updateTier($customer);
+            $transaction = LoyaltyTransaction::create([
+                'tenant_id' => $customer->tenant_id,
+                'customer_id' => $customer->id,
+                'type' => 'bonus',
+                'points' => $points,
+                'balance_after' => $newBalance,
+                'description' => $reason,
+            ]);
 
-        return $transaction;
+            $customer->update(['loyalty_points' => $newBalance]);
+            $this->updateTier($customer);
+
+            return $transaction;
+        });
     }
 
     /**
