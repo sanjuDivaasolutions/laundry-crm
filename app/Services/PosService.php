@@ -463,12 +463,19 @@ class PosService
     protected function generateCustomerCode(): string
     {
         $prefix = 'CUST';
-        $lastCustomer = Customer::orderBy('id', 'desc')
-            ->lockForUpdate()
-            ->first();
-        $sequence = $lastCustomer ? $lastCustomer->id + 1 : 1;
 
-        return sprintf('%s%06d', $prefix, $sequence);
+        return DB::transaction(function () use ($prefix) {
+            $lastCustomer = Customer::where('customer_code', 'like', "{$prefix}%")
+                ->orderBy('customer_code', 'desc')
+                ->lockForUpdate()
+                ->first();
+
+            $sequence = $lastCustomer
+                ? ((int) substr($lastCustomer->customer_code, -6)) + 1
+                : 1;
+
+            return sprintf('%s%06d', $prefix, $sequence);
+        });
     }
 
     /**
@@ -515,14 +522,19 @@ class PosService
     {
         $prefix = 'ORD';
         $date = now()->format('ymd');
-        $lastOrder = Order::whereDate('created_at', today())
-            ->orderBy('id', 'desc')
-            ->lockForUpdate()
-            ->first();
 
-        $sequence = $lastOrder ? ((int) substr($lastOrder->order_number, -4)) + 1 : 1;
+        return DB::transaction(function () use ($prefix, $date) {
+            $lastOrder = Order::where('order_number', 'like', "{$prefix}{$date}%")
+                ->orderBy('order_number', 'desc')
+                ->lockForUpdate()
+                ->first();
 
-        return sprintf('%s%s%04d', $prefix, $date, $sequence);
+            $sequence = $lastOrder
+                ? ((int) substr($lastOrder->order_number, -4)) + 1
+                : 1;
+
+            return sprintf('%s%s%04d', $prefix, $date, $sequence);
+        });
     }
 
     /**
@@ -533,15 +545,18 @@ class PosService
         $prefix = 'PAY';
         $date = now()->format('ymd');
 
-        // Payment model has no timestamps, use payment_date instead
-        $lastPayment = Payment::whereDate('payment_date', today())
-            ->orderBy('id', 'desc')
-            ->lockForUpdate()
-            ->first();
+        return DB::transaction(function () use ($prefix, $date) {
+            $lastPayment = Payment::where('payment_number', 'like', "{$prefix}{$date}%")
+                ->orderBy('payment_number', 'desc')
+                ->lockForUpdate()
+                ->first();
 
-        $sequence = $lastPayment ? ((int) substr($lastPayment->payment_number, -4)) + 1 : 1;
+            $sequence = $lastPayment
+                ? ((int) substr($lastPayment->payment_number, -4)) + 1
+                : 1;
 
-        return sprintf('%s%s%04d', $prefix, $date, $sequence);
+            return sprintf('%s%s%04d', $prefix, $date, $sequence);
+        });
     }
 
     /**
