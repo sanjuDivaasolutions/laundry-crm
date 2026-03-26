@@ -298,11 +298,41 @@ class PosService
     }
 
     /**
-     * Update order processing status.
+     * Valid processing status transitions.
+     * Terminal states (Delivered, Cancelled) have empty arrays — no transitions allowed.
      */
-    public function updateOrderStatus(Order $order, int $newStatusId): Order
+    protected static array $validTransitions = [
+        'Pending' => ['Washing', 'Cancelled'],
+        'Washing' => ['Drying', 'Pending', 'Cancelled'],
+        'Drying' => ['Ready Area', 'Washing', 'Cancelled'],
+        'Ready Area' => ['Delivered', 'Drying'],
+        'Delivered' => [],
+        'Cancelled' => [],
+    ];
+
+    /**
+     * Update order processing status.
+     *
+     * @param  bool  $force  Bypass transition validation (for system-initiated changes like payment completion)
+     */
+    public function updateOrderStatus(Order $order, int $newStatusId, bool $force = false): Order
     {
         $oldStatusId = $order->processing_status_id;
+
+        // Validate transition unless forced by system
+        if (! $force) {
+            $oldStatus = ProcessingStatus::find($oldStatusId);
+            $newStatus = ProcessingStatus::find($newStatusId);
+
+            if ($oldStatus && $newStatus) {
+                $allowed = static::$validTransitions[$oldStatus->status_name] ?? [];
+                if (! in_array($newStatus->status_name, $allowed)) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'status' => ["Cannot transition from '{$oldStatus->status_name}' to '{$newStatus->status_name}'."],
+                    ]);
+                }
+            }
+        }
 
         $order->update([
             'processing_status_id' => $newStatusId,
@@ -413,7 +443,7 @@ class PosService
 
             // If fully paid, mark as delivered and award loyalty points
             if ($paymentStatus === PaymentStatusEnum::Paid) {
-                $this->updateOrderStatus($order, ProcessingStatus::idFor(ProcessingStatusEnum::Delivered));
+                $this->updateOrderStatus($order, ProcessingStatus::idFor(ProcessingStatusEnum::Delivered), force: true);
                 $order->update([
                     'picked_up_at' => now(),
                     'closed_at' => now(),
