@@ -235,6 +235,8 @@ class FilterQueryBuilder
             }
             $query->{$field}();
         }
+
+        return $query;
     }
 
     public function between($filter, $query)

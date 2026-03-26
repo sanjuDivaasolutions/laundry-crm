@@ -204,7 +204,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     });
 
     // POS Board
-    Route::prefix('pos')->name('pos.')->group(function () {
+    Route::prefix('pos')->name('pos.')->middleware('throttle:writes')->group(function () {
         Route::get('board', 'OrderBoardApiController@getBoardData')->name('board');
         Route::get('statistics', 'OrderBoardApiController@getStatistics')->name('statistics');
         Route::get('items', 'OrderBoardApiController@getItems')->name('items');

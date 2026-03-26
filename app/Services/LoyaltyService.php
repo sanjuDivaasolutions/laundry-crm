@@ -56,6 +56,9 @@ class LoyaltyService
         }
 
         return DB::transaction(function () use ($customer, $order, $points) {
+            // Lock customer row to prevent concurrent balance modifications
+            $customer = Customer::where('id', $customer->id)->lockForUpdate()->first();
+
             $newBalance = $customer->loyalty_points + $points;
 
             $transaction = LoyaltyTransaction::create([
