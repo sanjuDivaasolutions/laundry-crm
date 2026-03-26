@@ -347,8 +347,27 @@ class PosService
 
             $amount = (float) $paymentData['amount'];
 
-            // Handle tip amount if provided
+            // Validate tip amount
             $tipAmount = (float) ($paymentData['tip_amount'] ?? 0);
+            if ($tipAmount < 0) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'tip_amount' => ['Tip amount cannot be negative.'],
+                ]);
+            }
+
+            // Validate payment doesn't exceed balance
+            $currentBalance = (float) $order->balance_amount;
+            if ($tipAmount > 0) {
+                // Tip changes the total and therefore the balance
+                $currentBalance += $tipAmount - (float) $order->tip_amount;
+            }
+            if ($amount > $currentBalance + 0.01) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'amount' => ["Payment amount ({$amount}) exceeds order balance ({$currentBalance})."],
+                ]);
+            }
+
+            // Handle tip amount if provided
             if ($tipAmount > 0) {
                 $newTotalAmount = (float) $order->total_amount + $tipAmount - (float) $order->tip_amount;
                 $order->update([
@@ -371,6 +390,7 @@ class PosService
                 'transaction_reference' => $paymentData['transaction_reference'] ?? null,
                 'notes' => $paymentData['notes'] ?? null,
                 'received_by_employee_id' => auth()->id(),
+                'created_at' => now(),
             ]);
 
             // Update order payment
