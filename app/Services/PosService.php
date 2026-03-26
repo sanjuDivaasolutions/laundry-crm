@@ -338,6 +338,13 @@ class PosService
     public function processPayment(Order $order, array $paymentData): array
     {
         return DB::transaction(function () use ($order, $paymentData) {
+            // Lock order row to prevent concurrent modifications
+            $order = Order::where('id', $order->id)->lockForUpdate()->first();
+
+            if (! $order) {
+                throw new \RuntimeException('Order not found.');
+            }
+
             $amount = (float) $paymentData['amount'];
 
             // Handle tip amount if provided
