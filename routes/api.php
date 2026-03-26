@@ -184,7 +184,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Control
     });
 
     // Exports (Excel/PDF - all queued)
-    Route::prefix('exports')->name('exports.')->group(function () {
+    Route::prefix('exports')->name('exports.')->middleware('throttle:exports')->group(function () {
         Route::post('{module}/{format}', 'ExportApiController@export')->name('queue');
         Route::get('download/{filename}', 'ExportApiController@download')->name('download-file');
     });
