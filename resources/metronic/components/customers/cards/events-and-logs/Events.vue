@@ -35,7 +35,7 @@
           <template v-for="(event, i) in events" :key="i">
             <tr>
               <!--begin::Event--->
-              <td class="min-w-400px" v-html="event.event"></td>
+              <td class="min-w-400px" v-html="sanitize(event.event)"></td>
               <!--end::Event--->
 
               <!--begin::Timestamp--->
@@ -56,6 +56,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import DOMPurify from "dompurify";
 
 export default defineComponent({
   name: "events-card",
@@ -117,8 +118,13 @@ export default defineComponent({
       },
     ]);
 
+    const sanitize = (html: string): string => {
+      return DOMPurify.sanitize(html);
+    };
+
     return {
       events,
+      sanitize,
     };
   },
 });
