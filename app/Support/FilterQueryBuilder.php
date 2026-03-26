@@ -218,10 +218,21 @@ class FilterQueryBuilder
         return $query->where($filter['column'], '!=', 0);
     }
 
+    /**
+     * Allowed scope names that can be invoked via the filter system.
+     * Add new safe scopes here as needed.
+     */
+    protected static array $allowedScopes = [
+        'active', 'ordered', 'pending', 'today', 'forDate', 'urgent', 'visible',
+    ];
+
     public function scope($filter, $query)
     {
         $fields = $filter['query_1'];
         foreach ($fields as $field) {
+            if (! in_array($field, static::$allowedScopes, true)) {
+                throw new \InvalidArgumentException("Scope '{$field}' is not allowed in filters.");
+            }
             $query->{$field}();
         }
     }
