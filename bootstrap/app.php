@@ -38,6 +38,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(append: [
             \App\Http\Middleware\IdentifyTenant::class,
             \App\Http\Middleware\AdminAuthGates::class,
+            \App\Http\Middleware\SecurityHeaders::class,
+        ]);
+
+        $middleware->web(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         $middleware->trustProxies(at: '*');
