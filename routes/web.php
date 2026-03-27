@@ -43,6 +43,8 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 
+Route::get('/health', \App\Http\Controllers\HealthCheckController::class);
+
 /*
 |--------------------------------------------------------------------------
 | Pricing & Checkout Routes
@@ -52,6 +54,7 @@ Route::get('/', function () {
 // Public pricing page
 Route::get('/pricing', function () {
     $plans = Plan::active()->ordered()->with(['features', 'quotas'])->get();
+
     return view('front-end.pricing', compact('plans'));
 })->name('pricing');
 
@@ -59,7 +62,7 @@ Route::get('/pricing', function () {
 Route::get('/checkout/success', function (Request $request) {
     $sessionId = $request->query('session_id');
 
-    if (!$sessionId) {
+    if (! $sessionId) {
         return redirect('/pricing')->with('error', 'Invalid checkout session');
     }
 
@@ -86,6 +89,7 @@ Route::get('/checkout/success', function (Request $request) {
         ]);
     } catch (\Exception $e) {
         logger()->error('Checkout success error', ['error' => $e->getMessage()]);
+
         return redirect('/pricing')->with('error', 'Failed to verify checkout');
     }
 })->name('checkout.success');
@@ -105,7 +109,7 @@ Route::get('/checkout/cancel', function () {
 Route::get('/billing', function (Request $request) {
     $tenant = app(\App\Services\TenantService::class)->getTenant();
 
-    if (!$tenant || !$tenant->hasStripeId()) {
+    if (! $tenant || ! $tenant->hasStripeId()) {
         return redirect('/pricing')->with('error', 'No billing account found');
     }
 
